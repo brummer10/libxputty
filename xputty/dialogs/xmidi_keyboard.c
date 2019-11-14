@@ -431,6 +431,19 @@ static void keyboard_motion(void *w_, void* xmotion_, void* user_data) {
     }
 }
 
+static void get_outkey(MidiKeyboard *keys, KeySym sym, float *outkey) {
+    switch(keys->layout) {
+        case(0):keysym_qwertz_to_midi_key(sym, outkey);
+        break;
+        case(1):keysym_qwerty_to_midi_key(sym, outkey);
+        break;
+        case(2):keysym_azerty_to_midi_key(sym, outkey);
+        break;
+        default:keysym_qwertz_to_midi_key(sym, outkey);
+        break;
+    }
+}
+
 static void key_press(void *w_, void *key_, void *user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = w->parent;
@@ -440,16 +453,7 @@ static void key_press(void *w_, void *key_, void *user_data) {
     if (!key) return;
     float outkey = 0.0;
     KeySym sym = XLookupKeysym (key, 0);
-    switch(keys->layout) {
-        case(0):keysym_qwertz_to_midi_key(sym, &outkey);
-        break;
-        case(1):keysym_qwerty_to_midi_key(sym, &outkey);
-        break;
-        case(2):keysym_azerty_to_midi_key(sym, &outkey);
-        break;        
-        default:keysym_qwertz_to_midi_key(sym, &outkey);
-        break;
-    }
+    get_outkey(keys, sym, &outkey);
 
     if ((int)outkey && !is_key_in_matrix(keys->key_matrix, (int)outkey+keys->octave)) {
         set_key_in_matrix(keys->key_matrix,(int)outkey+keys->octave,true);
@@ -473,25 +477,12 @@ static void key_release(void *w_, void *key_, void *user_data) {
     if (!key) return;
     float outkey = 0.0;
     KeySym sym = XLookupKeysym (key, 0);
-    switch(keys->layout) {
-        case(0):keysym_qwertz_to_midi_key(sym, &outkey);
-        break;
-        case(1):keysym_qwerty_to_midi_key(sym, &outkey);
-        break;
-        case(2):keysym_azerty_to_midi_key(sym, &outkey);
-        break;
-        default:keysym_qwertz_to_midi_key(sym, &outkey);
-        break;
-    }
+    get_outkey(keys, sym, &outkey);
     if ((int)outkey && is_key_in_matrix(keys->key_matrix, (int)outkey+keys->octave)) {
         set_key_in_matrix(keys->key_matrix,(int)outkey+keys->octave,false);
         keys->send_key = (int)outkey+keys->octave;
         keys->mk_send_note(p,&keys->send_key,false);
         expose_widget(w);
-        if(!have_key_in_matrix(keys->key_matrix)) {
-      //      adj_changed(w, GATE, 0.0);
-            //keys->active_key = keys->prelight_key = -1;
-        }
     }
 }
 

@@ -322,6 +322,16 @@ Widget_t *create_widget(Xputty *app, Widget_t *win,
                           int x, int y, int width, int height);
 
 /**
+ * @brief connect_func      - connect a event with a handler
+ * without type check
+ * @param **event           - the event to connect
+ * @param *handler          - the handler to handle the event
+ * @return void
+ */
+
+void connect_func(void (**event)(), void (*handler)());
+
+/**
  * @brief widget_set_title  - set window title for Widget_t
  * @param *w                - pointer to the Widget_t to set the title
  * @param *title            - the title to store
