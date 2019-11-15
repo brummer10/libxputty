@@ -37,21 +37,21 @@
 #define SYSTEM_TRAY_CANCEL_MESSAGE  2
 
 /**
- * @brief *evfunc     - function pointer to connect Xevents from the widgets
- * @param *widget     - void pointer to the widget
- * @param *main       - pointer to Xputty main struct
+ * @brief *vfunc      - function pointer to connect Xevents from the main loop to Widget_t
+ * @param *widget     - void pointer to the Widget_t
+ * @param *main       - pointer to Xputty main struct running the loop
  * @param *event      - void pointer to the XEvent
- * @param *user_data  - void pointer to attached user_data
+ * @param *user_data  - void pointer to attached user_data, maybe NULL
  * @return void
  */
 
 typedef void (*vfunc)(void * widget, void * event, Xputty *main, void* user_data);
 
 /**
- * @brief *evfunc     - function pointer to connect Xevents from the widgets
- * @param *widget     - void pointer to the widget
- * @param *event      -  void pointer to the XEvent
- * @param *user_data  -  void pointer to attached user_data
+ * @brief *evfunc     - function pointer to connect Xevents from a Widget_t to a event handler
+ * @param *widget     - void pointer to the Widget_t
+ * @param *event      - void pointer to the XEvent
+ * @param *user_data  - void pointer to attached user_data, maybe NULL
  * @return void
  */
 
@@ -59,9 +59,9 @@ typedef void (*evfunc)(void * widget, void * event, void* user_data);
 
 
 /**
- * @brief *xevfunc     - function pointer to connect XEvents from the widgets
+ * @brief *xevfunc     - function pointer to connect XEvents from a Widget_t to a event handler
  * @param *widget      - void pointer to the widget
- * @param *user_data   -  void pointer to attached user_data
+ * @param *user_data   - void pointer to attached user_data, maybe NULL
  * @return void
  */
 
@@ -92,6 +92,47 @@ typedef struct {
     evfunc key_press_callback;
     evfunc key_release_callback;
 } Func_t;
+
+/**
+ * 
+ * @brief EventType         - enum to hold identifier for all supported event callbacks
+ * \n Events could be connected to a handler by using this identifier
+ * @param EXPOSE            - (*xevfunc) expose_callback(void * widget, void* user_data)
+ * @param CONFIGURE         - (*xevfunc) configure_callback(void * widget, void* user_data)
+ * @param ENTER             - (*xevfunc) enter_callback(void * widget, void* user_data)
+ * @param LEAVE             - (*xevfunc) leave_callback(void * widget, void* user_data)
+ * @param ADJ_INTERN        - (*xevfunc) adj_callback(void * widget, void* user_data)
+ * @param VALUE_CHANGED     - (*xevfunc) value_changed_callback(void * widget, void* user_data)
+ * @param USER              - (*xevfunc) user_callback(void * widget, void* user_data)
+ * @param MEM_FREE          - (*xevfunc) mem_free_callback(void * widget, void* user_data)
+ * @param CONFIGURE_NOTIFY  - (*xevfunc) configure_notify_callback(void * widget, void* user_data)
+ * @param MAP_NOTIFY        - (*xevfunc) map_notify_callback(void * widget, void* user_data)
+ * @param DIALOG_RESPONS    - (*xevfunc) dialog_callback(void * widget, void* user_data)
+ * @param BUTTON_PRESS      - (*evfunc) button_press_callback(void * widget, void * event, void* user_data)
+ * @param BUTTON_RELEASE    - (*evfunc) button_release_callback(void * widget, void * event, void* user_data)
+ * @param POINTER_MOTION    - (*evfunc) motion_callback(void * widget, void * event, void* user_data)
+ * @param KEY_PRESS         - (*evfunc) key_press_callback(void * widget, void * event, void* user_data)
+ * @param KEY_RELEASE       - (*evfunc) key_release_callback(void * widget, void * event, void* user_data)
+ */
+
+typedef enum {
+    EXPOSE = 1,
+    CONFIGURE,
+    ENTER,
+    LEAVE,
+    ADJ_INTERN,
+    VALUE_CHANGED,
+    USER,
+    MEM_FREE,
+    CONFIGURE_NOTIFY,
+    MAP_NOTIFY,
+    DIALOG_RESPONSE,
+    BUTTON_PRESS,
+    BUTTON_RELEASE,
+    POINTER_MOTION,
+    KEY_PRESS,
+    KEY_RELEASE,
+} EventType;
 
 /**
  * 
@@ -206,7 +247,7 @@ enum {
 
 /**
  * 
- * @brief Widget_t           - struct to hold the basic widget info
+ * @brief Widget_t           - struct to hold the basic Widget_t info
  * @param *app               - pointer to the main struct
  * @param widget             - the X11 Window
  * @param *parent            - pointer to the Parent Window or Widget_t
@@ -301,7 +342,11 @@ struct Widget_t {
 
 /**
  * @brief *create_window     - create a Window 
- * @param *dpy               - pointer to the Display to use
+ * \n You need to create as least minimun one Window to get started.
+ * \n The first created Window is the top_level_widget()
+ * \n A Window could be created on the DefaultRootWindow() or embeded
+ * into a other XWindow
+ * @param *app               - pointer to the Xputty *main struct to use
  * @param win                - pointer to the Parrent Window (may be Root)
  * @param x,y,width,height   - the position/geometry to create the window
  * @return Widget_t *        - pointer to the Widget_t struct
@@ -312,7 +357,10 @@ Widget_t *create_window(Xputty *app, Window win,
 
 /**
  * @brief *create_widget      - create a widget
- * @param *dpy                - pointer to the Display to use
+ * \n A Widget_t could only be created as child of a other Widget_t
+ * \n To create a Widget_t you need to create a Widget_t with create_window()
+ * before.
+ * @param *app                - pointer to the Xputty *main struct to use
  * @param *parent             - pointer to the Parrent Widget_t
  * @param x,y,width,height    - the position/geometry to create the widget
  * @return Widget_t*          - pointer to the Widget_t struct
@@ -323,7 +371,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *win,
 
 /**
  * @brief connect_func      - connect a event with a handler
- * without type check
+ * without type check. For supported events see: Func_t
  * @param **event           - the event to connect
  * @param *handler          - the handler to handle the event
  * @return void
@@ -332,7 +380,20 @@ Widget_t *create_widget(Xputty *app, Widget_t *win,
 void connect_func(void (**event)(), void (*handler)());
 
 /**
- * @brief widget_set_title  - set window title for Widget_t
+ * @brief signal_connect_func - connect a event with a handler
+ * by EventType identifier, without type check
+ * \n You must ensure that the handler coresponde to the event type
+ * \n check EventType for more information
+ * @param *w                  - the Widget_t sending the event
+ * @param type                - the event type to connect
+ * @param *handler            - the handler to handle the event
+ * @return void
+ */
+
+void signal_connect_func(Widget_t *w, EventType type, void (*handler)());
+
+/**
+ * @brief widget_set_title  - set window title for a Widget_t
  * @param *w                - pointer to the Widget_t to set the title
  * @param *title            - the title to store
  * @return void 
@@ -349,7 +410,7 @@ void widget_set_title(Widget_t *w, const char *title);
 void widget_show(Widget_t *w);
 
 /**
- * @brief pop_widget_show_all   - map/show popup widget with all childs
+ * @brief pop_widget_show_all   - map/show popup widget with all it's childs
  * @param *w                    - pointer to the Widget_t to map
  * @return void 
  */
@@ -357,7 +418,7 @@ void widget_show(Widget_t *w);
 void pop_widget_show_all(Widget_t *w);
 
 /**
- * @brief widget_hide       - unmap/hide widget
+ * @brief widget_hide       - unmap/hide a Widget_t
  * @param *w                - pointer to the Widget_t to unmap
  * @return void 
  */
@@ -365,7 +426,7 @@ void pop_widget_show_all(Widget_t *w);
 void widget_hide(Widget_t *w);
 
 /**
- * @brief widget_show_all   - map/show widget with all childs
+ * @brief widget_show_all   - map/show Widget_t with all childs
  * @param *w                - pointer to the Widget_t to map
  * @return void 
  */
@@ -373,8 +434,8 @@ void widget_hide(Widget_t *w);
 void widget_show_all(Widget_t *w);
 
 /**
- * @brief show_tooltip     - check if a Widget_t have a tooltip,
- * if so, show it. 
+ * @brief show_tooltip      - check if a Widget_t have a tooltip,
+ * and show it, if a tooltip is available. 
  * @param *wid              - pointer to the Widget_t receiving the event
  * @return void
  */
@@ -383,7 +444,7 @@ void show_tooltip(Widget_t *wid);
 
 /**
  * @brief hide_tooltip     - check if a Widget_t have a tooltip,
- * if so, hide it. 
+ * and hide it, if a tooltip is mapped. 
  * @param *wid              - pointer to the Widget_t receiving the event
  * @return void
  */
@@ -416,7 +477,10 @@ void quit_widget(Widget_t *w);
 
 /**
  * @brief transparent_draw  - copy parent surface to child surface
- * @param *wid              - pointer to the Widget_t receiving a event
+ * \n you usaualy didn't need to call this, it's used automaticaly
+ * when a Widget_t have set the flag USE_TRANSPARENCY
+ * \n this is the default setting for Widget_t
+ * @param *wid              - pointer to the Widget_t receiving the event
  * @param *user_data        - void pointer to attached user_data
  * @return void 
  */
@@ -424,7 +488,8 @@ void quit_widget(Widget_t *w);
 void transparent_draw(void * wid, void* user_data);
 
 /**
- * @brief widget_reset_scale - reset scaling mode after image surface
+ * @brief widget_reset_scale - used to reset scaling mode after a image surface
+ * is drawn to the Widget_t surface with widget_set_scale()
  * @param *w                 - pointer to the Widget_t sending the request
  * @return void 
  */
@@ -432,7 +497,8 @@ void transparent_draw(void * wid, void* user_data);
 void widget_reset_scale(Widget_t *w);
 
 /**
- * @brief widget_set_scale   - set scaling mode for image surface
+ * @brief widget_set_scale   - set scaling mode to scale a image surface
+ * to the size of the Widget_t surface
  * @param *w                 - pointer to the Widget_t sending the request
  * @return void 
  */
@@ -440,7 +506,10 @@ void widget_reset_scale(Widget_t *w);
 void widget_set_scale(Widget_t *w);
 
 /**
- * @brief destroy_widget    - destroy a widget
+ * @brief destroy_widget    - destroy a widget 
+ * \n When a Widget_t receive a destroy_widget() call, it will propagate that
+ * to all childs in it's Childlist_t. So all childs get destroyed before the 
+ * Widget_t itself close.
  * @param *w                - pointer to the Widget_t sending the request
  * @param *main             - pointer to main struct
  * @return void 
@@ -450,8 +519,10 @@ void destroy_widget(Widget_t *w, Xputty *main);
 
 /**
  * @brief widget_event_loop - the internal widget event loop
- * @param *w                - pointer to the Widget_t receiving a event
+ * @param *w                - void pointer to the Widget_t receiving the event
  * @param *event            - void pointer to the XEvent
+ * @param *main             - void pointer to the Xputty *main struct running 
+ * the event loop
  * @param *user_data        - void pointer to attached user_data
  * @return void 
  */
@@ -459,7 +530,8 @@ void destroy_widget(Widget_t *w, Xputty *main);
 void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data);
 
 /**
- * @brief send_configure_event - send ConfigureNotify to Widget_t
+ * @brief send_configure_event - send a ConfigureNotify to Widget_t
+ * \n used to resize a Widget_t
  * @param *w                   - pointer to the Widget_t to send the notify
  * @param x,y                  - the new Widget_t position
  * @param width,height         - the new Widget_t size
@@ -470,6 +542,7 @@ void send_configure_event(Widget_t *w,int x, int y, int width, int height);
 
 /**
  * @brief send_button_press_event   - send ButtonPress event to Widget_t
+ * \n simulate a BUTTON_PRESS Event
  * @param *w                        - pointer to the Widget_t to send the notify
  * @return void 
  */
@@ -478,6 +551,7 @@ void send_button_press_event(Widget_t *w);
 
 /**
  * @brief send_button_release_event - send ButtonRelease event to Widget_t
+ * \n simulate a BUTTON_RELEASE Event
  * @param *w                        - pointer to the Widget_t to send the notify
  * @return void 
  */
@@ -486,6 +560,7 @@ void send_button_release_event(Widget_t *w);
 
 /**
  * @brief send_systray_message      - request a systray icon for Widget_t
+ * \n currently not working
  * @param *w                        - pointer to the Widget_t to send the notify
  * @return void 
  */
@@ -493,7 +568,7 @@ void send_button_release_event(Widget_t *w);
 void send_systray_message(Widget_t *w);
 
 /**
- * @brief expose_widgets    - send expose expose event to window
+ * @brief expose_widgets    - send a expose event (EXPOSE) to a Widget_t
  * @param w                 - the Widget_t to send the event to
  * @return void 
  */
@@ -501,7 +576,7 @@ void send_systray_message(Widget_t *w);
 void expose_widget(Widget_t *w);
 
 /**
- * @brief _key_mapping       - modifier key's mapped to a integer value
+ * @brief _key_mapping      - modifier key's mapped to a integer value
  * @param *dpy              - pointer to the Display in use
  * @param *xkey             - the key to map
  * @return int              - value (1-10) or 0 when not mapped 

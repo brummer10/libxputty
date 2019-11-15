@@ -20,12 +20,6 @@
 
 #include "xchildlist_private.h"
 
-/**
- * @brief _childlist_add_elem - reallocate the childlist array to new size
- * @param *childlist          - pointer to the Childlist_t
- * @return void 
- */
-
 void _childlist_add_elem(Childlist_t *childlist) {
     childlist->childs = realloc(childlist->childs, sizeof(Widget_t*) * (4+childlist->cap));
     assert(childlist->childs != NULL);

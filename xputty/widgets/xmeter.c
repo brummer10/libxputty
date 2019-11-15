@@ -23,12 +23,6 @@
 #include "xmeter_private.h"
 
 
-/**
- * @brief power2db             - power (db) input to db output consider falloff
- * @param power                - mesured power
- * @return float               - calculated db
- */
-
 float power2db(Widget_t *w, float power) {
     const float falloff = 27 * 60 * 0.0005;
     const float fallsoft = 6 * 60 * 0.0005;
@@ -50,15 +44,6 @@ float power2db(Widget_t *w, float power) {
     return  power;
 }
 
-/**
- * @brief add_vmeter          - add a vumeter to a Widget_t
- * connect to func.value_changed_callback to implement your actions
- * @param *parent             - pointer to the Widget_t request the vumeter
- * @param *label              - Label to show on the vumeter
- * @param x,y,width,height    - the position/geometry to create the button
- * @return Widget_t*          - pointer to the Widget_t meter struct
- */
-
 Widget_t* add_vmeter(Widget_t *parent, const char * label, bool show_scale,
                 int x, int y, int width, int height) {
 
@@ -76,15 +61,6 @@ Widget_t* add_vmeter(Widget_t *parent, const char * label, bool show_scale,
     }
     return wid;
 }
-
-/**
- * @brief add_hmeter          - add a vumeter to a Widget_t
- * connect to func.value_changed_callback to implement your actions
- * @param *parent             - pointer to the Widget_t request the vumeter
- * @param *label              - Label to show on the vumeter
- * @param x,y,width,height    - the position/geometry to create the button
- * @return Widget_t*          - pointer to the Widget_t meter struct
- */
 
 Widget_t* add_hmeter(Widget_t *parent, const char * label, bool show_scale,
                 int x, int y, int width, int height) {

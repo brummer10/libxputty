@@ -25,7 +25,7 @@
 
 
 /** xwidgets.h include some predefined widgets for libxputty, include this to use them 
- * if you would only use libxputty and define our own widgets, include xputt.h 
+ * if you would only use libxputty and define your own widgets, include xputt.h 
  * instead this one in your project.
  */
 

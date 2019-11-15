@@ -22,12 +22,6 @@
 #include "xmeter_private.h"
 
 
-/**
- * @brief _draw_vmeter_scale   - draw a vmeter scale beside the meter widget
- * @param w                    - the widget to draw to
- * @return void
- */
-
 void _draw_vmeter_scale(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     XWindowAttributes attrs;
@@ -74,12 +68,6 @@ void _draw_vmeter_scale(void *w_, void* user_data) {
     cairo_stroke(w->crb);
 }
 
-/**
- * @brief _draw_hmeter_scale   - draw a hmeter scale beside the meter widget
- * @param w                    - the widget to draw to
- * @return void
- */
-
 void _draw_hmeter_scale(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     XWindowAttributes attrs;
@@ -122,12 +110,6 @@ void _draw_hmeter_scale(void *w_, void* user_data) {
 	cairo_stroke(w->crb);
 }
 
-/**
- * @brief _log_meter           - logaritmic meter deflection
- * @param db                   - mesured db
- * @return float               - state to show on the meter
- */
-
 float _log_meter (float db) {
     float def = 0.0f; /* Meter deflection %age */
 
@@ -156,15 +138,6 @@ float _log_meter (float db) {
 
     return def/115.0f;
 }
-
-/**
- * @brief _create_vertical_meter_image      - internal draw the meter image
- * to the cairo image surface
- * @param *w                                - pointer to the Widget_t meter
- * @param width                             - widget width
- * @param height                            - widget height
- * @return void
- */
 
 void _create_vertical_meter_image(Widget_t *w, int width, int height) {
     w->image = cairo_surface_create_similar (w->surface, 
@@ -222,15 +195,6 @@ void _create_vertical_meter_image(Widget_t *w, int width, int height) {
     cairo_destroy(cri);
 }
 
-/**
- * @brief _create_horizontal_meter_image    - internal draw the meter image
- * to the cairo image surface
- * @param *w                                - pointer to the Widget_t meter
- * @param width                             - widget width
- * @param height                            - widget height
- * @return void
- */
-
 void _create_horizontal_meter_image(Widget_t *w, int width, int height) {
     w->image = cairo_surface_create_similar (w->surface, 
                         CAIRO_CONTENT_COLOR_ALPHA, width, height*2);
@@ -287,13 +251,6 @@ void _create_horizontal_meter_image(Widget_t *w, int width, int height) {
     cairo_destroy(cri);
 }
 
-/**
- * @brief _draw_v_meter          - internal draw the meter to the buffer
- * @param *w_                    - void pointer to the Widget_t button
- * @param *user_data             - void pointer to attached user_data
- * @return void
- */
-
 void _draw_v_meter(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
 
@@ -313,13 +270,6 @@ void _draw_v_meter(void *w_, void* user_data) {
     cairo_fill(w->crb);
     widget_reset_scale(w);
 }
-
-/**
- * @brief _draw_h_meter          - internal draw the meter to the buffer
- * @param *w_                    - void pointer to the Widget_t button
- * @param *user_data             - void pointer to attached user_data
- * @return void
- */
 
 void _draw_h_meter(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;

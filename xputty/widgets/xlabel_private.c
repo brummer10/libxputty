@@ -22,13 +22,6 @@
 #include "xlabel_private.h"
 
 
-/**
- * @brief _draw_label            - internal draw the label to the buffer
- * @param *w_                    - void pointer to the Widget_t label
- * @param *user_data             - void pointer to attached user_data
- * @return void
- */
-
 void _draw_label(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     XWindowAttributes attrs;

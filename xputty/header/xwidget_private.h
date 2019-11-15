@@ -31,7 +31,8 @@
 #include "xputty.h"
 
 /**
- * @brief _scroll_event     - internal check which adjustment needs update
+ * @brief _scroll_event     - internal check which Adjustment_t change it's value
+ * on a motion event (POINTER_MOTION)
  * @param *wid              - pointer to the Widget_t receiving a event
  * @param direction         - up/down scroll diretion
  * @return void 
@@ -39,16 +40,17 @@
 
 void _scroll_event(Widget_t * wid, int direction);
 /**
- * @brief _toggle_event     - internal check which adjustment needs update
+ * @brief _toggle_event     - internal check which Adjustment_t change it's value
+ * on a Button press event (BUTTON_PRESS)
  * @param *wid              - pointer to the Widget_t receiving a event
- * @param direction         - up/down scroll diretion
  * @return void 
  */
 
 void _toggle_event(Widget_t * wid);
 
 /**
- * @brief _check_enum     - internal check which adjustment needs update
+ * @brief _check_enum       - internal check if Adjustment_t is of type CL_ENUM
+ * and handle events acordingly
  * @param *wid              - pointer to the Widget_t receiving a event
  * @param *xbutton          - pointer to the XButtonEvent
  * @return void 
@@ -57,7 +59,7 @@ void _toggle_event(Widget_t * wid);
 void _check_enum(Widget_t * wid, XButtonEvent *xbutton);
 
 /**
- * @brief _button_press     - internal check which button is pressed
+ * @brief _button_press     - internal check which button is pressed (BUTTON_PRESS)
  * @param *wid              - pointer to the Widget_t receiving a event
  * @param *xbutton          - pointer to the XButtonEvent
  * @param *user_data        - void pointer to attached user_data
@@ -67,7 +69,9 @@ void _check_enum(Widget_t * wid, XButtonEvent *xbutton);
 void _button_press(Widget_t * wid, XButtonEvent *xbutton, void* user_data);
 
 /**
- * @brief _check_grab       - internal check if menu is pressed
+ * @brief _check_grab       - internal check if a Widgt_t holds a grab
+ * when a BUTTON_PRESS event occur. If so, check if the button is pressed
+ * inside the grab Widget_t. If yes, handle the event. In any case destroy the grab
  * @param *wid              - pointer to the Widget_t receiving a event
  * @param *xbutton          - pointer to the XButtonEvent
  * @param *main             - pointer to main struct
@@ -77,8 +81,8 @@ void _button_press(Widget_t * wid, XButtonEvent *xbutton, void* user_data);
 void _check_grab(Widget_t * wid, XButtonEvent *xbutton, Xputty *main);
 
 /**
- * @brief _propagate_childs - send expose to child window
- * @param *wid              - pointer to the Widget_t send the event
+ * @brief _propagate_child_expose - send expose to any child Widget_t
+ * @param *wid                    - pointer to the Widget_t send the event
  * @return void 
  */
 
@@ -91,7 +95,7 @@ void _propagate_child_expose(Widget_t *wid);
  * @return void
  */
 
-void _check_keymap (void *w_ ,XKeyEvent xkey);
+void _check_keymap (void *w_ , XKeyEvent xkey);
 
 /**
  * @brief _hide_all_tooltips - hide all active tooltips
@@ -102,7 +106,7 @@ void _check_keymap (void *w_ ,XKeyEvent xkey);
 void _hide_all_tooltips(Widget_t *wid);
 
 /**
- * @brief _has_pointer      - check if the widget has the pointer on Button release 
+ * @brief _has_pointer      - check if the widget has the pointer 
  * @param *w                - pointer to the Widget_t sending the request
  * @param *button           - pointer to the XButtonEvent sending the notify
  * @return void
@@ -120,7 +124,7 @@ void _has_pointer(Widget_t *w, XButtonEvent *button);
 void _set_adj_value(void *w_, bool x, int direction);
 
 /**
- * @brief _dummy1_callback    - default debuging callback for evfunc's
+ * @brief _dummy1_callback   - default debuging callback for evfunc's
  * @param *w                 - pointer to the Widget_t receive the event
  * @param user_data          - void pointer to attached user_data
  * @return void 
@@ -138,7 +142,7 @@ void _dummy1_callback(void *w_, void* _data, void* user_data);
 void _dummy_callback(void *w_, void* user_data);
 
 /**
- * @brief _resize_surface    - intern check if surfaces needs resizing
+ * @brief _resize_surface    - intern check if a Widget_t surfaces needs resizing
  * @param *wid               - pointer to the Widget_t receive the event
  * @param width              - the new width
  * @param height             - the new height

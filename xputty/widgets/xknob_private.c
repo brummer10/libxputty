@@ -21,12 +21,6 @@
 
 #include "xknob_private.h"
 
-/**
- * @brief _draw_image_knob       - internal draw the knob from image
- * to the buffer
- * @param *w                     - pointer to the Widget_t knob
- * @return void
- */
 
 void _draw_image_knob(Widget_t *w, int width_t, int height_t) {
     int width = cairo_xlib_surface_get_width(w->image);
@@ -43,13 +37,6 @@ void _draw_image_knob(Widget_t *w, int width_t, int height_t) {
     //widget_reset_scale(w);
     cairo_scale(w->crb, y,y);
 }
-
-/**
- * @brief _draw_knob             - internal draw the knob to the buffer
- * @param *w_                    - void pointer to the Widget_t button
- * @param *user_data             - void pointer to attached user_data
- * @return void
- */
 
 void _draw_knob(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
@@ -145,13 +132,6 @@ void _draw_knob(void *w_, void* user_data) {
     cairo_show_text(w->crb, w->label);
     cairo_new_path (w->crb);
 }
-
-/**
- * @brief _knob_released  - redraw the slider when buttob released 
- * @param *w_               - void pointer to the Widget_t button
- * @param *user_data        - void pointer to attached user_data
- * @return void
- */
 
 void _knob_released(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;

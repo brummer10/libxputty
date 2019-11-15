@@ -24,15 +24,6 @@
  * @brief      load png data from binary blob into cairo surface
 */
 
-/**
- * @brief png_stream_reader          - read binary data bytes
- * into cairo surface from binary stream
- * @param *stream                    - the stream to read from
- * @param length                     - the length to be read
- * @return CAIRO_STATUS_SUCCESS      - the result
- */
-
-
 cairo_status_t png_stream_reader (void *_stream, unsigned char *data, unsigned int length) {
     binary_stream * stream = (binary_stream *) _stream;
     memcpy(data, &stream->data[stream->position],length);
@@ -40,26 +31,12 @@ cairo_status_t png_stream_reader (void *_stream, unsigned char *data, unsigned i
     return CAIRO_STATUS_SUCCESS;
 }
 
-/**
- * @brief cairo_image_surface_create_from_stream  - read binary data 
- * into cairo surface from stream
- * @param *name                      - pointer to the binary image data
- * @return cairo_surface_t           - the cairo_image_surface
- */
-
 cairo_surface_t *cairo_image_surface_create_from_stream ( const unsigned char* name) {
     binary_stream png_stream;
     png_stream.data = name;
     png_stream.position = 0;
     return cairo_image_surface_create_from_png_stream(&png_stream_reader, (void *)&png_stream);
 }
-
-/**
- * @brief widget_get_png             - read png into Widget_t xlib surface
- * @param *w                         - pointer to the Widget_t which should use the png
- * @param *name                      - pointer to the binary image data LDVAR(name)
- * @return void
- */
 
 void widget_get_png(Widget_t *w, const unsigned char* name) {
     cairo_surface_t *getpng = cairo_image_surface_create_from_stream (name);
@@ -74,13 +51,6 @@ void widget_get_png(Widget_t *w, const unsigned char* name) {
     cairo_surface_destroy(getpng);
     cairo_destroy(cri);
 }
-
-/**
- * @brief widget_set_icon_from_surface            - set icon image from cairo surface to Widget_t 
- * @param *w                         - pointer to the Widget_t which should use the icon
- * @param *image                     - pointer to the cairo_surface_t to use for the icon
- * @return void
- */
 
 void widget_set_icon_from_surface(Widget_t *w, Pixmap *icon_, cairo_surface_t *image) {
     int width = cairo_xlib_surface_get_width(image);
@@ -107,13 +77,6 @@ void widget_set_icon_from_surface(Widget_t *w, Pixmap *icon_, cairo_surface_t *i
     XSetWMHints(w->app->dpy, w->widget, win_hints);
     XFree(win_hints);
 }
-
-/**
- * @brief widget_set_icon_from_png        - set icon image from png binary to Widget_t 
- * @param *w                         - pointer to the Widget_t which should use the icon
- * @param *image                     - pointer to the cairo_surface_t to use for the icon
- * @return void
- */
 
 void widget_set_icon_from_png(Widget_t *w, Pixmap *icon_, const unsigned char* name) {
     cairo_surface_t *image = cairo_image_surface_create_from_stream (name);

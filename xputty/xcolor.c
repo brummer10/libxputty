@@ -21,12 +21,6 @@
 #include "xcolor.h"
 
 
-/**
- * @brief set_dark_theme  - init color shema to default values 
- * @param *main             - pointer to the main Xputty struct
- * @return void
- */
-
 void set_dark_theme(Xputty *main) {
     main->color_scheme->normal = (Colors) {
          /* cairo    / r  / g  / b  / a  /  */
@@ -69,12 +63,6 @@ void set_dark_theme(Xputty *main) {
         .light =    { 0.18, 0.38, 0.38, 1.0}
     };
 }
-
-/**
- * @brief set_light_theme  - init color shema to light theme 
- * @param *main             - pointer to the main Xputty struct
- * @return void
- */
 
 void set_light_theme(Xputty *main) {
     main->color_scheme->normal = (Colors) {
@@ -119,13 +107,6 @@ void set_light_theme(Xputty *main) {
     };
 }
 
-/**
- * @brief get_color_scheme  - init color shema to default values 
- * @param *main             - pointer to the main Xputty struct
- * @param st               - the Color_state to use
- * @return Colors           - the Colors scheme asosiated with the Color_state 
- */
-
 Colors *get_color_scheme(Xputty *main, Color_state st) {
     switch(st) {
         case NORMAL_:
@@ -148,12 +129,6 @@ Colors *get_color_scheme(Xputty *main, Color_state st) {
    
 }
 
-/**
- * @brief get_color_state   - get the Color_state to use
- * @param *wid              - pointer to the Widget_t
- * @return Color_state      - the Color_state related to the Widget_t state
- */
-
 Color_state get_color_state(Widget_t *wid) {
     switch(wid->state) {
         case 0:
@@ -174,26 +149,12 @@ Color_state get_color_state(Widget_t *wid) {
     }
 }
 
-/**
- * @brief use_fg_color_scheme  - set normal forground color for Widget_t
- * @param w                    - the Widget_t to send the event to
- * @param st                   - the Color_state to use
- * @return void
- */
-
 void use_fg_color_scheme(Widget_t *w, Color_state st) {
     Colors *c = get_color_scheme(w->app, st);
     if (!c) return;
     cairo_set_source_rgba(w->cr, c->fg[0],  c->fg[1], c->fg[2],  c->fg[3]);
     cairo_set_source_rgba(w->crb, c->fg[0],  c->fg[1], c->fg[2],  c->fg[3]);
 }
-
-/**
- * @brief use_bg_color_scheme  - set normal background color for Widget_t
- * @param w                    - the Widget_t to send the event to
- * @param st                   - the Color_state to use
- * @return void
- */
 
 void use_bg_color_scheme(Widget_t *w, Color_state st) {
     Colors *c = get_color_scheme(w->app, st);
@@ -202,26 +163,12 @@ void use_bg_color_scheme(Widget_t *w, Color_state st) {
     cairo_set_source_rgba(w->crb, c->bg[0],  c->bg[1], c->bg[2],  c->bg[3]);
 }
 
-/**
- * @brief use_base_color_scheme  - set base color for Widget_t
- * @param w                      - the Widget_t to send the event to
- * @param st                     - the Color_state to use
- * @return void
- */
-
 void use_base_color_scheme(Widget_t *w, Color_state st) {
     Colors *c = get_color_scheme(w->app, st);
     if (!c) return;
     cairo_set_source_rgba(w->cr, c->base[0],  c->base[1], c->base[2],  c->base[3]);
     cairo_set_source_rgba(w->crb, c->base[0],  c->base[1], c->base[2],  c->base[3]);
 }
-
-/**
- * @brief use_text_color_scheme  - set text color for Widget_t
- * @param w                      - the Widget_t to send the event to
- * @param st                     - the Color_state to use
- * @return void
- */
 
 void use_text_color_scheme(Widget_t *w, Color_state st) {
     Colors *c = get_color_scheme(w->app, st);
@@ -230,26 +177,12 @@ void use_text_color_scheme(Widget_t *w, Color_state st) {
     cairo_set_source_rgba(w->crb, c->text[0],  c->text[1], c->text[2],  c->text[3]);
 }
 
-/**
- * @brief use_shadow_color_scheme  - set shadow color for Widget_t
- * @param w                        - the Widget_t to send the event to
- * @param st                       - the Color_state to use
- * @return void
- */
-
 void use_shadow_color_scheme(Widget_t *w, Color_state st) {
     Colors *c = get_color_scheme(w->app, st);
     if (!c) return;
     cairo_set_source_rgba(w->cr, c->shadow[0],  c->shadow[1], c->shadow[2],  c->shadow[3]);
     cairo_set_source_rgba(w->crb, c->shadow[0],  c->shadow[1], c->shadow[2],  c->shadow[3]);
 }
-
-/**
- * @brief use_frame_color_scheme  - set shadow color for Widget_t
- * @param w                        - the Widget_t to send the event to
- * @param st                       - the Color_state to use
- * @return void
- */
 
 void use_frame_color_scheme(Widget_t *w, Color_state st) {
     Colors *c = get_color_scheme(w->app, st);
@@ -258,29 +191,12 @@ void use_frame_color_scheme(Widget_t *w, Color_state st) {
     cairo_set_source_rgba(w->crb, c->frame[0],  c->frame[1], c->frame[2],  c->frame[3]);
 }
 
-/**
- * @brief use_light_color_scheme   - set light color for Widget_t
- * @param w                        - the Widget_t to send the event to
- * @param st                       - the Color_state to use
- * @return void
- */
-
 void use_light_color_scheme(Widget_t *w, Color_state st) {
     Colors *c = get_color_scheme(w->app, st);
     if (!c) return;
     cairo_set_source_rgba(w->cr, c->light[0],  c->light[1], c->light[2],  c->light[3]);
     cairo_set_source_rgba(w->crb, c->light[0],  c->light[1], c->light[2],  c->light[3]);
 }
-
-/**
- * @brief set_pattern       - set pattern for the col_fromted colors
- * @param *w_               - void pointer to the Widget_t button
- * @param *from             - the Colors set to use from
- * @param *to               - the Colors set to use to
- * @param mod               - the Color_mod to use
- * @param width             - the width of the base
- * @return void
- */
 
 void set_pattern(Widget_t *w, Colors *from, Colors *to, Color_mod mod) {
     double *col_from = NULL;

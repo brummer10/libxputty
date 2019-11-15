@@ -30,6 +30,13 @@
 /**
  * 
  * @brief Childlist_t       - struct to hold a Widget_t child list
+ * \n Xputty main holds a list of any Widget_t created in relation to main
+ * \n Any Event is only propagate to Widget_t's found in this list
+ * \n Every Widget_t holds a list of Child Widget_t's they contain
+ * \n When a Widget_t get destroy_widget() call, all of it's childs
+ * receive a destroy_widget() call before the Widget_t itself get destroyed
+ * \n the expose_callback() (EXPOSE) and the configure_callback() (CONFIGURE)
+ * will be propagate to all childs in a Childlist_t
  * @param **childs          - dynamic array to hold pointers to the childs
  * @param size              - current size of array
  * @param cap               - current capacity of the array
@@ -48,7 +55,8 @@ struct Childlist_t {
 };
 
 /**
- * @brief childlist_init      - allocate the array to min size
+ * @brief childlist_init      - internal use to allocate the array to min size
+ * \n You usually didn't need to call this
  * @param *childlist          - pointer to the Childlist_t
  * @return void 
  */
@@ -56,7 +64,8 @@ struct Childlist_t {
 void childlist_init(Childlist_t *childlist);
 
 /**
- * @brief childlist_destroy   - free the childlist
+ * @brief childlist_destroy   - internal use to free the Childlist_t
+ * \n You usually didn't need to call this
  * @param *childlist          - pointer to the Childlist_t
  * @return void 
  */
@@ -64,7 +73,8 @@ void childlist_init(Childlist_t *childlist);
 void childlist_destroy(Childlist_t *childlist);
 
 /**
- * @brief childlist_add_child - add a child to the childlist
+ * @brief childlist_add_child - internal use to add a child to the Childlist_t
+ * \n You usually didn't need to call this
  * @param *childlist          - pointer to the Childlist_t
  * @param *child              - pointer to the child to add
  * @return void 
@@ -73,36 +83,42 @@ void childlist_destroy(Childlist_t *childlist);
 void childlist_add_child(Childlist_t *childlist, Widget_t *child);
 
 /**
- * @brief childlist_add_child - remove a child from the childlist
- * @param *childlist          - pointer to the Childlist_t
- * @param *child              - pointer to the child to remove
+ * @brief childlist_remove_child - internal use to remove a child from the childlist
+ * \n You usually didn't need to call this
+ * @param *childlist             - pointer to the Childlist_t
+ * @param *child                 - pointer to the child to remove
  * @return void 
  */
 
 void childlist_remove_child(Childlist_t *childlist, Widget_t *child);
 
 /**
- * @brief childlist_find_child - find a child in a the childlist
+ * @brief childlist_find_child - find a child in a the Childlist_t
+ * this could be sued to check if a Widget_t is a child of a other Widget_t
  * @param *childlist           - pointer to the Childlist_t
  * @param *child               - pointer to the child to find
  * @return int                 - return position in childlist or -1 
+ * when not found
  */
 
 int childlist_find_child(Childlist_t *childlist, Widget_t *child);
 
 /**
  * @brief childlist_find_widget - find a child Widget_t in a the childlist
+ * by given the Window id 
  * @param *childlist            - pointer to the Childlist_t
- * @param child_window          - the window to find the Widget_t for
- * @return Widget_t*            - return pointer to WiDget or NULL
+ * @param child_window          - the Window to find the Widget_t for
+ * @return int                  - return position in childlist or -1 
+ * when not found
  */
 
 int childlist_find_widget(Childlist_t *childlist, Window child_window);
 
 /**
- * @brief childlist_has_child  - check if childlist contain a child
+ * @brief childlist_has_child  - check if a Widget_t Childlist_t contain a child
  * @param *childlist           - pointer to the Childlist_t
  * @return int                 - return element counter value
+ * 0 when Widget_t Childlist_t didn't contain a child
  */
 
 int childlist_has_child(Childlist_t *childlist);

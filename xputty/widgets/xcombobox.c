@@ -21,12 +21,6 @@
 #include "xcombobox.h"
 #include "xcombobox_private.h"
 
-/**
- * @brief combobox_set_active_entry  - set the active combobox entry
- * @param *w_                        - void pointer to the Widget_t combobox
- * @param active                     - the active entry (int)
- * @return void
- */
 
 void combobox_set_active_entry(Widget_t *w, int active) {
     float value = (float)active;
@@ -34,13 +28,6 @@ void combobox_set_active_entry(Widget_t *w, int active) {
     else if (value<w->adj->min_value) value = w->adj->min_value;
     adj_set_value(w->adj, value);
 }
-
-/**
- * @brief add_combobox        - add a combobox
- * @param *parent             - pointer to the Widget_t request the button
- * @param x,y,width,height    - the position/geometry to create the button
- * @return Widget_t*          - pointer to the Widget_t button struct
- */
 
 Widget_t* add_combobox(Widget_t *parent, const char  * label, int x, int y, int width, int height) {
 
@@ -65,13 +52,6 @@ Widget_t* add_combobox(Widget_t *parent, const char  * label, int x, int y, int 
 
     return wid;
 }
-
-/**
- * @brief combobox_add_entry    - add a entry to the combobox
- * @param *wid                  - pointer to the Widget_t combobox
- * @param *label                - Label to show on the menu
- * @return Widget_t*            - pointer to the Widget_t menu_item struct
- */
 
 Widget_t *combobox_add_entry(Widget_t *wid, const char  * label) {
     Widget_t *menu = wid->childlist->childs[1];

@@ -59,7 +59,11 @@ typedef enum {
  * @brief Color_t               - struct used to set cairo color for Widget_t
  * @param fg[4]                 - forground {red, green, blue, alpha}
  * @param bg[4]                 - background {red, green, blue, alpha}
- * @param ba[4]                 - base {red, green, blue, alpha}
+ * @param base[4]               - base {red, green, blue, alpha}
+ * @param text[4]               - text {red, green, blue, alpha}
+ * @param shadow[4]             - shadow {red, green, blue, alpha}
+ * @param frame[4]              - frame {red, green, blue, alpha}
+ * @param light[4]              - light {red, green, blue, alpha}
  */
 
 typedef struct {
@@ -74,6 +78,7 @@ typedef struct {
 
 /**
  * @brief XColor_t           - the Widget_t Color struct
+ * \n XColor_t could be used for theming you Widget_t set
  */
 
 struct XColor_t {
@@ -84,7 +89,8 @@ struct XColor_t {
 };
 
 /**
- * @brief set_dark_theme  - init color shema to default values 
+ * @brief set_dark_theme    - init the XColor_t struct to the default 
+ * dark theme 
  * @param *main             - pointer to the main Xputty struct
  * @return void
  */
@@ -92,7 +98,8 @@ struct XColor_t {
 void set_dark_theme(Xputty *main);
 
 /**
- * @brief set_light_theme  - init color shema to light theme 
+ * @brief set_light_theme   - init the XColor_t struct to the default 
+ * light theme 
  * @param *main             - pointer to the main Xputty struct
  * @return void
  */
@@ -100,7 +107,8 @@ void set_dark_theme(Xputty *main);
 void set_light_theme(Xputty *main);
 
 /**
- * @brief get_color_scheme  - init color shema to default values 
+ * @brief get_color_scheme  - get pointer to the Colors struct to use
+ * in relation to the Color_state
  * @param *st               - the Color state to use
  * @return void
  */
@@ -108,7 +116,8 @@ void set_light_theme(Xputty *main);
 Colors *get_color_scheme(Xputty *main, Color_state st);
 
 /**
- * @brief get_color_state   - get the Color_state to use
+ * @brief get_color_state   - get the Color_state to use in relation to the
+ * Widget_t state
  * @param *wid              - pointer to the Widget_t
  * @return Color_state      - the Color_state related to the Widget_t state
  */
@@ -116,8 +125,8 @@ Colors *get_color_scheme(Xputty *main, Color_state st);
 Color_state get_color_state(Widget_t *wid);
 
 /**
- * @brief use_fg_color_scheme  - set normal forground color for Widget_t
- * @param w                    - the Widget_t to send the event to
+ * @brief use_fg_color_scheme  - use forground Colors to paint on Widget_t
+ * @param *w                   - the Widget_t to set the Colors
  * @param st                   - the Color_state to use
  * @return void
  */
@@ -125,8 +134,8 @@ Color_state get_color_state(Widget_t *wid);
 void use_fg_color_scheme(Widget_t *w, Color_state st);
 
 /**
- * @brief use_bg_color_scheme  - set normal background color for Widget_t
- * @param w                    - the Widget_t to send the event to
+ * @brief use_bg_color_scheme  - use background Colors to paint on Widget_t
+ * @param w                    - the Widget_t to set the Colors
  * @param st                   - the Color_state to use
  * @return void
  */
@@ -134,8 +143,8 @@ void use_fg_color_scheme(Widget_t *w, Color_state st);
 void use_bg_color_scheme(Widget_t *w, Color_state st);
 
 /**
- * @brief use_base_color_scheme  - set base color for Widget_t
- * @param w                      - the Widget_t to send the event to
+ * @brief use_base_color_scheme  - use base Colors to paint on Widget_t
+ * @param w                      - the Widget_t to set the Colors
  * @param st                     - the Color_state to use
  * @return void
  */
@@ -143,8 +152,8 @@ void use_bg_color_scheme(Widget_t *w, Color_state st);
 void use_base_color_scheme(Widget_t *w, Color_state st);
 
 /**
- * @brief use_text_color_scheme  - set text color for Widget_t
- * @param w                      - the Widget_t to send the event to
+ * @brief use_text_color_scheme  - use text Colors to paint on Widget_t
+ * @param w                      - the Widget_t to set the Colors
  * @param st                     - the Color_state to use
  * @return void
  */
@@ -152,8 +161,8 @@ void use_base_color_scheme(Widget_t *w, Color_state st);
 void use_text_color_scheme(Widget_t *w, Color_state st);
 
 /**
- * @brief use_shadow_color_scheme  - set shadow color for Widget_t
- * @param w                        - the Widget_t to send the event to
+ * @brief use_shadow_color_scheme  - use shadow Colors to paint on Widget_t
+ * @param w                        - the Widget_t to set the Colors
  * @param st                       - the Color_state to use
  * @return void
  */
@@ -161,8 +170,8 @@ void use_text_color_scheme(Widget_t *w, Color_state st);
 void use_shadow_color_scheme(Widget_t *w, Color_state st);
 
 /**
- * @brief use_frame_color_scheme   - set frame color for Widget_t
- * @param w                        - the Widget_t to send the event to
+ * @brief use_frame_color_scheme   - use frame Colors to paint on Widget_t
+ * @param w                        - the Widget_t to set the Colors
  * @param st                       - the Color_state to use
  * @return void
  */
@@ -170,8 +179,8 @@ void use_shadow_color_scheme(Widget_t *w, Color_state st);
 void use_frame_color_scheme(Widget_t *w, Color_state st);
 
 /**
- * @brief use_light_color_scheme   - set light color for Widget_t
- * @param w                        - the Widget_t to send the event to
+ * @brief use_light_color_scheme   - use light Colors to paint on Widget_t
+ * @param w                        - the Widget_t to set the Colors
  * @param st                       - the Color_state to use
  * @return void
  */
@@ -179,12 +188,11 @@ void use_frame_color_scheme(Widget_t *w, Color_state st);
 void use_light_color_scheme(Widget_t *w, Color_state st);
 
 /**
- * @brief set_pattern       - set pattern for the selected colors
- * @param *w_               - void pointer to the Widget_t button
- * @param *from             - the Colors set to use from
- * @param *to               - the Colors set to use to
+ * @brief set_pattern       - set pattern for the selected Colors
+ * @param *w_               - pointer to the Widget_t to set the pattern
+ * @param *from             - the Colors set to pattern from (0)
+ * @param *to               - the Colors set to pattern to (1)
  * @param mod               - the Color_mod to use
- * @param width             - the width of the base
  * @return void
  */
 

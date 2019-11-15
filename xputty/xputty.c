@@ -21,21 +21,6 @@
 #include "xputty.h"
 
 
-/**
- * @brief main_init         - open the Display and init the 
- * main->childlist. Also it set the bool run to true.
- * This one will be used to terminate the main event loop.
- * main_init() should be called directly after declaration of Xputty.
- * Any Widget_t which would be created afterwards will be added to the list.
- * This list is used to check if a Widget_t is valid.
- * When a Widget_t call quit_widget() it will be removed from the list.
- * On main_quit() any remaining Widget_t from this list will be destroyed,
- * to ensure that we leave the memory clean.
- * This list is also used to check which Window receive a XEvent.
- * @param *main             - pointer to the main Xputty struct
- * @return void
- */
-
 void main_init(Xputty *main) {
     main->dpy = XOpenDisplay(0);
     assert(main->dpy);
@@ -48,14 +33,6 @@ void main_init(Xputty *main) {
     main->hold_grab = NULL;
     main->run = true;
 }
-
-/**
- * @brief main_run          - the main event loop. It should be start after
- * your Widget_t's been created. You could create and destroy additional Widget_t's
- * at any time later during run.
- * @param *main             - pointer to the main Xputty struct
- * @return void
- */
 
 void main_run(Xputty *main) {
     Widget_t * wid = main->childlist->childs[0]; 
@@ -108,15 +85,6 @@ void main_run(Xputty *main) {
     }
 }
 
-/**
- * @brief run_embedded      - the main event loop to run embedded UI's.
- * It should be start after your Widget_t's been created.
- * You could create and destroy additional Widget_t's
- * at any time later during run.
- * @param *main             - pointer to the main Xputty struct
- * @return void
- */
-
 void run_embedded(Xputty *main) {
 
     XEvent xev;
@@ -153,14 +121,6 @@ void run_embedded(Xputty *main) {
         }
     }
 }
-
-/**
- * @brief main_quit         - destroy all remaining Widget_t's from the
- * main->childlist. Free all resources which may be allocated between init
- * and quit. It should be called after main_run();
- * @param *main             - pointer to the main Xputty struct
- * @return void
- */
 
 void main_quit(Xputty *main) {
     int i = main->childlist->elem-1;

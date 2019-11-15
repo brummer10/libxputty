@@ -22,12 +22,6 @@
 #include "xmenu.h"
 #include "xmenu_private.h"
 
-/**
- * @brief pop_menu_show       - pop up a menu to a Widget_t
- * @param *parent             - pointer to the Widget_t the menu should pop over
- * @param *menu               - the menu to show
- * @return void
- */
 
 void pop_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     if (!childlist_has_child(menu->childlist)) return;
@@ -43,14 +37,6 @@ void pop_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     if (err) debug_print("Error grap pointer\n");
 }
 
-/**
- * @brief create_viewport     - create a viewport on a menu to a Widget_t
- * @param *parent             - pointer to the Widget_t the menu should pop over
- * @param width               - define the width of the viewport
- * @param height              - define the height of the viewport
- * @return Widget_t*          - pointer to the Widget_t viewport
- */
-
 Widget_t* create_viewport(Widget_t *parent, int width, int height) {
     Widget_t *wid = create_widget(parent->app, parent, 0, 0, width, height);
     wid->scale.gravity = NONE;
@@ -61,13 +47,6 @@ Widget_t* create_viewport(Widget_t *parent, int width, int height) {
     wid->func.expose_callback = _draw_viewslider;
     return wid;
 }
-
-/**
- * @brief create_menu         - create a menu to a Widget_t
- * @param *parent             - pointer to the Widget_t the menu should pop over
- * @param height              - define the height of a single menu item
- * @return Widget_t*          - pointer to the Widget_t button struct
- */
 
 Widget_t* create_menu(Widget_t *parent, int height) {
 
@@ -88,13 +67,6 @@ Widget_t* create_menu(Widget_t *parent, int height) {
     return wid;
 }
 
-/**
- * @brief menu_add_item       - add a item to menu
- * @param *menu               - pointer to the Widget_t menu
- * @param *label              - Label to show on the menu
- * @return Widget_t*          - pointer to the Widget_t menu_item struct
- */
-
 Widget_t* menu_add_item(Widget_t *menu,const char * label) {
     Widget_t* view_port =  menu->childlist->childs[0];
     XWindowAttributes attrs;
@@ -114,13 +86,6 @@ Widget_t* menu_add_item(Widget_t *menu,const char * label) {
     return wid;
 }
 
-/**
- * @brief menu_add_check_item - add a item to menu
- * @param *menu               - pointer to the Widget_t menu
- * @param *label              - Label to show on the menu
- * @return Widget_t*          - pointer to the Widget_t menu_item struct
- */
-
 Widget_t* menu_add_check_item(Widget_t *menu, const char * label) {
     Widget_t *wid = menu_add_item(menu, label);
     wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, 1.0,1.0, CL_TOGGLE);
@@ -129,13 +94,6 @@ Widget_t* menu_add_check_item(Widget_t *menu, const char * label) {
     wid->func.button_press_callback = _check_item_button_pressed;
     return wid;
 }
-
-
-/**
- * @brief radio_item_set_active       - activate selected radio item
- * @param *w                          - the Widget_t to activate
- * @return void
- */
 
 void radio_item_set_active(Widget_t *w) {
     Widget_t * p = w->parent;
@@ -148,13 +106,6 @@ void radio_item_set_active(Widget_t *w) {
         }
     }
 }
-
-/**
- * @brief menu_add_radio_item - add a radio item to menu
- * @param *menu               - pointer to the Widget_t menu
- * @param *label              - Label to show on the menu
- * @return Widget_t*          - pointer to the Widget_t menu_item struct
- */
 
 Widget_t* menu_add_radio_item(Widget_t *menu, const char * label) {
     Widget_t *wid = menu_add_check_item(menu, label);

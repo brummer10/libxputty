@@ -23,15 +23,6 @@
 #include "xbutton_private.h"
 
 
-/**
- * @brief add_button          - add a button to a Widget_t
- * connect to func.value_changed_callback to implement your actions
- * @param *parent             - pointer to the Widget_t request the button
- * @param *label              - Label to show on the button
- * @param x,y,width,height    - the position/geometry to create the button
- * @return Widget_t*          - pointer to the Widget_t button struct
- */
-
 Widget_t* add_button(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 
@@ -48,15 +39,6 @@ Widget_t* add_button(Widget_t *parent, const char * label,
     return wid;
 }
 
-/**
- * @brief add_on_off_button    - add a button with default on/off label to a Widget_t
- * connect to func.value_changed_callback to implement your actions
- * @param *parent             - pointer to the Widget_t request the button
- * @param *label              - Label (ignored)
- * @param x,y,width,height    - the position/geometry to create the button
- * @return Widget_t*          - pointer to the Widget_t button struct
- */
-
 Widget_t* add_on_off_button(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 
@@ -71,15 +53,6 @@ Widget_t* add_on_off_button(Widget_t *parent, const char * label,
     wid->func.button_release_callback = _toggle_button_released;
     return wid;
 }
-
-/**
- * @brief add_toggle_button          - add a button to a Widget_t
- * connect to func.value_changed_callback to implement your actions
- * @param *parent             - pointer to the Widget_t request the button
- * @param *label              - Label to show on the button
- * @param x,y,width,height    - the position/geometry to create the button
- * @return Widget_t*          - pointer to the Widget_t button struct
- */
 
 Widget_t* add_toggle_button(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
@@ -97,15 +70,6 @@ Widget_t* add_toggle_button(Widget_t *parent, const char * label,
     return wid;
 }
 
-/**
- * @brief add_image_toggle_button          - add a button to a Widget_t
- * connect to func.value_changed_callback to implement your actions
- * @param *parent             - pointer to the Widget_t request the button
- * @param *label              - Label to show on the button
- * @param x,y,width,height    - the position/geometry to create the button
- * @return Widget_t*          - pointer to the Widget_t button struct
- */
-
 Widget_t* add_image_toggle_button(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 
@@ -121,15 +85,6 @@ Widget_t* add_image_toggle_button(Widget_t *parent, const char * label,
     wid->func.button_release_callback = _toggle_button_released;
     return wid;
 }
-
-/**
- * @brief add_check_button    - add a button to a Widget_t
- * connect to func.value_changed_callback to implement your actions
- * @param *parent             - pointer to the Widget_t request the button
- * @param *label              - Label to show on the button
- * @param x,y,width,height    - the position/geometry to create the button
- * @return Widget_t*          - pointer to the Widget_t button struct
- */
 
 Widget_t* add_check_button(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
@@ -147,25 +102,9 @@ Widget_t* add_check_button(Widget_t *parent, const char * label,
     return wid;
 }
 
-/**
- * @brief get_width           - get the width of a tooltip text and resize the
- * tooltip widget to match the size
- * @param *w                   - the tooltip Widget_t
- * @return void
- */
-
 int get_width(const char *label) {
     return max(1, strlen(label)*24);    
 }
-
-/**
- * @brief add_check_box       - add a check box to a Widget_t
- * connect to func.value_changed_callback to implement your actions
- * @param *parent             - pointer to the Widget_t request the button
- * @param *label              - Label to show on the button
- * @param x,y,width,height    - the position/geometry to create the button
- * @return Widget_t*          - pointer to the Widget_t button struct
- */
 
 Widget_t* add_check_box(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {

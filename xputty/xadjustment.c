@@ -22,18 +22,6 @@
 #include "xadjustment_private.h"
 
 
-/**
- * @brief *add_adjustment    - adding a adjustment to the widget
- * @param *w                 - pointer to the Widget_t request a adjustment
- * @param std_value          - standard value of the adjustment
- * @param value              - current value of the adjustment
- * @param min_value          - minimum value of the adjustment
- * @param max_value          - maximal value of the adjustment
- * @param step               - step to increase/decrease the adjustment
- * @param type               - set CL_type of adjustment
- * @return *adj              - pointer to adjustment
- */
-
 Adjustment_t *add_adjustment(Widget_t *w, float std_value, float value,
                 float min_value,float max_value, float step, CL_type type) {
     Adjustment_t *adj = (Adjustment_t*)malloc(sizeof(Adjustment_t));
@@ -43,18 +31,6 @@ Adjustment_t *add_adjustment(Widget_t *w, float std_value, float value,
     debug_print("Widget_t add adjustment\n");
     return adj;
 }
-
-/**
- * @brief *set_adjustment    - set a new range to a existing Adjustment
- * @param *w                 - pointer to the Widget_t request a adjustment
- * @param std_value          - standard value of the adjustment
- * @param value              - current value of the adjustment
- * @param min_value          - minimum value of the adjustment
- * @param max_value          - maximal value of the adjustment
- * @param step               - step to increase/decrease the adjustment
- * @param type               - set CL_type of adjustment
- * @return *adj              - pointer to adjustment
- */
 
 void set_adjustment(Adjustment_t *adj, float std_value, float value,
                 float min_value,float max_value, float step, CL_type type) {
@@ -66,12 +42,6 @@ void set_adjustment(Adjustment_t *adj, float std_value, float value,
     debug_print("Widget_t set adjustment\n");
 }
 
-/**
- * @brief delete_adjustment  - freeing the memory of the adjustment
- * @param *adj               - pointer to the Adjustment to free 
- * @return *void             - return NULL
- */
-
 void *delete_adjustment(Adjustment_t *adj) {
     if(adj) {
         free(adj);
@@ -80,12 +50,6 @@ void *delete_adjustment(Adjustment_t *adj) {
     return NULL;
 }
 
-/**
- * @brief adj_set_state      - set the current state of the adjustment
- * @param *adj               - pointer to the Adjustment
- * @return float             - return the adjustment state (0<->1)
- */
-
 void adj_set_state(Adjustment_t *adj, float state) {
     if (!adj) return;
     float nvalue = min(1.0,max(0.0,state));
@@ -93,35 +57,16 @@ void adj_set_state(Adjustment_t *adj, float state) {
     check_value_changed(adj, &value);
 }
 
-/**
- * @brief adj_get_state      - get the current state of the adjustment
- * @param *adj               - pointer to the Adjustment
- * @return float             - return the adjustment state (0<->1)
- */
-
 float adj_get_state(Adjustment_t *adj) {
     if (!adj) return 0.0;
     return (adj->value - adj->min_value) /
        (adj->max_value - adj->min_value);
 }
 
-/**
- * @brief adj_get_value      - get the current value of the adjustment
- * @param *adj               - pointer to the Adjustment
- * @return float             - return the adjustment value
- */
-
 float adj_get_value(Adjustment_t *adj) {
     if (!adj) return 0.0;
     return (adj->value);
 }
-
-/**
- * @brief adj_set_value      - set the current value of the adjustment
- * @param *adj               - pointer to the Adjustment
- * @param v                  - value set the Adjustment to 
- * @return void
- */
 
 void adj_set_value(Adjustment_t *adj, float v) {
     if (!adj) return;
@@ -129,25 +74,11 @@ void adj_set_value(Adjustment_t *adj, float v) {
     check_value_changed(adj, &v);
 }
 
-/**
- * @brief adj_set_start_value - set start value of the adjustment
- * @param *w                  - pointer to Widget_t containing the adjustment 
- * @return void
- */
-
 void adj_set_start_value(void *w) {
     Widget_t * wid = (Widget_t*)w;
     if(wid->adj_x)wid->adj_x->start_value = wid->adj_x->value;
     if(wid->adj_y)wid->adj_y->start_value = wid->adj_y->value;
 }
-
-/**
- * @brief adj_set_motion_state      - set value/state of the adjustment
- * @param *adj               - pointer to Widget_t containing the adjustment
- * @param x                  - value for the xaxis
- * @param y                  - value for the yaxis
- * @return void
- */
 
 void adj_set_motion_state(void *w, float x, float y) {
     Widget_t * wid = (Widget_t*)w;
@@ -195,14 +126,6 @@ void adj_set_motion_state(void *w, float x, float y) {
         check_value_changed(wid->adj_y, &value);
     }
 }
-
-/**
- * @brief check_value_changed   - check if value has changed and send
- * adj_callback if so
- * @param *adj                  - pointer to the Adjustment
- * @param v                     - value to check 
- * @return void
- */
 
 void check_value_changed(Adjustment_t *adj, float *value) {
     debug_print("Adjustment_t check_value_changed %f\n", *(value));

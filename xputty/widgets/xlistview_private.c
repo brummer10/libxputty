@@ -23,26 +23,12 @@
 #include "xtooltip.h"
 
 
-/**
- * @brief _draw_listview           - draw listview on expose call
- * @param *w_                  - the listview to draw
- * @param *user_data           - attached user_data
- * @return void
- */
-
 void _draw_listview(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
     set_pattern(w,&w->app->color_scheme->normal,&w->app->color_scheme->active,BACKGROUND_);
     cairo_paint (w->cr);
 }
-
-/**
- * @brief _draw_list           - draw list on expose call
- * @param *w_                  - the Widget_t to draw
- * @param *user_data           - attached user_data
- * @return void
- */
 
 void _draw_list(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
@@ -106,14 +92,6 @@ void _draw_list(void *w_, void* user_data) {
     }
 }
 
-/**
- * @brief _list_motion             - follow mouse pointer to set prelight item 
- * @param *w_                      - void pointer to the Widget_t listview
- * @param *xmotion_                - void pointer to the XMotionEvent
- * @param *user_data               - void pointer to attached user_data
- * @return void
- */
-
 void _list_motion(void *w_, void* xmotion_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
@@ -128,14 +106,6 @@ void _list_motion(void *w_, void* xmotion_, void* user_data) {
         expose_widget(w);
     }
 }
-
-/**
- * @brief _list_key_pressed        - move listview or set active entry 
- * @param *w_                      - void pointer to the Widget_t listview
- * @param *button_                 - void pointer to the XButtonEvent
- * @param *user_data               - void pointer to attached user_data
- * @return void
- */
 
 void _list_key_pressed(void *w_, void* xkey_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
@@ -162,14 +132,6 @@ void _list_key_pressed(void *w_, void* xkey_, void* user_data) {
         }
     }
 }
-
-/**
- * @brief _list_entry_released     - move listview or set active entry 
- * @param *w_                      - void pointer to the Widget_t listview
- * @param *button_                 - void pointer to the XButtonEvent
- * @param *user_data               - void pointer to attached user_data
- * @return void
- */
 
 void _list_entry_released(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
@@ -199,27 +161,12 @@ void _list_entry_released(void *w_, void* button_, void* user_data) {
     }
 }
 
-/**
- * @brief _leave_list          - draw list on pointer leave
- * @param *w_                  - the Widget_t to draw
- * @param *user_data           - attached user_data
- * @return void
- */
-
 void _leave_list(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
     filelist->prelight_item = -1;
     expose_widget(w);
 }
-
-/**
- * @brief _reconfigure_listview_viewport - reconfigure the viewport adjustment
- * on size changes
- * @param *w_                      - void pointer to view_port
- * @param *user_data               - attached user_data
- * @return void
- */
 
 void _reconfigure_listview_viewport(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
@@ -234,13 +181,6 @@ void _reconfigure_listview_viewport(void *w_, void* user_data) {
     adj_set_state(w->adj,st);
 }
 
-/**
- * @brief _configure_listview       - configure the viewport on mapping
- * @param *w_                      - void pointer to view_port
- * @param *user_data               - attached user_data
- * @return void
- */
-
 void _configure_listview(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t* listview = w->parent;
@@ -250,14 +190,6 @@ void _configure_listview(void *w_, void* user_data) {
     int width = attrs.width;
     XResizeWindow (w->app->dpy, w->widget, width, 25*(max(1,filelist->list_size)));
 }
-
-/**
- * @brief _draw_listview_viewslider - draw a slider on the viewport
- * to indicate the view point
- * @param *w_                      - void pointer to view_port
- * @param *user_data               - attached user_data
- * @return void
- */
 
 void _draw_listview_viewslider(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
@@ -281,13 +213,6 @@ void _draw_listview_viewslider(void *w_, void* user_data) {
     cairo_set_line_width(w->crb,1);
     cairo_stroke(w->crb);
 }
-
-/**
- * @brief _set_listview_viewpoint  - move the view_port to position
- * @param *w_                      - void pointer to view_port
- * @param *user_data               - attached user_data
- * @return void
- */
 
 void _set_listview_viewpoint(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;

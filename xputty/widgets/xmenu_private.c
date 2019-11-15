@@ -22,26 +22,12 @@
 #include "xmenu_private.h"
 
 
-/**
- * @brief _draw_menu           - draw menu on expose call
- * @param *w_                  - the menu to draw
- * @param *user_data           - attached user_data
- * @return void
- */
-
 void _draw_menu(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
     use_bg_color_scheme(w, get_color_state(w));
     cairo_paint (w->crb);
 }
-
-/**
- * @brief _draw_item           - draw item on expose call
- * @param *w_                  - the item to draw
- * @param *user_data           - attached user_data
- * @return void
- */
 
 void _draw_item(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
@@ -79,13 +65,6 @@ void _draw_item(void *w_, void* user_data) {
     cairo_new_path (w->crb);
 }
 
-/**
- * @brief _draw_check_item     - draw item on expose call
- * @param *w_                  - the item to draw
- * @param *user_data           - attached user_data
- * @return void
- */
-
 void _draw_check_item(void *w_, void* user_data) {
     _draw_item(w_, user_data);
     Widget_t *w = (Widget_t*)w_;
@@ -110,14 +89,6 @@ void _draw_check_item(void *w_, void* user_data) {
     }
 }
 
-/**
- * @brief _draw_viewslider     - draw a slider on the viewport
- * to indicate the view point
- * @param *w_                  - void pointer to view_port
- * @param *user_data           - attached user_data
- * @return void
- */
-
 void _draw_viewslider(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     int v = (int)w->adj->max_value;
@@ -141,13 +112,6 @@ void _draw_viewslider(void *w_, void* user_data) {
     cairo_stroke(w->crb);
 }
 
-/**
- * @brief _set_viewpoint       - move the view_port to position
- * @param *w_                  - void pointer to view_port
- * @param *user_data           - attached user_data
- * @return void
- */
-
 void _set_viewpoint(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     int v = (int)max(0,adj_get_value(w->adj));
@@ -157,13 +121,6 @@ void _set_viewpoint(void *w_, void* user_data) {
     XMoveWindow(w->app->dpy,w->widget,0, -height*v);
 }
 
-/**
- * @brief _check_item_button_pressed  - redraw item on button press
- * @param *button                     - the xbutton which is pressed
- * @param *user_data                  - attached user_data
- * @return void
- */
-
 void _check_item_button_pressed(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (w->flags & HAS_FOCUS) {
@@ -172,26 +129,12 @@ void _check_item_button_pressed(void *w_, void* button_, void* user_data) {
     }
 }
 
-/**
- * @brief _radio_item_button_pressed  - redraw item on button press
- * @param *button                     - the xbutton which is pressed
- * @param *user_data                  - attached user_data
- * @return void
- */
-
 void _radio_item_button_pressed(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (w->flags & HAS_FOCUS) {
         radio_item_set_active(w);
     }
 }
-
-/**
- * @brief _configure_menu     - set final size and position of menu to a Widget_t
- * @param *parent             - pointer to the Widget_t the menu should pop over
- * @param *menu               - the menu to show
- * @return void
- */
 
 void _configure_menu(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     Widget_t* view_port =  menu->childlist->childs[0];

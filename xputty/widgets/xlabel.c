@@ -23,14 +23,6 @@
 #include "xlabel_private.h"
 
 
-/**
- * @brief add_label           - add a label to a Widget_t
- * @param *parent             - pointer to the Widget_t request the label
- * @param *label              - Label to show on the button
- * @param x,y,width,height    - the position/geometry to create the label
- * @return Widget_t*          - pointer to the Widget_t label struct
- */
-
 Widget_t* add_label(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 

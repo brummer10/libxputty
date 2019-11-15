@@ -182,9 +182,9 @@ struct Xputty{
  * \n main_init() should be called directly after the declaration of Xputty
  * before the first Widget_t get created.
  * \n Any Widget_t created afterwards will be added to the main childlist.
- * \n The main childlist is used to check if a Widget_t is valid.
+ * \n The main childlist is used to check if a Widget_t is valid to receive a Event.
  * \n Xputty check if a Widget_t is registerd in the main childlist, and only forward
- * events when it found the event window in the list.
+ * events when it found the Widget_t in the list.
  * \n When a Widget_t call destroy_widget() any childs of this Widget_t receive
  * a call to destroy_widget() to release there memory, they get removed from the main childlist
  * and finaly the Widget_t itself will be removed from the main childlist as well.

@@ -22,13 +22,6 @@
 #include "xtooltip.h"
 #include "xtooltip_private.h"
 
-/**
- * @brief tooltip_set_text     - set a (new) text to a tooltip for Widget_t
- * @param *w                   - pointer to the Widget_t request the tooltip
- * @param *label               - the tooltip text
- * @return void
- */
-
 void tooltip_set_text(Widget_t *w, const char* label) {
     Widget_t *wid = NULL;
     bool is_tooltip = false;
@@ -45,26 +38,11 @@ void tooltip_set_text(Widget_t *w, const char* label) {
     if (!is_tooltip) add_tooltip(w, label);
 }
 
-/**
- * @brief add_tooltip          - add a tooltip to Widget_t
- * @param *w                   - pointer to the Widget_t request the tooltip
- * @param *label               - the tooltip text
- * @return void
- */
-
 void add_tooltip(Widget_t *w, const char* label) {
     Widget_t *wid = create_tooltip(w, 25, 25);
     wid->label = label;
     _get_width(wid);
 }
-
-/**
- * @brief create_tooltip      - create a tooltip for a Widget_t
- * @param *parent             - pointer to the Widget_t the tooltip should pop over
- * @param width               - define the width of the tooltip
- * @param height              - define the height of the tooltip
- * @return Widget_t*          - pointer to the Widget_t button struct
- */
 
 Widget_t* create_tooltip(Widget_t *parent, int width, int height) {
 

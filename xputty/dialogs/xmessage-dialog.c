@@ -20,6 +20,7 @@
 
 #include "xmessage-dialog.h"
 
+
 static void draw_message_label(Widget_t *w, int width, int height) {
     MessageBox *mb = w->parent_struct;
     cairo_text_extents_t extents;
@@ -325,28 +326,6 @@ static void mg_mem_free(void *w_, void* user_data) {
     free(mb->choices);
     free(mb);
 }
-
-/**
- * @brief open_message_dialog  - open a non blocking dialog window,
- * lines in message chould be separated by the character "|"
- * choices for the SELECTION_BOX should be separated as well with the
- * character "|". message and/or choices could be NULL when not needed.
- * To fetch the response of a dialog, connect to the dialog_callback 
- * supported "styles" been
- * \n
- * INFO_BOX - a message dialog display a info text
- * \n
- * WARNING_BOX - a message dialog display a warning
- * \n
- * ERROR_BOX - a message dialog display a error message
- * \n
- * QUESTION_BOX - a no/yes dialog message
- * \n
- * SELECTION_BOX - a dialog to select between multiple options
- * \n
- * ENTRY_BOX - a dialog to get text input
- * @return Widget_t*           - pointer to the Widget_t struct
- */
 
 Widget_t *open_message_dialog(Widget_t *w, int style, const char *title,
                               const char *message, const char *choices) {

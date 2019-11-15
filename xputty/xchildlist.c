@@ -22,12 +22,6 @@
 #include "xchildlist_private.h"
 
 
-/**
- * @brief childlist_init      - allocate the array to min size
- * @param *childlist          - pointer to the Childlist_t
- * @return void 
- */
-
 void childlist_init(Childlist_t *childlist) {
     childlist->childs = (Widget_t**)malloc(sizeof(Widget_t*) * 4);
     assert(childlist->childs != NULL);
@@ -41,22 +35,9 @@ void childlist_init(Childlist_t *childlist) {
     }
 }
 
-/**
- * @brief childlist_destroy   - free the childlist
- * @param *childlist          - pointer to the Childlist_t
- * @return void 
- */
-
 void childlist_destroy(Childlist_t *childlist) {
     if(childlist) free(childlist->childs);
 }
-
-/**
- * @brief childlist_add_child - add a child to the childlist
- * @param *childlist          - pointer to the Childlist_t
- * @param *child              - pointer to the child to add
- * @return void 
- */
 
 void childlist_add_child(Childlist_t *childlist, Widget_t *child) {
     if(!childlist) childlist_init(childlist);
@@ -73,13 +54,6 @@ void childlist_add_child(Childlist_t *childlist, Widget_t *child) {
     childlist->elem +=1;
 }
 
-/**
- * @brief childlist_add_child - remove a child from the childlist
- * @param *childlist          - pointer to the Childlist_t
- * @param *child              - pointer to the child to remove
- * @return void 
- */
-
 void childlist_remove_child(Childlist_t *childlist, Widget_t *child) {
     if (!childlist) return;
     int it = childlist_find_child(childlist, child);
@@ -94,13 +68,6 @@ void childlist_remove_child(Childlist_t *childlist, Widget_t *child) {
     }
 }
 
-/**
- * @brief childlist_find_child - find a child in a the childlist
- * @param *childlist           - pointer to the Childlist_t
- * @param *child               - pointer to the child to find
- * @return int                 - return position in childlist or -1 
- */
-
 int childlist_find_child(Childlist_t *childlist, Widget_t *child) {
     int i = 0;
     for(;i<childlist->elem;i++) {
@@ -111,13 +78,6 @@ int childlist_find_child(Childlist_t *childlist, Widget_t *child) {
     return -1;
 }
 
-/**
- * @brief childlist_find_widget - find a child Widget_t in a the childlist
- * @param *childlist            - pointer to the Childlist_t
- * @param child_window          - the window to find the Widget_t for
- * @return Widget_t*            - return pointer to WiDget or NULL
- */
-
 int childlist_find_widget(Childlist_t *childlist, Window child_window) {
     int i = childlist->elem-1;
     for(;i>-1;i--) {
@@ -127,12 +87,6 @@ int childlist_find_widget(Childlist_t *childlist, Window child_window) {
     }
     return -1;
 }
-
-/**
- * @brief childlist_has_child  - check if childlist contain a child
- * @param *childlist           - pointer to the Childlist_t
- * @return int                 - return element counter value
- */
 
 int childlist_has_child(Childlist_t *childlist) {
     return childlist->elem;

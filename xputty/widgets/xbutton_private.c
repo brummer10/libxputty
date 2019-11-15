@@ -21,14 +21,6 @@
 
 #include "xbutton_private.h"
 
-/**
- * @brief _rounded_rectangle  - internal draw a rounded button
- * @param x                   - point on x axis
- * @param y                   - point on y axis
- * @param width               - the button width
- * @param height              - the button height
- * @return void
- */
 
 void _rounded_rectangle(cairo_t *cr,float x, float y, float width, float height) {
 	cairo_new_path (cr);
@@ -39,14 +31,6 @@ void _rounded_rectangle(cairo_t *cr,float x, float y, float width, float height)
 	cairo_curve_to (cr, x, height, x, height, x, (y + height)/2);
 	cairo_close_path (cr);
 }
-
-/**
- * @brief _pattern_in         - a little pattern to make press state more visible
- * @param *w_                 - void pointer to the Widget_t button
- * @param st                  - the color state to use
- * @param height              - the button height
- * @return void
- */
 
 void _pattern_out(Widget_t *w, Color_state st, int height) {
     Colors *c = get_color_scheme(w->app,st);
@@ -59,14 +43,6 @@ void _pattern_out(Widget_t *w, Color_state st, int height) {
     cairo_pattern_destroy (pat);
 }
 
-/**
- * @brief _pattern_in         - a little pattern to make press state more visible
- * @param *w_                 - void pointer to the Widget_t button
- * @param st                  - the color state to use
- * @param height              - the button height
- * @return void
- */
-
 void _pattern_in(Widget_t *w, Color_state st, int height) {
     Colors *c = get_color_scheme(w->app,st);
     if (!c) return;
@@ -77,13 +53,6 @@ void _pattern_in(Widget_t *w, Color_state st, int height) {
     cairo_set_source(w->crb, pat);
     cairo_pattern_destroy (pat);
 }
-
-/**
- * @brief _draw_image_button       - internal draw the knob from image
- * to the buffer
- * @param *w                     - pointer to the Widget_t knob
- * @return void
- */
 
 void _draw_image_button(Widget_t *w, int width_t, int height_t, float offset) {
     int width = cairo_xlib_surface_get_width(w->image);
@@ -102,13 +71,6 @@ void _draw_image_button(Widget_t *w, int width_t, int height_t, float offset) {
     cairo_fill(w->crb);
     cairo_scale(w->crb, x1,y1);
 }
-
-/**
- * @brief _draw_image_button_with_label  - internal draw the knob from image
- * to the buffer
- * @param *w                             - pointer to the Widget_t knob
- * @return void
- */
 
 void _draw_image_button_with_label(Widget_t *w, int width_t, int height_t) {
     int width = cairo_xlib_surface_get_width(w->image);
@@ -189,13 +151,6 @@ void _draw_button_base(Widget_t *w, int width, int height) {
     }
 }
 
-/**
- * @brief _draw_button           - internal draw the button to the buffer
- * @param *w_                    - void pointer to the Widget_t button
- * @param *user_data             - void pointer to attached user_data
- * @return void
- */
-
 void _draw_button(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
@@ -243,13 +198,6 @@ void _draw_button(void *w_, void* user_data) {
     }
 }
 
-/**
- * @brief _draw_on_off_button    - internal draw the on/off button to the buffer
- * @param *w_                    - void pointer to the Widget_t button
- * @param *user_data             - void pointer to attached user_data
- * @return void
- */
-
 void _draw_on_off_button(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
@@ -296,13 +244,6 @@ void _draw_on_off_button(void *w_, void* user_data) {
 
 }
 
-/**
- * @brief _draw_ti_button           - internal draw the button to the buffer
- * @param *w_                    - void pointer to the Widget_t button
- * @param *user_data             - void pointer to attached user_data
- * @return void
- */
-
 void _draw_ti_button(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
@@ -327,13 +268,6 @@ void _draw_ti_button(void *w_, void* user_data) {
        _draw_image_button(w, width, height,offset);
    }
 }
-
-/**
- * @brief _draw_check_button     - internal draw the button to the buffer
- * @param *w_                    - void pointer to the Widget_t button
- * @param *user_data             - void pointer to attached user_data
- * @return void
- */
 
 void _draw_check_button(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
@@ -367,13 +301,6 @@ void _draw_check_button(void *w_, void* user_data) {
         cairo_new_path (w->crb);
     }
 }
-
-/**
- * @brief _draw_check_box        - internal draw the check box to the buffer
- * @param *w_                    - void pointer to the Widget_t button
- * @param *user_data             - void pointer to attached user_data
- * @return void
- */
 
 void _draw_check_box(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
@@ -425,26 +352,10 @@ void _draw_check_box(void *w_, void* user_data) {
 -----------------------------------------------------------------------
 ----------------------------------------------------------------------*/
 
-/**
- * @brief _button_pressed   - redraw the button and send state via user_callback
- * @param *w_               - void pointer to the Widget_t button
- * @param *button           - void pointer to XEvent.xbutton struct
- * @param *user_data        - void pointer to attached user_data
- * @return void
- */
-
 void _button_pressed(void *w_, void* button, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     adj_set_value(w->adj_y, 1.0);
 }
-
-/**
- * @brief _button_released  - redraw the button and send state via user_callback
- * @param *w_               - void pointer to the Widget_t button
- * @param *button           - void pointer to XEvent.xbutton struct
- * @param *user_data        - void pointer to attached user_data
- * @return void
- */
 
 void _button_released(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
@@ -458,25 +369,9 @@ void _button_released(void *w_, void* button_, void* user_data) {
 -----------------------------------------------------------------------
 ----------------------------------------------------------------------*/
 
-/**
- * @brief _toggle_button_pressed  - redraw the button and send state via user_callback
- * @param *w_                     - void pointer to the Widget_t button
- * @param *button                 - void pointer to XEvent.xbutton struct
- * @param *user_data              - void pointer to attached user_data
- * @return void
- */
-
 void _toggle_button_pressed(void *w_, void* button, void* user_data) {
     expose_widget(w_);
 }
-
-/**
- * @brief _toggle_button_released  - redraw the button and send state via user_callback
- * @param *w_                      - void pointer to the Widget_t button
- * @param *button                  - void pointer to XEvent.xbutton struct
- * @param *user_data               - void pointer to attached user_data
- * @return void
- */
 
 void _toggle_button_released(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;

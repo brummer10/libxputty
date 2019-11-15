@@ -24,13 +24,6 @@
 #include "xtooltip.h"
 
 
-/**
- * @brief listview_set_active_entry   - set the active listview entry
- * @param *w_                        - void pointer to the Widget_t listview
- * @param active                     - the active entry (int)
- * @return void
- */
-
 void listview_set_active_entry(Widget_t *w, int active) {
     if(active<0) return;
     Widget_t* view_port =  w->childlist->childs[0];
@@ -41,14 +34,6 @@ void listview_set_active_entry(Widget_t *w, int active) {
     filelist->active_item = (int)value;
     adj_set_value(w->adj,filelist->active_item);
 }
-
-/**
- * @brief create_listview_viewport     - create a viewport on a listview to a Widget_t
- * @param *parent                     - pointer to the Widget_t request the viewport
- * @param width                       - define the width of the viewport
- * @param height                      - define the height of the viewport
- * @return Widget_t*                  - pointer to the Widget_t viewport
- */
 
 Widget_t* create_listview_viewport(Widget_t *parent, int elem, int width, int height) {
     Widget_t *wid = create_widget(parent->app, parent, 0, 0, width, height);
@@ -76,14 +61,6 @@ Widget_t* create_listview_viewport(Widget_t *parent, int elem, int width, int he
     return wid;
 }
 
-/**
- * @brief add_listview        - add a listview to a Widget_t
- * @param *parent             - pointer to the Widget_t request the listview
- * @param *label              - Label to show on the listview (not used)
- * @param x,y,width,height    - the position/geometry to create the listview
- * @return Widget_t*          - pointer to the Widget_t label struct
- */
-
 Widget_t* add_listview(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 
@@ -99,26 +76,11 @@ Widget_t* add_listview(Widget_t *parent, const char * label,
     return wid;
 }
 
-/**
- * @brief listview_mem_free        - release additional used memory when destroy the Widget_t
- * @param *w_                      - void pointer to the Widget_t
- * @param *user_data               - void pointer to attached user_data
- * @return void
- */
-
 void listview_mem_free(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
     free(filelist);
 }
-
-/**
- * @brief listview_set_list   - set a list to a listview  Widget_t
- * @param *listview           - pointer to the Widget_t listview which should show the list
- * @param **list              - pointer to the list
- * @param list_size           - how many items contain the list
- * @return void
- */
 
 void listview_set_list(Widget_t *listview, char **list, int list_size) {
     Widget_t* view_port =  listview->childlist->childs[0];

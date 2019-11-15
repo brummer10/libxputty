@@ -23,27 +23,12 @@
 #include "xlistbox_private.h"
 
 
-/**
- * @brief listbox_set_active_entry   - set the active listbox entry
- * @param *w_                        - void pointer to the Widget_t listbox
- * @param active                     - the active entry (int)
- * @return void
- */
-
 void listbox_set_active_entry(Widget_t *w, int active) {
     float value = (float)active;
     if (value>w->adj->max_value) value = w->adj->max_value;
     else if (value<w->adj->min_value) value = w->adj->min_value;
     adj_set_value(w->adj, value);
 }
-
-/**
- * @brief create_listbox_viewport     - create a viewport on a listbox to a Widget_t
- * @param *parent                     - pointer to the Widget_t request the viewport
- * @param width                       - define the width of the viewport
- * @param height                      - define the height of the viewport
- * @return Widget_t*                  - pointer to the Widget_t viewport
- */
 
 Widget_t* create_listbox_viewport(Widget_t *parent, int elem, int width, int height) {
     Widget_t *wid = create_widget(parent->app, parent, 0, 0, width, height);
@@ -58,14 +43,6 @@ Widget_t* create_listbox_viewport(Widget_t *parent, int elem, int width, int hei
     return wid;
 }
 
-/**
- * @brief add_label           - add a listbox to a Widget_t
- * @param *parent             - pointer to the Widget_t request the listbox
- * @param *label              - Label to show on the button
- * @param x,y,width,height    - the position/geometry to create the listbox
- * @return Widget_t*          - pointer to the Widget_t label struct
- */
-
 Widget_t* add_listbox(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 
@@ -79,13 +56,6 @@ Widget_t* add_listbox(Widget_t *parent, const char * label,
     create_listbox_viewport(wid, elem, width, height);
     return wid;
 }
-
-/**
- * @brief listbox_add_entry   - add a item to listbox
- * @param *listbox            - pointer to the Widget_t listbox
- * @param *label              - Label to show on the listbox
- * @return Widget_t*          - pointer to the Widget_t listbox_item struct
- */
 
 Widget_t* listbox_add_entry(Widget_t *listbox, const char * label) {
     Widget_t* view_port =  listbox->childlist->childs[0];

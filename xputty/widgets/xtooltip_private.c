@@ -22,13 +22,6 @@
 #include "xtooltip_private.h"
 
 
-/**
- * @brief _get_width           - get the width of a tooltip text and resize the
- * tooltip widget to match the size
- * @param *w                   - the tooltip Widget_t
- * @return void
- */
-
 void _get_width(Widget_t *w) {
     cairo_text_extents_t extents;
     cairo_set_font_size (w->crb, 12);
@@ -37,13 +30,6 @@ void _get_width(Widget_t *w) {
     cairo_text_extents(w->crb,w->label , &extents);
     XResizeWindow (w->app->dpy, w->widget, max(1, (int)extents.width+40), 25);    
 }
-
-/**
- * @brief _draw_tooltip        - draw tooltip on expose call
- * @param *w_                  - the tooltip to draw
- * @param *user_data           - attached user_data
- * @return void
- */
 
 void _draw_tooltip(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;

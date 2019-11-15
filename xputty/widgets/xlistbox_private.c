@@ -23,26 +23,12 @@
 #include "xtooltip.h"
 
 
-/**
- * @brief _draw_listbox           - draw listbox on expose call
- * @param *w_                  - the listbox to draw
- * @param *user_data           - attached user_data
- * @return void
- */
-
 void _draw_listbox(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
     use_bg_color_scheme(w, NORMAL_);
     cairo_paint (w->crb);
 }
-
-/**
- * @brief _draw_listbox_item   - draw item on expose call
- * @param *w_                  - the item to draw
- * @param *user_data           - attached user_data
- * @return void
- */
 
 void _draw_listbox_item(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
@@ -90,14 +76,6 @@ void _draw_listbox_item(void *w_, void* user_data) {
     }
 }
 
-/**
- * @brief _reconfigure_listbox_viewport - reconfigure the viewport adjustment
- * on size changes
- * @param *w_                      - void pointer to view_port
- * @param *user_data               - attached user_data
- * @return void
- */
-
 void _reconfigure_listbox_viewport(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     float st = adj_get_state(w->adj);
@@ -111,13 +89,6 @@ void _reconfigure_listbox_viewport(void *w_, void* user_data) {
     adj_set_state(w->adj,st);
 }
 
-/**
- * @brief _configure_listbox       - configure the viewport on mapping
- * @param *w_                      - void pointer to view_port
- * @param *user_data               - attached user_data
- * @return void
- */
-
 void _configure_listbox(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     int si = max(1,childlist_has_child(w->childlist));
@@ -127,14 +98,6 @@ void _configure_listbox(void *w_, void* user_data) {
     int width = attrs.width;
     XResizeWindow (w->app->dpy, w->widget, width, 25*(si));
 }
-
-/**
- * @brief _draw_listbox_viewslider - draw a slider on the viewport
- * to indicate the view point
- * @param *w_                      - void pointer to view_port
- * @param *user_data               - attached user_data
- * @return void
- */
 
 void _draw_listbox_viewslider(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
@@ -159,13 +122,6 @@ void _draw_listbox_viewslider(void *w_, void* user_data) {
     cairo_stroke(w->crb);
 }
 
-/**
- * @brief _set_listbox_viewpoint  - move the view_port to position
- * @param *w_                     - void pointer to view_port
- * @param *user_data              - attached user_data
- * @return void
- */
-
 void _set_listbox_viewpoint(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     int v = (int)adj_get_value(w->adj);
@@ -174,14 +130,6 @@ void _set_listbox_viewpoint(void *w_, void* user_data) {
     int height = attrs.height;
     XMoveWindow(w->app->dpy,w->widget,0, -height*v);
 }
-
-/**
- * @brief _listbox_entry_released  - redraw the slider when buttob released 
- * @param *w_                      - void pointer to the Widget_t entry
- * @param *button_                 - void pointer to the XButtonEvent
- * @param *user_data               - void pointer to attached user_data
- * @return void
- */
 
 void _listbox_entry_released(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;

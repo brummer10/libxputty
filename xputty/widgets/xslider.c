@@ -23,16 +23,6 @@
 #include "xslider_private.h"
 
 
-/**
- * @brief add_vslider          - add a vertical slider to a Widget_t
- * connect to func.value_changed_callback to implement your actions
- * use set_adjustment(w->adj, . . ) to set the range you need
- * @param *parent             - pointer to the Widget_t request the button
- * @param *label              - Label to show on the button
- * @param x,y,width,height    - the position/geometry to create the button
- * @return Widget_t*          - pointer to the Widget_t button struct
- */
-
 Widget_t* add_vslider(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 
@@ -47,16 +37,6 @@ Widget_t* add_vslider(Widget_t *parent, const char * label,
     wid->func.button_release_callback = _slider_released;
     return wid;
 }
-
-/**
- * @brief add_hslider         - add a horizontal slider to a Widget_t
- * connect to func.value_changed_callback to implement your actions
- * use set_adjustment(w->adj, . . ) to set the range you need
- * @param *parent             - pointer to the Widget_t request the button
- * @param *label              - Label to show on the button
- * @param x,y,width,height    - the position/geometry to create the button
- * @return Widget_t*          - pointer to the Widget_t button struct
- */
 
 Widget_t* add_hslider(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {

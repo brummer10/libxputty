@@ -12,6 +12,6 @@ $(SUBDIR):
 	@exec $(MAKE) -C $@ $(MAKECMDGOALS)
 
 doc:
-	@rm -rf ./docs
-	doxygen Doxyfile
-	cp ./examples/index.html ./docs/
+	#@rm -rf ./docs
+	#doxygen Doxyfile
+	#cp ./examples/index.html ./docs/

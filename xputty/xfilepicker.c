@@ -128,15 +128,6 @@ static inline int fp_prefill_dirbuffer(FilePicker *filepicker, char *path) {
     return ret;   
 }
 
-/**
- * @brief fp_get_files             - fill file_names and dir_names with the
- * results from readdir path
- * @param *filepicker              - pointer to the struct holding the list pointers
- * @param *path                    - the path to read from
- * @param get_dirs                 - 0 = only read files 1 = refill the directory buffer as well
- * @return int                     - return the position of the given path in the directory list 
- */
-
 int fp_get_files(FilePicker *filepicker, char *path, int get_dirs) {
     int ret = 0;
     fp_clear_filebuffer(filepicker);
@@ -182,12 +173,6 @@ int fp_get_files(FilePicker *filepicker, char *path, int get_dirs) {
     return ret;
 }
 
-/**
- * @brief fp_free                  - release all memory used by the filepicker
- * @param *filepicker              - pointer to the struct to be released
- * @return void
- */
-
 void fp_free(FilePicker *filepicker) {
     fp_clear_filebuffer(filepicker);
     fp_clear_dirbuffer(filepicker);
@@ -195,13 +180,6 @@ void fp_free(FilePicker *filepicker) {
     free(filepicker->path);
     free(filepicker->filter);
 }
-
-/**
- * @brief fp_init                  - set default values used by the filepicker
- * @param *filepicker              - pointer to the struct to alocate
- * @param *path                    - the path to read from
- * @return void
- */
 
 void fp_init(FilePicker *filepicker, const char *path) {
     filepicker->file_counter=0;

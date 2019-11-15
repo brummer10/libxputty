@@ -23,13 +23,6 @@
 #include "xwidget_private.h"
 
 
-/**
- * @brief key_mapping       - modifier key's mapped to a integer value
- * @param *dpy              - pointer to the Display in use
- * @param *xkey             - the key to map
- * @return int              - value (1-10) or 0 when not mapped 
- */
-
 int key_mapping(Display *dpy, XKeyEvent *xkey) {
     if (xkey->keycode == XKeysymToKeycode(dpy,XK_Tab))
         return (xkey->state == ShiftMask) ? 1 : 2;
@@ -75,13 +68,6 @@ int key_mapping(Display *dpy, XKeyEvent *xkey) {
     else return 0;
 }
 
-/**
- * @brief destroy_widget    - destroy a widget
- * @param *w                - pointer to the Widget_t sending the request
- * @param *main             - pointer to main struct
- * @return void 
- */
-
 void destroy_widget(Widget_t * w, Xputty *main) {
     int count = childlist_find_child(main->childlist, w);
     if (count == 0 && main->run == true) {
@@ -122,13 +108,6 @@ void destroy_widget(Widget_t * w, Xputty *main) {
     }
 }
 
-/**
- * @brief configure_event    - default callback when a widget receive a ConfigureNotify
- * @param *w                 - pointer to the Widget_t receive the event
- * @param user_data          - void pointer to attached user_data
- * @return void 
- */
-
 void configure_event(void *w_, void* user_data) {
     Widget_t *wid = (Widget_t*)w_;
     XWindowAttributes attrs;
@@ -151,33 +130,13 @@ void configure_event(void *w_, void* user_data) {
     }
 }
 
-/**
- * @brief widget_reset_scale - reset scaling mode after image surface
- * @param *w                 - pointer to the Widget_t sending the request
- * @return void 
- */
-
 void widget_reset_scale(Widget_t *w) {
     cairo_scale(w->crb, w->scale.cscale_x,w->scale.cscale_y);
 }
 
-/**
- * @brief widget_set_scale   - set scaling mode for image surface
- * @param *w                 - pointer to the Widget_t sending the request
- * @return void 
- */
-
 void widget_set_scale(Widget_t *w) {
     cairo_scale(w->crb, w->scale.rcscale_x,w->scale.rcscale_y);
 }
-
-/**
- * @brief *create_window     - create a Window 
- * @param *dpy               - pointer to the Display to use
- * @param win                - pointer to the Parrent Window (may be Root)
- * @param x,y,width,height   - the position/geometry to create the window
- * @return Widget_t *        - pointer to the Widget_t struct
- */
 
 Widget_t *create_window(Xputty *app, Window win,
                           int x, int y, int width, int height) {
@@ -288,14 +247,6 @@ Widget_t *create_window(Xputty *app, Window win,
     return w;
 }
 
-/**
- * @brief *create_widget      - create a widget
- * @param *dpy                - pointer to the Display to use
- * @param *parent             - pointer to the Parrent Widget_t
- * @param x,y,width,height    - the position/geometry to create the widget
- * @return Widget_t*          - pointer to the Widget_t struct
- */
-
 Widget_t *create_widget(Xputty *app, Widget_t *parent,
                           int x, int y, int width, int height) {
 
@@ -398,14 +349,6 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     return w;
 }
 
-/**
- * @brief connect_func      - connect a event with a handler
- * without type check
- * @param **event           - the event to connect
- * @param *handler          - the handler to handle the event
- * @return void
- */
-
 void connect_func(void (**event)(), void (*handler)()) {
     debug_print("address of a is: %p\n", (void*)event);
     debug_print("address of b is: %p\n", (void*)handler);
@@ -413,33 +356,69 @@ void connect_func(void (**event)(), void (*handler)()) {
     debug_print("address of a is: %p\n", (void*)(*event));
 }
 
-/**
- * @brief widget_set_title  - set window title for Widget_t
- * @param *w                - pointer to the Widget_t to set the title
- * @param *title            - the title to store
- * @return void 
- */
+void signal_connect_func(Widget_t *w, EventType type, void (*handler)()) {
+    switch(type) {
+        case(EXPOSE):
+            w->func.expose_callback = handler;
+        break;
+        case(CONFIGURE):
+            w->func.configure_callback = handler;
+        break;
+        case(ENTER):
+            w->func.enter_callback = handler;
+        break;
+        case(LEAVE):
+            w->func.leave_callback = handler;
+        break;
+        case(ADJ_INTERN):
+            w->func.adj_callback = handler;
+        break;
+        case(VALUE_CHANGED):
+            w->func.value_changed_callback = handler;
+        break;
+        case(USER):
+            w->func.user_callback = handler;
+        break;
+        case(MEM_FREE):
+            w->func.mem_free_callback = handler;
+        break;
+        case(CONFIGURE_NOTIFY):
+            w->func.configure_notify_callback = handler;
+        break;
+        case(MAP_NOTIFY):
+            w->func.map_notify_callback = handler;
+        break;
+        case(DIALOG_RESPONSE):
+            w->func.dialog_callback = handler;
+        break;
+        case(BUTTON_PRESS):
+            w->func.button_press_callback = handler;
+        break;
+        case(BUTTON_RELEASE):
+            w->func.button_release_callback = handler;
+        break;
+        case(POINTER_MOTION):
+            w->func.motion_callback = handler;
+        break;
+        case( KEY_PRESS):
+            w->func.key_press_callback = handler;
+        break;
+        case( KEY_RELEASE):
+            w->func.key_release_callback = handler;
+        break;
+        default:
+        break;
+    }
+}
 
 void widget_set_title(Widget_t *w, const char *title) {
     XStoreName(w->app->dpy, w->widget, title);
 }
 
-/**
- * @brief widget_show       - map/show widget
- * @param *w                - pointer to the Widget_t to map
- * @return void 
- */
-
 void widget_show(Widget_t *w) {
     w->func.map_notify_callback(w, NULL);
     XMapWindow(w->app->dpy, w->widget);
 }
-
-/**
- * @brief widget_hide       - unmap/hide widget
- * @param *w                - pointer to the Widget_t to unmap
- * @return void 
- */
 
 void widget_hide(Widget_t *w) {
     int i=0;
@@ -448,12 +427,6 @@ void widget_hide(Widget_t *w) {
     }
     XUnmapWindow(w->app->dpy, w->widget);
 }
-
-/**
- * @brief widget_show_all   - map/show widget with all childs
- * @param *w                - pointer to the Widget_t to map
- * @return void 
- */
 
 void widget_show_all(Widget_t *w) {
     if (w->flags & IS_POPUP || w->flags & IS_TOOLTIP) {
@@ -468,12 +441,6 @@ void widget_show_all(Widget_t *w) {
     }
 }
 
-/**
- * @brief pop_widget_show_all   - map/show popup widget with all childs
- * @param *w                    - pointer to the Widget_t to map
- * @return void 
- */
-
 void pop_widget_show_all(Widget_t *w) {
     w->func.map_notify_callback(w, NULL);
     XMapWindow(w->app->dpy, w->widget);
@@ -482,13 +449,6 @@ void pop_widget_show_all(Widget_t *w) {
         pop_widget_show_all(w->childlist->childs[i]);
     }
 }
-
-/**
- * @brief show_tooltip     - check if a Widget_t have a tooltip,
- * if so, show it. 
- * @param *wid              - pointer to the Widget_t receiving the event
- * @return void
- */
 
 void show_tooltip(Widget_t *wid) {
     int i = 0;
@@ -509,13 +469,6 @@ void show_tooltip(Widget_t *wid) {
     }
 }
 
-/**
- * @brief hide_tooltip     - check if a Widget_t have a tooltip,
- * if so, hide it. 
- * @param *wid              - pointer to the Widget_t receiving the event
- * @return void
- */
-
 void hide_tooltip(Widget_t *wid) {
     int i = 0;
     for(;i<wid->childlist->elem;i++) {
@@ -527,21 +480,9 @@ void hide_tooltip(Widget_t *wid) {
     }
 }
 
-/**
- * @brief *get_toplevel_widget - get pointer to the top level Widget_t
- * @param *main                - pointer to the main Xputty struct
- * @return void 
- */
-
 Widget_t *get_toplevel_widget(Xputty *main) {
     return  main->childlist->childs[0];
 }
-
-/**
- * @brief expose_widgets    - send expose expose event to window
- * @param w                 - the Widget_t to send the event to
- * @return void 
- */
 
 void expose_widget(Widget_t *w) {
     XEvent exp;
@@ -550,13 +491,6 @@ void expose_widget(Widget_t *w) {
     exp.xexpose.window = w->widget;
     XSendEvent(w->app->dpy, w->widget, False, ExposureMask, (XEvent *)&exp);
 }
-
-/**
- * @brief transparent_draw  - copy parent surface to child surface
- * @param *wid              - pointer to the Widget_t receiving a event
- * @param *user_data        - void pointer to attached user_data
- * @return void 
- */
 
 void transparent_draw(void * w_, void* user_data) {
     Widget_t *wid = (Widget_t*)w_;
@@ -585,14 +519,6 @@ void transparent_draw(void * w_, void* user_data) {
     cairo_paint (wid->cr);
     _propagate_child_expose(wid);
 }
-
-/**
- * @brief widget_event_loop - the internal widget event loop
- * @param *w                - pointer to the Widget_t receiving a event
- * @param *event            - void pointer to the XEvent
- * @param *user_data        - void pointer to attached user_data
- * @return void 
- */
 
 void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
     Widget_t *wid = (Widget_t*)w_;
@@ -703,14 +629,6 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
     }
 }
 
-/**
- * @brief send_configure_event - send ConfigureNotify to Widget_t
- * @param *w                   - pointer to the Widget_t to send the notify
- * @param x,y                  - the new Widget_t position
- * @param width,height         - the new Widget_t size
- * @return void 
- */
-
 void send_configure_event(Widget_t *w,int x, int y, int width, int height) {
     XConfigureEvent notify;
     memset(&notify, 0, sizeof(notify));
@@ -728,12 +646,6 @@ void send_configure_event(Widget_t *w,int x, int y, int width, int height) {
     notify.override_redirect = 1;
     XSendEvent( w->app->dpy, w->widget, true, StructureNotifyMask, (XEvent*)&notify );    
 }
-
-/**
- * @brief send_button_press_event   - send ButtonPress event to Widget_t
- * @param *w                        - pointer to the Widget_t to send the notify
- * @return void 
- */
 
 void send_button_press_event(Widget_t *w) {
     XEvent event;
@@ -755,12 +667,6 @@ void send_button_press_event(Widget_t *w) {
 
 }
 
-/**
- * @brief send_button_release_event - send ButtonRelease event to Widget_t
- * @param *w                        - pointer to the Widget_t to send the notify
- * @return void 
- */
-
 void send_button_release_event(Widget_t *w) {
     XEvent event;
     memset(&event, 0, sizeof(XEvent));
@@ -780,12 +686,6 @@ void send_button_release_event(Widget_t *w) {
     XSendEvent(w->app->dpy, PointerWindow, True, ButtonReleaseMask, &event);
 
 }
-
-/**
- * @brief send_systray_message      - request a systray icon for Widget_t
- * @param *w                        - pointer to the Widget_t to send the notify
- * @return void 
- */
 
 void send_systray_message(Widget_t *w) {
     XEvent event;
@@ -814,12 +714,6 @@ void send_systray_message(Widget_t *w) {
     XSendEvent(w->app->dpy, tray, False, NoEventMask, &event);
 }
 
-/**
- * @brief quit              - exit the main loop
- * @param *w                - pointer to the Widget_t sending the request
- * @return void 
- */
-
 void quit(Widget_t *w) {
     Atom WM_DELETE_WINDOW = XInternAtom(w->app->dpy, "WM_DELETE_WINDOW", True);
     XClientMessageEvent xevent;
@@ -831,12 +725,6 @@ void quit(Widget_t *w) {
     xevent.data.l[0] = WM_DELETE_WINDOW;
     XSendEvent(w->app->dpy, w->widget, 0, 0, (XEvent *)&xevent);
 }
-
-/**
- * @brief quit_widget       - remove a widget from the processing loop
- * @param *w                - pointer to the Widget_t sending the request
- * @return void 
- */
 
 void quit_widget(Widget_t *w) {
     Atom QUIT_WIDGET = XInternAtom(w->app->dpy, "WIDGET_DESTROY", False);

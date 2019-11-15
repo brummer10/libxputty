@@ -20,12 +20,6 @@
 
 #include "xwidget_private.h"
 
-/**
- * @brief _scroll_event     - internal check which adjustment needs update
- * @param *wid              - pointer to the Widget_t receiving a event
- * @param direction         - up/down scroll diretion
- * @return void 
- */
 
 void _scroll_event(Widget_t * wid, int direction) {
     Adjustment_t *adj = NULL;
@@ -56,13 +50,6 @@ void _scroll_event(Widget_t * wid, int direction) {
     } 
 }
 
-/**
- * @brief _toggle_event     - internal check which adjustment needs update
- * @param *wid              - pointer to the Widget_t receiving a event
- * @param direction         - up/down scroll diretion
- * @return void 
- */
-
 void _toggle_event(Widget_t * wid) {
     Adjustment_t *adj = NULL;
     if (wid->adj_y) {
@@ -74,13 +61,6 @@ void _toggle_event(Widget_t * wid) {
         adj_set_start_value(wid);
     }
 }
-
-/**
- * @brief _check_enum     - internal check which adjustment needs update
- * @param *wid              - pointer to the Widget_t receiving a event
- * @param *xbutton          - pointer to the XButtonEvent
- * @return void 
- */
 
 void _check_enum(Widget_t * wid, XButtonEvent *xbutton) {
     if (wid->flags & HAS_POINTER && xbutton->button == Button1) {
@@ -98,14 +78,6 @@ void _check_enum(Widget_t * wid, XButtonEvent *xbutton) {
         }
     }
 }
-
-/**
- * @brief _button_press     - internal check which button is pressed
- * @param *wid              - pointer to the Widget_t receiving a event
- * @param *xbutton          - pointer to the XButtonEvent
- * @param *user_data        - void pointer to attached user_data
- * @return void 
- */
 
 void _button_press(Widget_t * wid, XButtonEvent *xbutton, void* user_data) {
     switch(xbutton->button) {
@@ -134,14 +106,6 @@ void _button_press(Widget_t * wid, XButtonEvent *xbutton, void* user_data) {
     }
 }
 
-/**
- * @brief _check_grab       - internal check if menu is pressed
- * @param *wid              - pointer to the Widget_t receiving a event
- * @param *xbutton          - pointer to the XButtonEvent
- * @param *main             - pointer to main struct
- * @return void 
- */
-
 void _check_grab(Widget_t * wid, XButtonEvent *xbutton, Xputty *main) {
     if(main->hold_grab != NULL) {
         Widget_t *view_port = main->hold_grab->childlist->childs[0];
@@ -169,12 +133,6 @@ void _check_grab(Widget_t * wid, XButtonEvent *xbutton, Xputty *main) {
     }
 }
 
-/**
- * @brief _propagate_childs - send expose to child window
- * @param *wid              - pointer to the Widget_t send the event
- * @return void 
- */
-
 void _propagate_child_expose(Widget_t *wid) {
 
     if (childlist_has_child(wid->childlist)) {
@@ -186,13 +144,6 @@ void _propagate_child_expose(Widget_t *wid) {
         }
     }      
 }
-
-/**
- * @brief _check_keymap     - check if key is in map, send requests if so 
- * @param *w                - pointer to the Widget_t receiving the event
- * @param xkey              - the XKeyEvent to check
- * @return void
- */
 
 void _check_keymap (void *w_ ,XKeyEvent xkey) {
     Widget_t *wid = (Widget_t*)w_;
@@ -240,12 +191,6 @@ void _check_keymap (void *w_ ,XKeyEvent xkey) {
     }
 }
 
-/**
- * @brief _hide_all_tooltips - hide all active tooltips
- * @param *wid               - pointer to the Widget_t receiving the event
- * @return void
- */
-
 void _hide_all_tooltips(Widget_t *wid) {
     int i = 0;
     for(;i<wid->app->childlist->elem;i++) {
@@ -255,13 +200,6 @@ void _hide_all_tooltips(Widget_t *wid) {
         }
     }
 }
-
-/**
- * @brief _has_pointer      - check if the widget has the pointer on Button release 
- * @param *w                - pointer to the Widget_t sending the request
- * @param *button           - pointer to the XButtonEvent sending the notify
- * @return void
- */
 
 void _has_pointer(Widget_t *w, XButtonEvent *button) {
     XWindowAttributes attrs;
@@ -274,13 +212,6 @@ void _has_pointer(Widget_t *w, XButtonEvent *button) {
         w->flags &= ~HAS_POINTER;
     }
 }
-
-/**
- * @brief _set_adj_value    - set value to adjustment from key event
- * @param *w                - pointer to the Widget_t receiving the event
- * @param x                 - use x or y-axis
- * @return void
- */
 
 void _set_adj_value(void *w_, bool x, int direction) {
     Widget_t *wid = (Widget_t*)w_;
@@ -297,35 +228,13 @@ void _set_adj_value(void *w_, bool x, int direction) {
     }
 }
 
-/**
- * @brief _dummy1_callback    - default debuging callback for evfunc's
- * @param *w                 - pointer to the Widget_t receive the event
- * @param user_data          - void pointer to attached user_data
- * @return void 
- */
-
 void _dummy1_callback(void *w_, void* _data, void* user_data) {
     debug_print("Widget_t _dummy callback\n");
 }
 
-/**
- * @brief _dummy1_callback    - default debuging callback for xevfunc's
- * @param *w                 - pointer to the Widget_t receive the event
- * @param user_data          - void pointer to attached user_data
- * @return void 
- */
-
 void _dummy_callback(void *w_, void* user_data) {
     debug_print("Widget_t _dummy callback\n");
 }
-
-/**
- * @brief _resize_surface    - intern check if surfaces needs resizing
- * @param *wid               - pointer to the Widget_t receive the event
- * @param width              - the new width
- * @param height             - the new height
- * @return void 
- */
 
 void _resize_surface(Widget_t *wid, int width, int height) {
     wid->width = width;
@@ -337,12 +246,6 @@ void _resize_surface(Widget_t *wid, int width, int height) {
                         CAIRO_CONTENT_COLOR_ALPHA, width, height);
     wid->crb = cairo_create (wid->buffer);
 }
-
-/**
- * @brief _resize_childs     - intern check if child widgets needs resizing
- * @param *wid               - pointer to the Widget_t receive the event
- * @return void 
- */
 
 void _resize_childs(Widget_t *wid) {
     if(!childlist_has_child(wid->childlist)) return;
@@ -388,8 +291,6 @@ void _resize_childs(Widget_t *wid) {
                     w->scale.init_width - (wid->scale.scale_x)-5), w->scale.init_height);
             break;
             case(NONE):
-              //  XMoveWindow(wid->app->dpy,w->widget,w->scale.init_x-wid->scale.scale_x,
-              //                          w->scale.init_y-wid->scale.scale_y);
             break;
             default:
             break;
