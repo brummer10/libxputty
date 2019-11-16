@@ -195,6 +195,7 @@ Widget_t *create_window(Xputty *app, Window win,
 
     w->flags = IS_WINDOW;
     w->flags &= ~NO_AUTOREPEAT;
+    w->flags &= ~FAST_REDRAW;
     w->app = app;
     w->parent = &win;
     w->parent_struct = NULL;
@@ -296,6 +297,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     
     w->flags = IS_WIDGET | USE_TRANSPARENCY;
     w->flags &= ~NO_AUTOREPEAT;
+    w->flags &= ~FAST_REDRAW;
     w->app = app;
     w->parent = parent;
     w->parent_struct = NULL;

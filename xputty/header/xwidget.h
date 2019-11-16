@@ -243,6 +243,8 @@ enum {
     HAS_MEM           = 1<<9,
     /** Widget_t didn't receive autorepeated keys */
     NO_AUTOREPEAT     = 1<<10,
+    /** Widget_t need fast redrawing  */
+    FAST_REDRAW       = 1<<11,
 };
 
 /**

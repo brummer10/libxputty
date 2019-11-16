@@ -139,8 +139,11 @@ void _propagate_child_expose(Widget_t *wid) {
         int i = 0;
         for(;i<wid->childlist->elem;i++) {
             Widget_t *w = wid->childlist->childs[i];
-            if (w->flags & USE_TRANSPARENCY)
-                expose_widget(w);
+            if (w->flags & USE_TRANSPARENCY) {
+                if(w->flags & FAST_REDRAW)
+                    transparent_draw(w, NULL);
+                else expose_widget(w);
+            }
         }
     }      
 }
