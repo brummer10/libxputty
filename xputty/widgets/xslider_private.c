@@ -91,7 +91,7 @@ void _draw_vslider(void *w_, void* user_data) {
 
 
     use_text_color_scheme(w, get_color_state(w));
-    cairo_set_font_size (w->crb, center/2);
+    cairo_set_font_size (w->crb, center/2.1);
     cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
                                CAIRO_FONT_WEIGHT_BOLD);
     cairo_text_extents(w->crb,w->label , &extents);
@@ -110,7 +110,7 @@ void _draw_vslider(void *w_, void* user_data) {
         snprintf(s, 63, format[2-1], w->adj->value);
     }
     cairo_text_extents(w->crb,s , &extents);
-    cairo_move_to (w->crb, center-extents.width/2, extents.height );
+    cairo_move_to (w->crb, center-extents.width/2, extents.height-center/2.1);
     cairo_show_text(w->crb, s);
     cairo_new_path (w->crb);
 }

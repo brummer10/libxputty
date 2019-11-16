@@ -664,7 +664,6 @@ void send_button_press_event(Widget_t *w) {
     event.xbutton.state = 0;
     event.xbutton.button = Button1;
     XSendEvent(w->app->dpy, PointerWindow, True, ButtonPressMask, &event);
-
 }
 
 void send_button_release_event(Widget_t *w) {
@@ -684,7 +683,6 @@ void send_button_release_event(Widget_t *w) {
     event.xbutton.state = 0;
     event.xbutton.button = Button1;
     XSendEvent(w->app->dpy, PointerWindow, True, ButtonReleaseMask, &event);
-
 }
 
 void send_systray_message(Widget_t *w) {
