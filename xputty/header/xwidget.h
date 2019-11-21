@@ -84,6 +84,7 @@ typedef struct {
     xevfunc mem_free_callback;
     xevfunc configure_notify_callback;
     xevfunc map_notify_callback;
+    xevfunc unmap_notify_callback;
     xevfunc dialog_callback;
 
     evfunc button_press_callback;
@@ -107,6 +108,7 @@ typedef struct {
  * @param MEM_FREE          - (*xevfunc) mem_free_callback(void * widget, void* user_data)
  * @param CONFIGURE_NOTIFY  - (*xevfunc) configure_notify_callback(void * widget, void* user_data)
  * @param MAP_NOTIFY        - (*xevfunc) map_notify_callback(void * widget, void* user_data)
+ * @param UNMAP_NOTIFY      - (*xevfunc) unmap_notify_callback(void * widget, void* user_data)
  * @param DIALOG_RESPONS    - (*xevfunc) dialog_callback(void * widget, void* user_data)
  * @param BUTTON_PRESS      - (*evfunc) button_press_callback(void * widget, void * event, void* user_data)
  * @param BUTTON_RELEASE    - (*evfunc) button_release_callback(void * widget, void * event, void* user_data)
@@ -126,6 +128,7 @@ typedef enum {
     MEM_FREE,
     CONFIGURE_NOTIFY,
     MAP_NOTIFY,
+    UNMAP_NOTIFY,
     DIALOG_RESPONSE,
     BUTTON_PRESS,
     BUTTON_RELEASE,
@@ -245,6 +248,8 @@ enum {
     NO_AUTOREPEAT     = 1<<10,
     /** Widget_t need fast redrawing  */
     FAST_REDRAW       = 1<<11,
+    /** Hide Widget_t instead delete on "WM_DELETE_WINDOW"  */
+    HIDE_ON_DELETE    = 1<<12,
 };
 
 /**

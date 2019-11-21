@@ -118,6 +118,16 @@ void run_embedded(Xputty *main) {
                 }
             }
         break;
+        case ClientMessage:
+            /* delete window event */
+            if (xev.xclient.data.l[0] == XInternAtom(main->dpy, "WM_DELETE_WINDOW", True) ) {
+                int i = childlist_find_widget(main->childlist, xev.xclient.window);
+                if(i<1) return;
+                Widget_t *w = main->childlist->childs[i];
+                if(w->flags & HIDE_ON_DELETE) widget_hide(w);
+                else destroy_widget(w, main);
+            }
+        break;
         }
     }
 }

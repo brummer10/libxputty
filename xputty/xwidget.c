@@ -196,6 +196,7 @@ Widget_t *create_window(Xputty *app, Window win,
     w->flags = IS_WINDOW;
     w->flags &= ~NO_AUTOREPEAT;
     w->flags &= ~FAST_REDRAW;
+    w->flags &= ~HIDE_ON_DELETE;
     w->app = app;
     w->parent = &win;
     w->parent_struct = NULL;
@@ -240,6 +241,7 @@ Widget_t *create_window(Xputty *app, Window win,
     w->func.mem_free_callback = _dummy_callback;
     w->func.configure_notify_callback = _dummy_callback;
     w->func.map_notify_callback = _dummy_callback;
+    w->func.unmap_notify_callback = _dummy_callback;
     w->func.dialog_callback = _dummy_callback;
 
     childlist_add_child(app->childlist,w);
@@ -298,6 +300,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     w->flags = IS_WIDGET | USE_TRANSPARENCY;
     w->flags &= ~NO_AUTOREPEAT;
     w->flags &= ~FAST_REDRAW;
+    w->flags &= ~HIDE_ON_DELETE;
     w->app = app;
     w->parent = parent;
     w->parent_struct = NULL;
@@ -343,6 +346,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     w->func.mem_free_callback = _dummy_callback;
     w->func.configure_notify_callback = _dummy_callback;
     w->func.map_notify_callback = _dummy_callback;
+    w->func.unmap_notify_callback = _dummy_callback;
     w->func.dialog_callback = _dummy_callback;
 
     childlist_add_child(app->childlist,w);
@@ -390,6 +394,9 @@ void signal_connect_func(Widget_t *w, EventType type, void (*handler)()) {
         case(MAP_NOTIFY):
             w->func.map_notify_callback = handler;
         break;
+        case(UNMAP_NOTIFY):
+            w->func.unmap_notify_callback = handler;
+        break;
         case(DIALOG_RESPONSE):
             w->func.dialog_callback = handler;
         break;
@@ -427,6 +434,7 @@ void widget_hide(Widget_t *w) {
     for(;i<w->childlist->elem;i++) {
         widget_hide(w->childlist->childs[i]);
     }
+    w->func.unmap_notify_callback(w, NULL);
     XUnmapWindow(w->app->dpy, w->widget);
 }
 
