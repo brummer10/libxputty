@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XKNOB_PRIVATE_H_
 #define XKNOB_PRIVATE_H_
 
 #include "xknob.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief _draw_image_knob       - internal draw the knob from image
@@ -53,5 +56,9 @@ void _draw_knob(void *w_, void* user_data);
 
 void _knob_released(void *w_, void* button_, void* user_data);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XKNOB_PRIVATE_H_

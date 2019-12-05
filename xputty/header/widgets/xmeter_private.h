@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XMETER_PRIVATE_H_
 #define XMETER_PRIVATE_H_
 
 #include "xmeter.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -90,5 +93,9 @@ void _draw_v_meter(void *w_, void* user_data);
  */
 
 void _draw_h_meter(void *w_, void* user_data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XMETER_PRIVATE_H_

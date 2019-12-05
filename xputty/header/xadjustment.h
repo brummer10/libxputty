@@ -18,11 +18,14 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XADJUSTMENT_H_
 #define XADJUSTMENT_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "xputty.h"
 
@@ -190,5 +193,9 @@ void adj_set_motion_state(void *w, float x, float y);
  */
 
 void check_value_changed(Adjustment_t *adj, float *value);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XADJUSTMENT_H_

@@ -18,7 +18,6 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XPUTTY1_H_
@@ -39,6 +38,10 @@
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*---------------------------------------------------------------------
 -----------------------------------------------------------------------	
@@ -130,6 +133,10 @@ typedef struct XColor_t XColor_t;
 
 typedef struct Xputty Xputty;
 
+#ifdef __cplusplus
+}
+#endif
+
 /*---------------------------------------------------------------------
 -----------------------------------------------------------------------	
 				xputty library headers
@@ -143,6 +150,10 @@ typedef struct Xputty Xputty;
 #include "xcolor.h"
 #include "xpngloader.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Xputty             - the main struct. 
@@ -229,6 +240,10 @@ void run_embedded(Xputty *main);
  */
 
 void main_quit(Xputty *main);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XPUTTY_H_
 

@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XPNGLOADER_H_
 #define XPNGLOADER_H_
 
 #include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**  
@@ -34,7 +37,16 @@
 */
 
 #ifdef __APPLE__
+
+#ifdef __cplusplus
+}
+#endif
+
 #include <mach-o/getsect.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define EXTLD(NAME) \
   extern const unsigned char _section$__DATA__ ## NAME [];
@@ -120,5 +132,9 @@ void widget_set_icon_from_surface(Widget_t *w, Pixmap *icon_, cairo_surface_t *i
  */
 
 void widget_set_icon_from_png(Widget_t *w, Pixmap *icon_, const unsigned char* name);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XPNGLOADER_H_

@@ -30,4 +30,12 @@
 
 #include "xputty.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // XADJUSTMENT_PRIVATE_H_

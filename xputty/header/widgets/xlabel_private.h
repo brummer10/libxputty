@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XLABEL_PRIVATE_H_
 #define XLABEL_PRIVATE_H_
 
 #include "xlabel.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -35,5 +38,9 @@
  */
 
 void _draw_label(void *w_, void* user_data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XLABEL_PRIVATE_H_

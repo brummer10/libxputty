@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XCHILDLIST_H_
 #define XCHILDLIST_H_
 
 #include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -123,5 +126,8 @@ int childlist_find_widget(Childlist_t *childlist, Window child_window);
 
 int childlist_has_child(Childlist_t *childlist);
 
-#endif //XCHILDLISTT_H_
+#ifdef __cplusplus
+}
+#endif
 
+#endif //XCHILDLISTT_H_

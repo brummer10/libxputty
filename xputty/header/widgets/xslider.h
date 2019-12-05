@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XSLIDER_H_
 #define XSLIDER_H_
 
 #include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -52,5 +55,9 @@ Widget_t* add_vslider(Widget_t *parent, const char * label,
 
 Widget_t* add_hslider(Widget_t *parent, const char * label,
                 int x, int y, int width, int height);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XSLIDER_H_

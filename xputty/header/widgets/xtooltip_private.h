@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XTOOLTIP_PRIVATE_H_
 #define XTOOLTIP_PRIVATE_H_
 
 #include "xtooltip.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -44,5 +47,9 @@ void _get_width(Widget_t *w);
  */
 
 void _draw_tooltip(void *w_, void* user_data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XTOOLTIP_PRIVATE_H_

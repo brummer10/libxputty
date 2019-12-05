@@ -22,13 +22,16 @@
  * here are the private functions from xwidget
  */
 
-
 #pragma once
 
 #ifndef XWIDGET_PRIVATE_H_
 #define XWIDGET_PRIVATE_H_
 
 #include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief _scroll_event     - internal check which Adjustment_t change it's value
@@ -158,5 +161,9 @@ void _resize_surface(Widget_t *wid, int width, int height);
  */
 
 void _resize_childs(Widget_t *wid);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // XWIDGET_PRIVATE_H__

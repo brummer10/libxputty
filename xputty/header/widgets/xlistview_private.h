@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XLISTVIEW_PRIVATE_H_
 #define XLISTVIEW_PRIVATE_H_
 
 #include "xlistview.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -121,5 +124,9 @@ void _draw_listview_viewslider(void *w_, void* user_data);
  */
 
 void _set_listview_viewpoint(void *w_, void* user_data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XLISTVIEW_PRIVATE_H_

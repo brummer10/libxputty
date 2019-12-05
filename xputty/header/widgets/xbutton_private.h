@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XBUTTON_PRIVATE_H_
 #define XBUTTON_PRIVATE_H_
 
 #include "xbutton.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -154,6 +157,8 @@ void _toggle_button_pressed(void *w_, void* button, void* user_data);
 
 void _toggle_button_released(void *w_, void* button_, void* user_data);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // XBUTTON_PRIVATE_H_
-

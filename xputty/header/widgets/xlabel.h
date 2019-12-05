@@ -13,13 +13,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XLABEL_H_
 #define XLABEL_H_
 
 #include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -32,5 +35,9 @@
 
 Widget_t* add_label(Widget_t *parent, const char * label,
                 int x, int y, int width, int height);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XLABEL_H_

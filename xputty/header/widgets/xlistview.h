@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XLISTVIEW_H_
 #define XLISTVIEW_H_
 
 #include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief ViewList_t         - struct to hold information for the listview
@@ -91,5 +94,9 @@ void listview_mem_free(void *w_, void* user_data);
  */
 
 void listview_set_list(Widget_t *listview, char **list, int list_size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XLISTVIEW_H_

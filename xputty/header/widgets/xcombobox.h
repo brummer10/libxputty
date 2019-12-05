@@ -18,7 +18,6 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XCOMBOBOX_H_
@@ -26,6 +25,10 @@
 
 #include "xputty.h"
 #include "xmenu.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief add_combobox        - add a combobox
@@ -53,5 +56,9 @@ Widget_t *combobox_add_entry(Widget_t *wid, const char  * label);
  */
 
 void combobox_set_active_entry(Widget_t *w, int active);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XCOMBOBOX_H_

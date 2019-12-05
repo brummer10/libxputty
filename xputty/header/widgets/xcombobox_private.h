@@ -18,7 +18,6 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XCOMBOBOX_PRIVATE_H_
@@ -26,6 +25,10 @@
 
 #include "xcombobox.h"
 #include "xbutton_private.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief _draw_combobox_button  - internal draw the combobox button to the buffer
@@ -84,5 +87,9 @@ void _entry_released(void *w_, void* item_, void* user_data);
 
 void _set_entry(void *w_, void* user_data);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XCOMBOBOX_PRIVATE_H_

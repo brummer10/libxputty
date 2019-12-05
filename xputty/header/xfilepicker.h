@@ -43,6 +43,10 @@
 #ifndef XFILEPICKER_H_
 #define XFILEPICKER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* comment out xdgmine.h will disable the file filter, you may implement your own.*/
 #include "xdgmime.h"
 /* comment out xasprintf and define _GNU_SOURCE on top of this file will remove this dependency.*/
@@ -94,5 +98,9 @@ void fp_free(FilePicker *filepicker);
  */
 
 void fp_init(FilePicker *filepicker, const char *path);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XFILEPICKER_H_

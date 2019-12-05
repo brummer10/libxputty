@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XKNOB_H_
 #define XKNOB_H_
 
 #include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -39,5 +42,9 @@
 
 Widget_t* add_knob(Widget_t *parent, const char * label,
                 int x, int y, int width, int height);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XKNOB_H_

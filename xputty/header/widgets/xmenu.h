@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XMENU_H_
 #define XMENU_H_
 
 #include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -89,5 +92,9 @@ void radio_item_set_active(Widget_t *w);
  */
 
 Widget_t* menu_add_radio_item(Widget_t *menu, const char * label);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XMENU_H_

@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XCOLOR_H_
 #define XCOLOR_H_
 
 #include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -197,5 +200,9 @@ void use_light_color_scheme(Widget_t *w, Color_state st);
  */
 
 void set_pattern(Widget_t *w, Colors *from, Colors *to, Color_mod mod);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XCOLOR_H_

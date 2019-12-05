@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XMESSAGE_DIALOG_H_
 #define XMESSAGE_DIALOG_H_
 
 #include "xwidgets.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
     INFO_BOX,
@@ -72,5 +75,9 @@ typedef struct {
 
 Widget_t *open_message_dialog(Widget_t *w, int style, const char *title,
                               const char *message, const char *choices);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XMESSAGE_DIALOG_H_

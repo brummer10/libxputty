@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XTOOLTIP_H_
 #define XTOOLTIP_H_
 
 #include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -54,5 +57,9 @@ void add_tooltip(Widget_t *w, const char* label);
  */
 
 Widget_t* create_tooltip(Widget_t *parent, int width, int height);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XTOOLTIP_H_

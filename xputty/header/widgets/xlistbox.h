@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XLISTBOX_H_
 #define XLISTBOX_H_
 
 #include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -66,5 +69,8 @@ Widget_t* add_listbox(Widget_t *parent, const char * label,
 
 Widget_t* listbox_add_entry(Widget_t *listbox, const char * label);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XLISTBOX_H_

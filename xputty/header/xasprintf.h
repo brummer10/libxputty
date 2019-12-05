@@ -11,6 +11,10 @@
 #ifndef XASPRINTF_H_
 #define XASPRINTF_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 int _vscprintf_so(const char * format, va_list pargs);
 
@@ -18,8 +22,10 @@ int vasprintf(char **strp, const char *fmt, va_list ap);
 
 int asprintf(char *strp[], const char *fmt, ...);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XASPRINTF_H_
 
 #endif // !_GNU_SOURCE
-

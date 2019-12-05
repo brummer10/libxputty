@@ -22,13 +22,16 @@
  * here are the private functions from xchildlist
  */
 
-
 #pragma once
 
 #ifndef XCHILDLIST_PRIVATE_H_
 #define XCHILDLIST_PRIVATE_H_
 
 #include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief _childlist_add_elem - internal use to reallocate the 
@@ -39,5 +42,9 @@
  */
 
 void _childlist_add_elem(Childlist_t *childlist);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // XCHILDLIST_PRIVATE_H_

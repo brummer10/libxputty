@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XWIDGET_H
 #define XWIDGET_H
 
 #include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*---------------------------------------------------------------------
 -----------------------------------------------------------------------	
@@ -591,6 +594,8 @@ void expose_widget(Widget_t *w);
 
 int key_mapping(Display *dpy, XKeyEvent *xkey);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XWIDGET_H
-

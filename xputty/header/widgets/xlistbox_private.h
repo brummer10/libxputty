@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XLISTBOX_PRIVATE_H_
 #define XLISTBOX_PRIVATE_H_
 
 #include "xlistbox.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -92,5 +95,9 @@ void _set_listbox_viewpoint(void *w_, void* user_data);
  */
 
 void _listbox_entry_released(void *w_, void* button_, void* user_data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XLISTBOX_PRIVATE_H_

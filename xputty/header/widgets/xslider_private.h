@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XSLIDER_PRIVATE_H_
 #define XSLIDER_PRIVATE_H_
 
 #include "xslider.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief _pattern_vslider  - set pattern for the slider base
@@ -72,5 +75,9 @@ void _draw_hslider(void *w_, void* user_data);
  */
 
 void _slider_released(void *w_, void* button_, void* user_data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XSLIDER_PRIVATE_H_

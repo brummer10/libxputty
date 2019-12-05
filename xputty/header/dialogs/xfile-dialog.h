@@ -18,7 +18,6 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XFILE_DIALOG_H_
@@ -28,6 +27,10 @@
 #include "xdgmime.h"
 #include "xasprintf.h"
 #include "xfilepicker.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct {
     Widget_t *parent;
@@ -71,5 +74,8 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter);
 Widget_t *add_file_button(Widget_t *parent, int x, int y, int width, int height,
                            const char *path, const char *filter);
 
-#endif //XFILE_DIALOG_H_
+#ifdef __cplusplus
+}
+#endif
 
+#endif //XFILE_DIALOG_H_

@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XMETER_H_
 #define XMETER_H_
 
 #include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -58,5 +61,9 @@ Widget_t* add_vmeter(Widget_t *parent, const char * label, bool show_scale,
 
 Widget_t* add_hmeter(Widget_t *parent, const char * label, bool show_scale,
                 int x, int y, int width, int height);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XMETER_H_

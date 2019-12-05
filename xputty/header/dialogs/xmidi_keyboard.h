@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XMIDI_KEYBOARD_H_
 #define XMIDI_KEYBOARD_H_
 
 #include "xwidgets.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef void (*midikeyfunc)(Widget_t *w,int *key, bool on_off);
 typedef void (*midiwheelfunc)(Widget_t *w,int *value);
@@ -62,5 +65,9 @@ bool have_key_in_matrix(unsigned long *key_matrix);
 void clear_key_matrix(unsigned long *key_matrix);
 
 Widget_t *open_midi_keyboard(Widget_t *w);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XMIDI_KEYBOARD_H_

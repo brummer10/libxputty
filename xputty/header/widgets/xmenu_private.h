@@ -18,13 +18,16 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XMENU_PRIVATE_H_
 #define XMENU_PRIVATE_H_
 
 #include "xmenu.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -99,5 +102,9 @@ void _radio_item_button_pressed(void *w_, void* button_, void* user_data);
  */
 
 void _configure_menu(Widget_t *parent, Widget_t *menu, int elem, bool above);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //XMENU_PRIVATE_H_

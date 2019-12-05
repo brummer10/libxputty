@@ -18,7 +18,6 @@
  *
  */
 
-
 #pragma once
 
 #ifndef XBUTTON_H_
@@ -26,6 +25,10 @@
 
 #include "xputty.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief add_button          - add a button to a Widget_t
@@ -98,5 +101,9 @@ Widget_t* add_check_button(Widget_t *parent, const char * label,
 
 Widget_t* add_check_box(Widget_t *parent, const char * label,
                 int x, int y, int width, int height);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // XBUTTON_H_
