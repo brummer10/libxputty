@@ -228,6 +228,101 @@ void clear_key_matrix(unsigned long *key_matrix) {
         i = 0;
     }
 }
+void mk_draw_knob(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    int width = attrs.width-2;
+    int height = attrs.height-2;
+
+    const double scale_zero = 20 * (M_PI/180); // defines "dead zone" for knobs
+    int arc_offset = 0;
+    int knob_x = 0;
+    int knob_y = 0;
+
+    int grow = (width > height) ? height:width;
+    knob_x = grow-1;
+    knob_y = grow-1;
+    /** get values for the knob **/
+
+    int knobx = (width - knob_x) * 0.5;
+    int knobx1 = width* 0.5;
+
+    int knoby = (height - knob_y) * 0.5;
+    int knoby1 = height * 0.5;
+
+    double knobstate = adj_get_state(w->adj_y);
+    double angle = scale_zero + knobstate * 2 * (M_PI - scale_zero);
+
+    double pointer_off =knob_x/3.5;
+    double radius = min(knob_x-pointer_off, knob_y-pointer_off) / 2;
+    double lengh_x = (knobx+radius+pointer_off/2) - radius * sin(angle);
+    double lengh_y = (knoby+radius+pointer_off/2) + radius * cos(angle);
+    double radius_x = (knobx+radius+pointer_off/2) - radius/ 1.18 * sin(angle);
+    double radius_y = (knoby+radius+pointer_off/2) + radius/ 1.18 * cos(angle);
+    cairo_pattern_t* pat;
+    cairo_new_path (w->crb);
+
+    pat = cairo_pattern_create_linear (0, 0, 0, knob_y);
+    cairo_pattern_add_color_stop_rgba (pat, 0,  0.3, 0.3, 0.3, 1.0);
+    cairo_pattern_add_color_stop_rgba (pat, 0.25,  0.2, 0.2, 0.2, 1.0);
+    cairo_pattern_add_color_stop_rgba (pat, 0.5,  0.15, 0.15, 0.15, 1.0);
+    cairo_pattern_add_color_stop_rgba (pat, 0.75,  0.1, 0.1, 0.1, 1.0);
+    cairo_pattern_add_color_stop_rgba (pat, 1,  0.0, 0.0, 0.0, 1.0);
+
+    cairo_arc(w->crb,knobx1+arc_offset/2, knoby1+arc_offset/2, knob_x/2.2, 0, 2 * M_PI );
+    cairo_set_source (w->crb, pat);
+    cairo_fill_preserve (w->crb);
+     cairo_set_source_rgb (w->crb, 0.1, 0.1, 0.1); 
+    cairo_set_line_width(w->crb,1);
+    cairo_stroke(w->crb);
+    cairo_new_path (w->crb);
+
+    cairo_arc(w->crb,knobx1+arc_offset/2, knoby1+arc_offset/2, knob_x/2.6, 0, 2 * M_PI );
+    cairo_set_source (w->crb, pat);
+    cairo_fill_preserve (w->crb);
+     cairo_set_source_rgb (w->crb, 0.1, 0.1, 0.1); 
+    cairo_set_line_width(w->crb,1);
+    cairo_stroke(w->crb);
+    cairo_new_path (w->crb);
+
+    /** create a rotating pointer on the kob**/
+    cairo_set_line_cap(w->crb, CAIRO_LINE_CAP_ROUND); 
+    cairo_set_line_join(w->crb, CAIRO_LINE_JOIN_BEVEL);
+    cairo_move_to(w->crb, radius_x, radius_y);
+    cairo_line_to(w->crb,lengh_x,lengh_y);
+    cairo_set_line_width(w->crb,3);
+    cairo_set_source_rgb (w->crb,0.63,0.63,0.63);
+    cairo_stroke(w->crb);
+    cairo_new_path (w->crb);
+
+    cairo_text_extents_t extents;
+    /** show value on the kob**/
+    if (w->state) {
+        char s[64];
+        snprintf(s, 63,"%d",  (int) w->adj_y->value);
+        cairo_set_source_rgb (w->crb, 0.6, 0.6, 0.6);
+        cairo_set_font_size (w->crb, knobx1/3);
+        cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
+                                   CAIRO_FONT_WEIGHT_BOLD);
+        cairo_text_extents(w->crb, s, &extents);
+        cairo_move_to (w->crb, knobx1-extents.width/2, knoby1+extents.height/2);
+        cairo_show_text(w->crb, s);
+        cairo_new_path (w->crb);
+    }
+
+    /** show label below the knob**/
+    use_text_color_scheme(w, get_color_state(w));
+    float font_size = ((height/2.2 < (width*0.5)/3) ? height/2.2 : (width*0.5)/3);
+    cairo_set_font_size (w->crb, font_size);
+    cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
+                               CAIRO_FONT_WEIGHT_BOLD);
+    cairo_text_extents(w->crb,w->label , &extents);
+
+    cairo_move_to (w->crb, knobx1-extents.width/2, height );
+    cairo_show_text(w->crb, w->label);
+    cairo_new_path (w->crb);
+}
 
 static void draw_keyboard(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
@@ -249,7 +344,7 @@ static void draw_keyboard(void *w_, void* user_data) {
     int k = 0;
 
     for(;i<width_t;i++) {
-        cairo_rectangle(w->crb,i,height_t*0.3,25,height_t*0.7);
+        cairo_rectangle(w->crb,i,height_t*0.4,25,height_t*0.6);
         if ( k+keys->octave == keys->active_key || is_key_in_matrix(keys->key_matrix,k+keys->octave)) {
             use_base_color_scheme(w, ACTIVE_);
             cairo_set_line_width(w->crb, 1.0);
@@ -293,7 +388,7 @@ static void draw_keyboard(void *w_, void* user_data) {
 
        if (space!=3) {
             cairo_set_line_width(w->crb, 1.0);
-            cairo_rectangle(w->crb,i+15,height_t*0.3,20,height_t*0.4);
+            cairo_rectangle(w->crb,i+15,height_t*0.4,20,height_t*0.39);
             if ( k+keys->octave == keys->active_key || is_key_in_matrix(keys->key_matrix,k+keys->octave)) {
                 use_base_color_scheme(w, ACTIVE_);
                 cairo_set_line_width(w->crb, 1.0);
@@ -344,13 +439,13 @@ static void keyboard_motion(void *w_, void* xmotion_, void* user_data) {
 
     bool catch = false;
 
-    if(xmotion->y < height*0.3) {
+    if(xmotion->y < height*0.4) {
         keys->active_key = keys->prelight_key = -1;
         expose_widget(w);
         return;
     }
 
-    if(xmotion->y < height*0.7) {
+    if(xmotion->y < height*0.8) {
         int space = 1;
         int set = 0;
         int set_key = 1;
@@ -546,6 +641,33 @@ static void modwheel_callback(void *w_, void* user_data) {
     keys->mk_send_mod(pa, &keys->modwheel);
 }
 
+static void sustain_callback(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Widget_t *p = w->parent;
+    Widget_t *pa = p->parent;
+    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    keys->sustain = (int)adj_get_value(w->adj);
+    keys->mk_send_sustain(pa, &keys->sustain);
+}
+
+static void volume_callback(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Widget_t *p = w->parent;
+    Widget_t *pa = p->parent;
+    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    keys->volume = (int)adj_get_value(w->adj);
+    keys->mk_send_volume(pa, &keys->volume);
+}
+
+static void velocity_callback(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Widget_t *p = w->parent;
+    Widget_t *pa = p->parent;
+    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    keys->velocity = (int)adj_get_value(w->adj);
+    keys->mk_send_velocity(pa, &keys->velocity);
+}
+
 static void pitchwheel_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = w->parent;
@@ -641,36 +763,68 @@ Widget_t *open_midi_keyboard(Widget_t *w) {
     keys->mk_send_pitch = wheel_dummy;
     keys->mk_send_pitchsensity = wheel_dummy;
     keys->mk_send_mod = wheel_dummy;
+    keys->mk_send_sustain = wheel_dummy;
+    keys->mk_send_volume = wheel_dummy;
+    keys->mk_send_velocity = wheel_dummy;
     keys->mk_send_all_sound_off = wheel_dummy;
 
-    Widget_t *b = add_hslider(wid, "Keyboard mapping", 10, 10, 160, 40);
-    b->flags |= NO_AUTOREPEAT;
-    set_adjustment(b->adj,2.0, 2.0, 0.0, 4.0, 1.0, CL_CONTINUOS);
-    b->func.value_changed_callback = octave_callback;
-
-    Widget_t *p = add_hslider(wid, "PitchWheel", 170, 10, 160, 40);
+    Widget_t *p = add_knob(wid, "PitchBend", 5, 0, 60, 75);
     p->flags |= NO_AUTOREPEAT;
     set_adjustment(p->adj,64.0, 64.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
+    p->func.expose_callback = mk_draw_knob;
     p->func.value_changed_callback = pitchwheel_callback;
     p->func.key_press_callback = wheel_key_press;
     p->func.key_release_callback = wheel_key_release;
     
-    Widget_t *s = add_hslider(wid, "PitchSensity", 330, 12, 90, 35);
+    Widget_t *s = add_knob(wid, "P.Sensity", 65, 0, 60, 75);
     s->flags |= NO_AUTOREPEAT;
     set_adjustment(s->adj,64.0, 64.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
+    s->func.expose_callback = mk_draw_knob;
     s->func.value_changed_callback = pitchsensity_callback;
     s->func.key_press_callback = wheel_key_press;
     s->func.key_release_callback = wheel_key_release;
 
-    Widget_t *m = add_hslider(wid, "ModWheel", 420, 10, 160, 40);
+    Widget_t *m = add_knob(wid, "ModWheel", 130, 0, 60, 75);
     m->flags |= NO_AUTOREPEAT;
     set_adjustment(m->adj,64.0, 64.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
+    m->func.expose_callback = mk_draw_knob;
     m->func.value_changed_callback = modwheel_callback;
     m->func.key_press_callback = wheel_key_press;
     m->func.key_release_callback = wheel_key_release;
 
-    Widget_t *layout = add_combobox(wid, "", 590, 15, 90, 30);
+    Widget_t *su = add_knob(wid, "Sustain", 195, 0, 60, 75);
+    su->flags |= NO_AUTOREPEAT;
+    set_adjustment(su->adj,64.0, 64.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
+    su->func.expose_callback = mk_draw_knob;
+    su->func.value_changed_callback = sustain_callback;
+    su->func.key_press_callback = wheel_key_press;
+    su->func.key_release_callback = wheel_key_release;
+
+    Widget_t *v = add_knob(wid, "Volume", 260, 0, 60, 75);
+    v->flags |= NO_AUTOREPEAT;
+    set_adjustment(v->adj,64.0, 64.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
+    v->func.expose_callback = mk_draw_knob;
+    v->func.value_changed_callback = volume_callback;
+    v->func.key_press_callback = wheel_key_press;
+    v->func.key_release_callback = wheel_key_release;
+
+    Widget_t *ve = add_knob(wid, "Velocity", 325, 0, 60, 75);
+    ve->flags |= NO_AUTOREPEAT;
+    set_adjustment(ve->adj,64.0, 64.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
+    ve->func.expose_callback = mk_draw_knob;
+    ve->func.value_changed_callback = velocity_callback;
+    ve->func.key_press_callback = wheel_key_press;
+    ve->func.key_release_callback = wheel_key_release;
+
+    Widget_t *b = add_hslider(wid, "Keyboard mapping", 540, 40, 160, 35);
+    b->flags |= NO_AUTOREPEAT;
+    set_adjustment(b->adj,2.0, 2.0, 0.0, 4.0, 1.0, CL_CONTINUOS);
+    adj_set_scale(b->adj, 0.05);
+    b->func.value_changed_callback = octave_callback;
+
+    Widget_t *layout = add_combobox(wid, "", 550, 2, 130, 30);
     layout->flags |= NO_AUTOREPEAT;
+    layout->scale.gravity = ASPECT;
     combobox_add_entry(layout,"qwertz");
     combobox_add_entry(layout,"qwerty");
     combobox_add_entry(layout,"azerty");

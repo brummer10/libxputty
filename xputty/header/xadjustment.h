@@ -87,6 +87,8 @@ struct  Adjustment_t {
     float step;
 /** internal use to store the current value when pointer movement starts */
     float start_value;
+/** the scalling to increase/decrease the adjustment on pointer motion*/
+    float scale;
 /** should be on of the CL_ type */
     CL_type type;
 };
@@ -172,6 +174,15 @@ void adj_set_value(Adjustment_t *adj, float value);
  */
 
 void adj_set_start_value(void *w);
+
+/**
+ * @brief adj_set_scale      - internal use to scale the pointer movement (0.1 -1.0)
+ * @param *adj               - pointer to the Adjustment_t
+ * @param value              - value to set the scaleing factor to 
+ * @return void
+ */
+
+void adj_set_scale(Adjustment_t *adj, float value);
 
 /**
  * @brief adj_set_motion_state   - internal use to set value and state of the Adjustment_t

@@ -38,6 +38,9 @@ typedef struct {
     int octave;
     int layout;
     int modwheel;
+    int sustain;
+    int volume;
+    int velocity;
     int pitchwheel;
     int pitchsensity;
     int prelight_key;
@@ -49,6 +52,9 @@ typedef struct {
     midiwheelfunc mk_send_pitch;
     midiwheelfunc mk_send_pitchsensity;
     midiwheelfunc mk_send_mod;
+    midiwheelfunc mk_send_sustain;
+    midiwheelfunc mk_send_volume;
+    midiwheelfunc mk_send_velocity;
     midiwheelfunc mk_send_all_sound_off;
 } MidiKeyboard;
 

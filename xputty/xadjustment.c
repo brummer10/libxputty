@@ -26,7 +26,7 @@ Adjustment_t *add_adjustment(Widget_t *w, float std_value, float value,
                 float min_value,float max_value, float step, CL_type type) {
     Adjustment_t *adj = (Adjustment_t*)malloc(sizeof(Adjustment_t));
     assert(adj);
-    *(adj) = (Adjustment_t){w, std_value, value, min_value, max_value, step, value, type};
+    *(adj) = (Adjustment_t){w, std_value, value, min_value, max_value, step, value, 1.0, type};
 
     debug_print("Widget_t add adjustment\n");
     return adj;
@@ -37,7 +37,7 @@ void set_adjustment(Adjustment_t *adj, float std_value, float value,
     if (!adj)
     adj = (Adjustment_t*)malloc(sizeof(Adjustment_t));
     assert(adj);
-    *(adj) = (Adjustment_t){adj->w, std_value, value, min_value, max_value, step, value, type};
+    *(adj) = (Adjustment_t){adj->w, std_value, value, min_value, max_value, step, value, 1.0, type};
 
     debug_print("Widget_t set adjustment\n");
 }
@@ -80,9 +80,12 @@ void adj_set_start_value(void *w) {
     if(wid->adj_y)wid->adj_y->start_value = wid->adj_y->value;
 }
 
+void adj_set_scale(Adjustment_t *adj, float value) {
+    adj->scale = value;
+}
+
 void adj_set_motion_state(void *w, float x, float y) {
     Widget_t * wid = (Widget_t*)w;
-    const float scaling = 1.0;
     if(wid->adj_x) {
         float value= wid->adj_x->value;
         switch(wid->adj_x->type) {
@@ -91,8 +94,10 @@ void adj_set_motion_state(void *w, float x, float y) {
                 float state = (wid->adj_x->start_value - wid->adj_x->min_value) / 
                     (wid->adj_x->max_value - wid->adj_x->min_value);
                 float nsteps = wid->adj_x->step / (wid->adj_x->max_value - wid->adj_x->min_value);
-                float nvalue = min(1.0,max(0.0,state + ((float)(x - wid->pos_x)*scaling *nsteps)));
-                value = nvalue * (wid->adj_x->max_value - wid->adj_x->min_value) + wid->adj_x->min_value;
+                float nvalue = min(1.0,max(0.0,state + ((float)(x - wid->pos_x)*wid->adj_x->scale *nsteps)));
+                float prevalue = nvalue * (wid->adj_x->max_value - wid->adj_x->min_value) + wid->adj_x->min_value;
+                float mulscale = round(prevalue/wid->adj_x->step);
+                value = mulscale*wid->adj_x->step;
             }
             break;
             case (CL_TOGGLE):
@@ -112,8 +117,10 @@ void adj_set_motion_state(void *w, float x, float y) {
                 float state = (wid->adj_y->start_value - wid->adj_y->min_value) / 
                     (wid->adj_y->max_value - wid->adj_y->min_value);
                 float nsteps = wid->adj_y->step / (wid->adj_y->max_value - wid->adj_y->min_value);
-                float nvalue = min(1.0,max(0.0,state + ((float)(wid->pos_y - y)*scaling *nsteps)));
-                value = nvalue * (wid->adj_y->max_value - wid->adj_y->min_value) + wid->adj_y->min_value;
+                float nvalue = min(1.0,max(0.0,state + ((float)(wid->pos_y - y)*wid->adj_y->scale *nsteps)));
+                float prevalue = nvalue * (wid->adj_y->max_value - wid->adj_y->min_value) + wid->adj_y->min_value;
+                float mulscale = round(prevalue/wid->adj_y->step);
+                value = (float)mulscale*wid->adj_y->step;
             }
             break;
             case (CL_TOGGLE):
