@@ -283,7 +283,7 @@ void _resize_childs(Widget_t *wid) {
             break;
             case(ASPECT):
                 XMoveWindow(wid->app->dpy,w->widget,w->scale.init_x /
-                    wid->scale.ascale,w->scale.init_y / wid->scale.ascale);
+                    wid->scale.cscale_x,w->scale.init_y / wid->scale.cscale_y);
                 XResizeWindow (wid->app->dpy, w->widget, max(1,
                     w->scale.init_width / (wid->scale.ascale)), 
                     max(1,w->scale.init_height / (wid->scale.ascale)));
