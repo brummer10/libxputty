@@ -715,6 +715,18 @@ static void keyboard_mem_free(void *w_, void* user_data) {
     free(keys);
 }
 
+static void map_keyboard(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Widget_t *pa = (Widget_t*)w->parent;
+    MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
+    keys->mk_send_pitchsensity(pa,&keys->pitchsensity);
+    keys->mk_send_pitch(pa,&keys->pitchwheel);
+    keys->mk_send_velocity(pa, &keys->velocity);
+    keys->mk_send_volume(pa, &keys->volume);
+    keys->mk_send_sustain(pa, &keys->sustain);
+    keys->mk_send_mod(pa, &keys->modwheel);
+}
+
 static void key_dummy(Widget_t *w,int *key, bool on_off) {
     //if (on_off)
     //fprintf(stderr, "send note on %i\n",(*key));
@@ -740,9 +752,6 @@ Widget_t *open_midi_keyboard(Widget_t *w) {
     keys->send_key = -1;
     keys->octave = 12*2;
     keys->layout = 0;
-    keys->modwheel = 64;
-    keys->pitchwheel = 64;
-    keys->pitchsensity = 64;
     keys->icon = NULL;
     int j = 0;
     for(;j<4;j++) {
@@ -757,6 +766,7 @@ Widget_t *open_midi_keyboard(Widget_t *w) {
     wid->func.key_press_callback = key_press;
     wid->func.key_release_callback = key_release;
     wid->func.mem_free_callback = keyboard_mem_free;
+    wid->func.map_notify_callback = map_keyboard;
     widget_set_icon_from_png(wid,keys->icon,LDVAR(midikeyboard_png));
     widget_set_title(wid, "Midi Keyboard");
     keys->mk_send_note = key_dummy;
@@ -775,6 +785,7 @@ Widget_t *open_midi_keyboard(Widget_t *w) {
     p->func.value_changed_callback = pitchwheel_callback;
     p->func.key_press_callback = wheel_key_press;
     p->func.key_release_callback = wheel_key_release;
+    keys->pitchwheel = (int)adj_get_value(p->adj);
     
     Widget_t *s = add_knob(wid, "P.Sensity", 65, 0, 60, 75);
     s->flags |= NO_AUTOREPEAT;
@@ -783,6 +794,7 @@ Widget_t *open_midi_keyboard(Widget_t *w) {
     s->func.value_changed_callback = pitchsensity_callback;
     s->func.key_press_callback = wheel_key_press;
     s->func.key_release_callback = wheel_key_release;
+    keys->pitchsensity = (int)adj_get_value(s->adj);
 
     Widget_t *m = add_knob(wid, "ModWheel", 130, 0, 60, 75);
     m->flags |= NO_AUTOREPEAT;
@@ -791,6 +803,7 @@ Widget_t *open_midi_keyboard(Widget_t *w) {
     m->func.value_changed_callback = modwheel_callback;
     m->func.key_press_callback = wheel_key_press;
     m->func.key_release_callback = wheel_key_release;
+    keys->modwheel = (int)adj_get_value(m->adj);
 
     Widget_t *su = add_knob(wid, "Sustain", 195, 0, 60, 75);
     su->flags |= NO_AUTOREPEAT;
@@ -799,6 +812,7 @@ Widget_t *open_midi_keyboard(Widget_t *w) {
     su->func.value_changed_callback = sustain_callback;
     su->func.key_press_callback = wheel_key_press;
     su->func.key_release_callback = wheel_key_release;
+    keys->sustain = (int)adj_get_value(su->adj);
 
     Widget_t *v = add_knob(wid, "Volume", 260, 0, 60, 75);
     v->flags |= NO_AUTOREPEAT;
@@ -807,14 +821,16 @@ Widget_t *open_midi_keyboard(Widget_t *w) {
     v->func.value_changed_callback = volume_callback;
     v->func.key_press_callback = wheel_key_press;
     v->func.key_release_callback = wheel_key_release;
+    keys->volume = (int)adj_get_value(v->adj);
 
     Widget_t *ve = add_knob(wid, "Velocity", 325, 0, 60, 75);
     ve->flags |= NO_AUTOREPEAT;
-    set_adjustment(ve->adj,64.0, 64.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
+    set_adjustment(ve->adj,127.0, 127.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
     ve->func.expose_callback = mk_draw_knob;
     ve->func.value_changed_callback = velocity_callback;
     ve->func.key_press_callback = wheel_key_press;
     ve->func.key_release_callback = wheel_key_release;
+    keys->velocity = (int)adj_get_value(ve->adj);
 
     Widget_t *b = add_hslider(wid, "Keyboard mapping", 540, 40, 160, 35);
     b->flags |= NO_AUTOREPEAT;
