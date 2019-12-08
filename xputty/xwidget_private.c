@@ -94,6 +94,7 @@ void _button_press(Widget_t * wid, XButtonEvent *xbutton, void* user_data) {
         break;
         case Button3:
             debug_print("Button3 \n");
+            wid->func.button_press_callback(wid, xbutton, user_data);
         break;
         case  Button4:
             _scroll_event(wid, 1);

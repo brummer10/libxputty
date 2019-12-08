@@ -236,7 +236,7 @@ void mk_draw_knob(void *w_, void* user_data) {
     int height = attrs.height-2;
 
     const double scale_zero = 20 * (M_PI/180); // defines "dead zone" for knobs
-    int arc_offset = 0;
+    int arc_offset = 2;
     int knob_x = 0;
     int knob_y = 0;
 
@@ -264,27 +264,39 @@ void mk_draw_knob(void *w_, void* user_data) {
     cairo_new_path (w->crb);
 
     pat = cairo_pattern_create_linear (0, 0, 0, knob_y);
+    cairo_pattern_add_color_stop_rgba (pat, 1,  0.3, 0.3, 0.3, 1.0);
+    cairo_pattern_add_color_stop_rgba (pat, 0.75,  0.2, 0.2, 0.2, 1.0);
+    cairo_pattern_add_color_stop_rgba (pat, 0.5,  0.15, 0.15, 0.15, 1.0);
+    cairo_pattern_add_color_stop_rgba (pat, 0.25,  0.1, 0.1, 0.1, 1.0);
+    cairo_pattern_add_color_stop_rgba (pat, 0,  0.05, 0.05, 0.05, 1.0);
+
+    cairo_scale (w->crb, 0.95, 1.05);
+    cairo_arc(w->crb,knobx1+arc_offset/2, knoby1-arc_offset, knob_x/2.2, 0, 2 * M_PI );
+    cairo_set_source (w->crb, pat);
+    cairo_fill_preserve (w->crb);
+     cairo_set_source_rgb (w->crb, 0.1, 0.1, 0.1); 
+    cairo_set_line_width(w->crb,1);
+    cairo_stroke(w->crb);
+    cairo_scale (w->crb, 1.05, 0.95);
+    cairo_new_path (w->crb);
+    cairo_pattern_destroy (pat);
+    pat = NULL;
+
+    pat = cairo_pattern_create_linear (0, 0, 0, knob_y);
     cairo_pattern_add_color_stop_rgba (pat, 0,  0.3, 0.3, 0.3, 1.0);
     cairo_pattern_add_color_stop_rgba (pat, 0.25,  0.2, 0.2, 0.2, 1.0);
     cairo_pattern_add_color_stop_rgba (pat, 0.5,  0.15, 0.15, 0.15, 1.0);
     cairo_pattern_add_color_stop_rgba (pat, 0.75,  0.1, 0.1, 0.1, 1.0);
-    cairo_pattern_add_color_stop_rgba (pat, 1,  0.0, 0.0, 0.0, 1.0);
+    cairo_pattern_add_color_stop_rgba (pat, 1,  0.05, 0.05, 0.05, 1.0);
 
-    cairo_arc(w->crb,knobx1+arc_offset/2, knoby1+arc_offset/2, knob_x/2.2, 0, 2 * M_PI );
+    cairo_arc(w->crb,knobx1, knoby1, knob_x/2.6, 0, 2 * M_PI );
     cairo_set_source (w->crb, pat);
     cairo_fill_preserve (w->crb);
      cairo_set_source_rgb (w->crb, 0.1, 0.1, 0.1); 
     cairo_set_line_width(w->crb,1);
     cairo_stroke(w->crb);
     cairo_new_path (w->crb);
-
-    cairo_arc(w->crb,knobx1+arc_offset/2, knoby1+arc_offset/2, knob_x/2.6, 0, 2 * M_PI );
-    cairo_set_source (w->crb, pat);
-    cairo_fill_preserve (w->crb);
-     cairo_set_source_rgb (w->crb, 0.1, 0.1, 0.1); 
-    cairo_set_line_width(w->crb,1);
-    cairo_stroke(w->crb);
-    cairo_new_path (w->crb);
+    cairo_pattern_destroy (pat);
 
     /** create a rotating pointer on the kob**/
     cairo_set_line_cap(w->crb, CAIRO_LINE_CAP_ROUND); 
@@ -738,6 +750,17 @@ static void wheel_dummy(Widget_t *w,int *value) {
     //fprintf(stderr, "send wheel value %i\n",(*value));
 }
 
+Widget_t *add_keyboard_knob(Widget_t *parent, const char * label,
+                                int x, int y, int width, int height) {
+    Widget_t *wid = add_knob(parent,label, x, y, width, height);
+    wid->flags |= NO_AUTOREPEAT;
+    set_adjustment(wid->adj,64.0, 64.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
+    wid->func.expose_callback = mk_draw_knob;
+    wid->func.key_press_callback = wheel_key_press;
+    wid->func.key_release_callback = wheel_key_release;
+    return wid;
+}
+
 Widget_t *open_midi_keyboard(Widget_t *w) {
     Widget_t *wid = create_window(w->app, DefaultRootWindow(w->app->dpy), 0, 0, 700, 200);
     XSelectInput(wid->app->dpy, wid->widget,StructureNotifyMask|ExposureMask|KeyPressMask 
@@ -778,58 +801,29 @@ Widget_t *open_midi_keyboard(Widget_t *w) {
     keys->mk_send_velocity = wheel_dummy;
     keys->mk_send_all_sound_off = wheel_dummy;
 
-    Widget_t *p = add_knob(wid, "PitchBend", 5, 0, 60, 75);
-    p->flags |= NO_AUTOREPEAT;
-    set_adjustment(p->adj,64.0, 64.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
-    p->func.expose_callback = mk_draw_knob;
+    Widget_t *p = add_keyboard_knob(wid, "PitchBend", 5, 0, 60, 75);
     p->func.value_changed_callback = pitchwheel_callback;
-    p->func.key_press_callback = wheel_key_press;
-    p->func.key_release_callback = wheel_key_release;
     keys->pitchwheel = (int)adj_get_value(p->adj);
     
-    Widget_t *s = add_knob(wid, "P.Sensity", 65, 0, 60, 75);
-    s->flags |= NO_AUTOREPEAT;
-    set_adjustment(s->adj,64.0, 64.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
-    s->func.expose_callback = mk_draw_knob;
+    Widget_t *s = add_keyboard_knob(wid, "P.Sensity", 65, 0, 60, 75);
     s->func.value_changed_callback = pitchsensity_callback;
-    s->func.key_press_callback = wheel_key_press;
-    s->func.key_release_callback = wheel_key_release;
     keys->pitchsensity = (int)adj_get_value(s->adj);
 
-    Widget_t *m = add_knob(wid, "ModWheel", 130, 0, 60, 75);
-    m->flags |= NO_AUTOREPEAT;
-    set_adjustment(m->adj,64.0, 64.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
-    m->func.expose_callback = mk_draw_knob;
+    Widget_t *m = add_keyboard_knob(wid, "ModWheel", 130, 0, 60, 75);
     m->func.value_changed_callback = modwheel_callback;
-    m->func.key_press_callback = wheel_key_press;
-    m->func.key_release_callback = wheel_key_release;
     keys->modwheel = (int)adj_get_value(m->adj);
 
-    Widget_t *su = add_knob(wid, "Sustain", 195, 0, 60, 75);
-    su->flags |= NO_AUTOREPEAT;
-    set_adjustment(su->adj,64.0, 64.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
-    su->func.expose_callback = mk_draw_knob;
+    Widget_t *su = add_keyboard_knob(wid, "Sustain", 195, 0, 60, 75);
     su->func.value_changed_callback = sustain_callback;
-    su->func.key_press_callback = wheel_key_press;
-    su->func.key_release_callback = wheel_key_release;
     keys->sustain = (int)adj_get_value(su->adj);
 
-    Widget_t *v = add_knob(wid, "Volume", 260, 0, 60, 75);
-    v->flags |= NO_AUTOREPEAT;
-    set_adjustment(v->adj,64.0, 64.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
-    v->func.expose_callback = mk_draw_knob;
+    Widget_t *v = add_keyboard_knob(wid, "Volume", 260, 0, 60, 75);
     v->func.value_changed_callback = volume_callback;
-    v->func.key_press_callback = wheel_key_press;
-    v->func.key_release_callback = wheel_key_release;
     keys->volume = (int)adj_get_value(v->adj);
 
-    Widget_t *ve = add_knob(wid, "Velocity", 325, 0, 60, 75);
-    ve->flags |= NO_AUTOREPEAT;
+    Widget_t *ve = add_keyboard_knob(wid, "Velocity", 325, 0, 60, 75);
     set_adjustment(ve->adj,127.0, 127.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
-    ve->func.expose_callback = mk_draw_knob;
     ve->func.value_changed_callback = velocity_callback;
-    ve->func.key_press_callback = wheel_key_press;
-    ve->func.key_release_callback = wheel_key_release;
     keys->velocity = (int)adj_get_value(ve->adj);
 
     Widget_t *b = add_hslider(wid, "Keyboard mapping", 540, 40, 160, 35);
