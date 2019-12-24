@@ -345,11 +345,17 @@ static void draw_keyboard(void *w_, void* user_data) {
     if (attrs.map_state != IsViewable) return;
     MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
     
-    cairo_rectangle(w->crb,0,0,width_t,height_t);
+    cairo_rectangle(w->crb,0,0,width_t,height_t*0.4);
     set_pattern(w,&w->app->color_scheme->selected,&w->app->color_scheme->normal,BACKGROUND_);
     cairo_fill (w->crb);
+    //set_pattern(w,&w->app->color_scheme->normal,&w->app->color_scheme->selected,BACKGROUND_);
+    use_bg_color_scheme(w, SELECTED_);
+    cairo_rectangle(w->crb,0,height_t*0.38,width_t,height_t*0.02);
+    cairo_fill_preserve (w->crb);
+    use_bg_color_scheme(w, ACTIVE_);
 
     cairo_set_line_width(w->crb, 1.0);
+    cairo_stroke(w->crb);
     int space = 2;
     int set = 0;
     int i = 0;
@@ -653,6 +659,15 @@ static void modwheel_callback(void *w_, void* user_data) {
     keys->mk_send_mod(pa, &keys->modwheel);
 }
 
+static void attack_callback(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Widget_t *p = w->parent;
+    Widget_t *pa = p->parent;
+    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    keys->attack = (int)adj_get_value(w->adj);
+    keys->mk_send_attack(pa, &keys->attack);
+}
+
 static void sustain_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = w->parent;
@@ -660,6 +675,15 @@ static void sustain_callback(void *w_, void* user_data) {
     MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
     keys->sustain = (int)adj_get_value(w->adj);
     keys->mk_send_sustain(pa, &keys->sustain);
+}
+
+static void release_callback(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Widget_t *p = w->parent;
+    Widget_t *pa = p->parent;
+    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    keys->release = (int)adj_get_value(w->adj);
+    keys->mk_send_release(pa, &keys->release);
 }
 
 static void volume_callback(void *w_, void* user_data) {
@@ -813,15 +837,23 @@ Widget_t *open_midi_keyboard(Widget_t *w) {
     m->func.value_changed_callback = modwheel_callback;
     keys->modwheel = (int)adj_get_value(m->adj);
 
-    Widget_t *su = add_keyboard_knob(wid, "Sustain", 195, 0, 60, 75);
+    Widget_t *at = add_keyboard_knob(wid, "Attack", 195, 0, 60, 75);
+    at->func.value_changed_callback = attack_callback;
+    keys->attack = (int)adj_get_value(at->adj);
+
+    Widget_t *su = add_keyboard_knob(wid, "Sustain", 260, 0, 60, 75);
     su->func.value_changed_callback = sustain_callback;
     keys->sustain = (int)adj_get_value(su->adj);
 
-    Widget_t *v = add_keyboard_knob(wid, "Volume", 260, 0, 60, 75);
+    Widget_t *re = add_keyboard_knob(wid, "Release", 325, 0, 60, 75);
+    re->func.value_changed_callback = release_callback;
+    keys->release = (int)adj_get_value(re->adj);
+
+    Widget_t *v = add_keyboard_knob(wid, "Volume", 390, 0, 60, 75);
     v->func.value_changed_callback = volume_callback;
     keys->volume = (int)adj_get_value(v->adj);
 
-    Widget_t *ve = add_keyboard_knob(wid, "Velocity", 325, 0, 60, 75);
+    Widget_t *ve = add_keyboard_knob(wid, "Velocity", 455, 0, 60, 75);
     set_adjustment(ve->adj,127.0, 127.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
     ve->func.value_changed_callback = velocity_callback;
     keys->velocity = (int)adj_get_value(ve->adj);
