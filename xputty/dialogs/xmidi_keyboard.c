@@ -659,6 +659,15 @@ static void modwheel_callback(void *w_, void* user_data) {
     keys->mk_send_mod(pa, &keys->modwheel);
 }
 
+static void detune_callback(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Widget_t *p = w->parent;
+    Widget_t *pa = p->parent;
+    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    keys->detune = (int)adj_get_value(w->adj);
+    keys->mk_send_detune(pa, &keys->detune);
+}
+
 static void attack_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = w->parent;
@@ -820,7 +829,10 @@ Widget_t *open_midi_keyboard(Widget_t *w) {
     keys->mk_send_pitch = wheel_dummy;
     keys->mk_send_pitchsensity = wheel_dummy;
     keys->mk_send_mod = wheel_dummy;
+    keys->mk_send_detune = wheel_dummy;
+    keys->mk_send_attack = wheel_dummy;
     keys->mk_send_sustain = wheel_dummy;
+    keys->mk_send_release = wheel_dummy;
     keys->mk_send_volume = wheel_dummy;
     keys->mk_send_velocity = wheel_dummy;
     keys->mk_send_all_sound_off = wheel_dummy;
@@ -833,27 +845,31 @@ Widget_t *open_midi_keyboard(Widget_t *w) {
     s->func.value_changed_callback = pitchsensity_callback;
     keys->pitchsensity = (int)adj_get_value(s->adj);
 
-    Widget_t *m = add_keyboard_knob(wid, "ModWheel", 130, 0, 60, 75);
+    Widget_t *m = add_keyboard_knob(wid, "ModWheel", 125, 0, 60, 75);
     m->func.value_changed_callback = modwheel_callback;
     keys->modwheel = (int)adj_get_value(m->adj);
 
-    Widget_t *at = add_keyboard_knob(wid, "Attack", 195, 0, 60, 75);
+    Widget_t *de = add_keyboard_knob(wid, "Detune", 185, 0, 60, 75);
+    de->func.value_changed_callback = detune_callback;
+    keys->detune = (int)adj_get_value(de->adj);
+
+    Widget_t *at = add_keyboard_knob(wid, "Attack", 245, 0, 60, 75);
     at->func.value_changed_callback = attack_callback;
     keys->attack = (int)adj_get_value(at->adj);
 
-    Widget_t *su = add_keyboard_knob(wid, "Sustain", 260, 0, 60, 75);
+    Widget_t *su = add_keyboard_knob(wid, "Sustain", 305, 0, 60, 75);
     su->func.value_changed_callback = sustain_callback;
     keys->sustain = (int)adj_get_value(su->adj);
 
-    Widget_t *re = add_keyboard_knob(wid, "Release", 325, 0, 60, 75);
+    Widget_t *re = add_keyboard_knob(wid, "Release", 365, 0, 60, 75);
     re->func.value_changed_callback = release_callback;
     keys->release = (int)adj_get_value(re->adj);
 
-    Widget_t *v = add_keyboard_knob(wid, "Volume", 390, 0, 60, 75);
+    Widget_t *v = add_keyboard_knob(wid, "Volume", 425, 0, 60, 75);
     v->func.value_changed_callback = volume_callback;
     keys->volume = (int)adj_get_value(v->adj);
 
-    Widget_t *ve = add_keyboard_knob(wid, "Velocity", 455, 0, 60, 75);
+    Widget_t *ve = add_keyboard_knob(wid, "Velocity", 485, 0, 60, 75);
     set_adjustment(ve->adj,127.0, 127.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
     ve->func.value_changed_callback = velocity_callback;
     keys->velocity = (int)adj_get_value(ve->adj);
