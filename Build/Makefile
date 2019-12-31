@@ -82,7 +82,7 @@ $(LIB_OBJ): $(LIB_SOURCES)
 -include $(DEP)
 
 libxputty.a:  $(RESOURCES_OBJ) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
-	ar rcs libxputty.a $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ) $(XDG_OBJ)
+	$(AR) rcs libxputty.a $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ) $(XDG_OBJ)
 	mkdir -p $(RELEASE_DIR)include/
 	cp $(HEADER_DIR)*.h $(RELEASE_DIR)include/
 	cp $(WIDGET_HEADER_DIR)*.h $(RELEASE_DIR)include/
