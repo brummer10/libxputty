@@ -51,7 +51,9 @@ extern "C" {
 
 #ifndef DEBUG
 #define DEBUG 0
+#ifndef NDEBUG
 #define NDEBUG // switch of assertion checks
+#endif
 #endif
 
 /**
@@ -183,6 +185,12 @@ struct Xputty{
     Widget_t *hold_grab;
 /** bool to quit the main loop */
     bool run;
+/** small fontsize for all Widget_t*/
+    int small_font;
+/** normal fontsize  for all Widget_t*/
+    int normal_font;
+/** big fontsize  for all Widget_t*/
+    int big_font;
 };
 
 /**

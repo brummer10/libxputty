@@ -18,15 +18,31 @@
  *
  */
 
-#include "xchildlist_private.h"
+#pragma once
 
-void _childlist_add_elem(Childlist_t *childlist) {
-    childlist->childs = (Widget_t**)realloc(childlist->childs, sizeof(Widget_t*) * (4+childlist->cap));
-    assert(childlist->childs != NULL);
-    childlist->cap +=4;
-    childlist->size = sizeof(childlist);
-    int i = childlist->elem+1;
-    for(;i<childlist->cap;i++) {
-        childlist->childs[i] = NULL;
-    }
+#ifndef XVALUEDISPLAY_H_
+#define XVALUEDISPLAY_H_
+
+#include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+/**
+ * @brief add_valuedisplay    - add a valuedisplay widget to a Widget_t
+ * @param *parent             - pointer to the Widget_t request the valuedisplay
+ * @param *label              - Label to show on the valuedisplay
+ * @param x,y,width,height    - the position/geometry to create the valuedisplay
+ * @return Widget_t*          - pointer to the Widget_t valuedisplay struct
+ */
+
+Widget_t* add_valuedisplay(Widget_t *parent, const char * label,
+                int x, int y, int width, int height);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif //XVALUEDISPLAY_H_

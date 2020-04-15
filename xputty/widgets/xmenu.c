@@ -96,7 +96,7 @@ Widget_t* menu_add_check_item(Widget_t *menu, const char * label) {
 }
 
 void radio_item_set_active(Widget_t *w) {
-    Widget_t * p = w->parent;
+    Widget_t * p = (Widget_t*) w->parent;
     int i = p->childlist->elem-1;
     for(;i>-1;i--) {
         Widget_t *wid = p->childlist->childs[i];

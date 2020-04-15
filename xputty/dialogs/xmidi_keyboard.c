@@ -315,8 +315,6 @@ void mk_draw_knob(void *w_, void* user_data) {
         snprintf(s, 63,"%d",  (int) w->adj_y->value);
         cairo_set_source_rgb (w->crb, 0.6, 0.6, 0.6);
         cairo_set_font_size (w->crb, knobx1/3);
-        cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                                   CAIRO_FONT_WEIGHT_BOLD);
         cairo_text_extents(w->crb, s, &extents);
         cairo_move_to (w->crb, knobx1-extents.width/2, knoby1+extents.height/2);
         cairo_show_text(w->crb, s);
@@ -327,8 +325,6 @@ void mk_draw_knob(void *w_, void* user_data) {
     use_text_color_scheme(w, get_color_state(w));
     float font_size = ((height/2.2 < (width*0.5)/3) ? height/2.2 : (width*0.5)/3);
     cairo_set_font_size (w->crb, font_size);
-    cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                               CAIRO_FONT_WEIGHT_BOLD);
     cairo_text_extents(w->crb,w->label , &extents);
 
     cairo_move_to (w->crb, knobx1-extents.width/2, height );
@@ -446,7 +442,7 @@ static void draw_keyboard(void *w_, void* user_data) {
 
 static void keyboard_motion(void *w_, void* xmotion_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
+    Widget_t *p = (Widget_t *)w->parent;
     MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
     XMotionEvent *xmotion = (XMotionEvent*)xmotion_;
     XWindowAttributes attrs;
@@ -455,7 +451,7 @@ static void keyboard_motion(void *w_, void* xmotion_, void* user_data) {
     int width = attrs.width;
     int height = attrs.height;
 
-    bool catch = false;
+    bool catchit = false;
 
     if(xmotion->y < height*0.4) {
         keys->active_key = keys->prelight_key = -1;
@@ -481,7 +477,7 @@ static void keyboard_motion(void *w_, void* xmotion_, void* user_data) {
                             keys->mk_send_note(p, &keys->send_key,true);
                         }
                     }
-                    catch = true;
+                    catchit = true;
                     expose_widget(w);
                     break;
                 }
@@ -502,7 +498,7 @@ static void keyboard_motion(void *w_, void* xmotion_, void* user_data) {
         }        
     }
 
-    if (!catch) {
+    if (!catchit) {
         int space = 2;
         int set = 0;
         int i = 0;
@@ -559,7 +555,7 @@ static void get_outkey(MidiKeyboard *keys, KeySym sym, float *outkey) {
 
 static void key_press(void *w_, void *key_, void *user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
+    Widget_t *p = (Widget_t *)w->parent;
     if (!w) return;
     MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
     XKeyEvent *key = (XKeyEvent*)key_;
@@ -583,7 +579,7 @@ static void key_press(void *w_, void *key_, void *user_data) {
 
 static void key_release(void *w_, void *key_, void *user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
+    Widget_t *p = (Widget_t *)w->parent;
     if (!w) return;
     MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
     XKeyEvent *key = (XKeyEvent*)key_;
@@ -608,7 +604,7 @@ static void leave_keyboard(void *w_, void* user_data) {
 
 static void button_pressed_keyboard(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
+    Widget_t *p = (Widget_t *)w->parent;
     if (w->flags & HAS_POINTER) {
         MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
         XButtonEvent *xbutton = (XButtonEvent*)button_;
@@ -623,7 +619,7 @@ static void button_pressed_keyboard(void *w_, void* button_, void* user_data) {
 
 static void button_released_keyboard(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
+    Widget_t *p = (Widget_t *)w->parent;
     if (w->flags & HAS_POINTER) {
         MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
         XButtonEvent *xbutton = (XButtonEvent*)button_;
@@ -638,22 +634,22 @@ static void button_released_keyboard(void *w_, void* button_, void* user_data) {
 
 static void octave_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
+    Widget_t *p = (Widget_t *)w->parent;
     MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
     keys->octave = (int)12*adj_get_value(w->adj);
 }
 
 static void layout_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
+    Widget_t *p = (Widget_t *)w->parent;
     MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
     keys->layout = (int)adj_get_value(w->adj);
 }
 
 static void modwheel_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
-    Widget_t *pa = p->parent;
+    Widget_t *p = (Widget_t *)w->parent;
+    Widget_t *pa = (Widget_t *)p->parent;
     MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
     keys->modwheel = (int)adj_get_value(w->adj);
     keys->mk_send_mod(pa, &keys->modwheel);
@@ -661,8 +657,8 @@ static void modwheel_callback(void *w_, void* user_data) {
 
 static void detune_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
-    Widget_t *pa = p->parent;
+    Widget_t *p = (Widget_t *)w->parent;
+    Widget_t *pa = (Widget_t *)p->parent;
     MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
     keys->detune = (int)adj_get_value(w->adj);
     keys->mk_send_detune(pa, &keys->detune);
@@ -670,8 +666,8 @@ static void detune_callback(void *w_, void* user_data) {
 
 static void attack_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
-    Widget_t *pa = p->parent;
+    Widget_t *p = (Widget_t *)w->parent;
+    Widget_t *pa = (Widget_t *)p->parent;
     MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
     keys->attack = (int)adj_get_value(w->adj);
     keys->mk_send_attack(pa, &keys->attack);
@@ -679,8 +675,8 @@ static void attack_callback(void *w_, void* user_data) {
 
 static void sustain_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
-    Widget_t *pa = p->parent;
+    Widget_t *p = (Widget_t *)w->parent;
+    Widget_t *pa = (Widget_t *)p->parent;
     MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
     keys->sustain = (int)adj_get_value(w->adj);
     keys->mk_send_sustain(pa, &keys->sustain);
@@ -688,8 +684,8 @@ static void sustain_callback(void *w_, void* user_data) {
 
 static void release_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
-    Widget_t *pa = p->parent;
+    Widget_t *p = (Widget_t *)w->parent;
+    Widget_t *pa = (Widget_t *)p->parent;
     MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
     keys->release = (int)adj_get_value(w->adj);
     keys->mk_send_release(pa, &keys->release);
@@ -697,8 +693,8 @@ static void release_callback(void *w_, void* user_data) {
 
 static void volume_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
-    Widget_t *pa = p->parent;
+    Widget_t *p = (Widget_t *)w->parent;
+    Widget_t *pa = (Widget_t *)p->parent;
     MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
     keys->volume = (int)adj_get_value(w->adj);
     keys->mk_send_volume(pa, &keys->volume);
@@ -706,8 +702,8 @@ static void volume_callback(void *w_, void* user_data) {
 
 static void velocity_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
-    Widget_t *pa = p->parent;
+    Widget_t *p = (Widget_t *)w->parent;
+    Widget_t *pa = (Widget_t *)p->parent;
     MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
     keys->velocity = (int)adj_get_value(w->adj);
     keys->mk_send_velocity(pa, &keys->velocity);
@@ -715,8 +711,8 @@ static void velocity_callback(void *w_, void* user_data) {
 
 static void pitchwheel_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
-    Widget_t *pa = p->parent;
+    Widget_t *p = (Widget_t *)w->parent;
+    Widget_t *pa = (Widget_t *)p->parent;
     MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
     keys->pitchwheel = (int)adj_get_value(w->adj);
     keys->mk_send_pitch(pa,&keys->pitchwheel);
@@ -724,8 +720,8 @@ static void pitchwheel_callback(void *w_, void* user_data) {
 
 static void pitchsensity_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
-    Widget_t *pa = p->parent;
+    Widget_t *p = (Widget_t *)w->parent;
+    Widget_t *pa = (Widget_t *)p->parent;
     MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
     keys->pitchsensity = (int)adj_get_value(w->adj);
     keys->mk_send_pitchsensity(pa,&keys->pitchsensity);
@@ -733,13 +729,13 @@ static void pitchsensity_callback(void *w_, void* user_data) {
 
 static void wheel_key_release(void *w_, void *key_, void *user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
+    Widget_t *p = (Widget_t *)w->parent;
     p->func.key_release_callback(p, key_, user_data);
 }
 
 static void wheel_key_press(void *w_, void *key_, void *user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t *p = w->parent;
+    Widget_t *p = (Widget_t *)w->parent;
     p->func.key_press_callback(p, key_, user_data);
 }
 

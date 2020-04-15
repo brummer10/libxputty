@@ -98,14 +98,32 @@ void _draw_image_button_with_label(Widget_t *w, int width_t, int height_t) {
     }
 
     use_text_color_scheme(w, get_color_state(w));
-    cairo_set_font_size (w->crb, (width_t*0.5)/3);
-    cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                               CAIRO_FONT_WEIGHT_BOLD);
-    cairo_text_extents(w->crb,w->label , &extents);
-
-    cairo_move_to (w->crb, (width_t*0.5)-(extents.width/2), height_t);
-    cairo_show_text(w->crb, w->label);
+    cairo_set_font_size (w->crb,w->app->normal_font/w->scale.ascale);
+    if ((int)adj_get_value(w->adj) && strlen(w->input_label)) {
+        cairo_text_extents(w->crb,w->input_label , &extents);
+        cairo_move_to (w->crb, (width_t*0.5)-(extents.width/2), height_t-(extents.height/4));
+        cairo_show_text(w->crb, w->input_label);
+    } else {
+        cairo_text_extents(w->crb,w->label , &extents);
+        cairo_move_to (w->crb, (width_t*0.5)-(extents.width/2), height_t-(extents.height/4));
+        cairo_show_text(w->crb, w->label);
+    }
     cairo_new_path (w->crb);
+}
+
+void _draw_switch_image_button(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    if (!w) return;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    int width = attrs.width-2;
+    int height = attrs.height-2;
+    if (attrs.map_state != IsViewable) return;    
+    if(strlen(w->label)) {
+        _draw_image_button_with_label(w, width, height);
+    } else {
+        _draw_image_button(w, width, height,0.0);
+    }
 }
 
 void _draw_button_base(Widget_t *w, int width, int height) {
@@ -159,36 +177,32 @@ void _draw_button(void *w_, void* user_data) {
     int width = attrs.width-2;
     int height = attrs.height-2;
     if (attrs.map_state != IsViewable) return;
+    _draw_button_base(w, width, height);
+
+    float offset = 0.0;
+    if(w->state==1 && ! (int)w->adj_y->value) {
+        offset = 1.0;
+    } else if(w->state==1) {
+        offset = 2.0;
+    } else if(w->state==2) {
+        offset = 2.0;
+    } else if(w->state==3) {
+        offset = 1.0;
+    }
     if (w->image) {
         if(strlen(w->label)) {
             _draw_image_button_with_label(w, width, height);
         } else {
-            _draw_image_button(w, width, height,0.0);
+            _draw_image_button(w, width, height,offset);
         }
     } else {
-        _draw_button_base(w, width, height);
 
-        float offset = 0.0;
         cairo_text_extents_t extents;
-        if(w->state==1 && ! (int)w->adj_y->value) {
-            offset = 1.0;
-        } else if(w->state==1) {
-            offset = 2.0;
-        } else if(w->state==2) {
-            offset = 2.0;
-        } else if(w->state==3) {
-            offset = 1.0;
-        }
-
         use_text_color_scheme(w, get_color_state(w));
-        float font_size = ((height/2.2 < (width*0.5)/3) ? height/2.2 : (width*0.6)/3);
-        cairo_set_font_size (w->crb, font_size);
-        cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                                   CAIRO_FONT_WEIGHT_BOLD);
+        cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
         cairo_text_extents(w->crb,w->label , &extents);
         if(IS_UTF8(w->label[0])) {
-            font_size = ((height/1.5 < (width)/1.5) ? height/1.5 : (width)/1.5);
-            cairo_set_font_size (w->crb, font_size);
+            cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
             cairo_text_extents(w->crb,w->label , &extents);
         }
 
@@ -227,14 +241,10 @@ void _draw_on_off_button(void *w_, void* user_data) {
     }
 
     use_text_color_scheme(w, get_color_state(w));
-    float font_size = ((height/2.2 < (width*0.5)/3) ? height/2.2 : (width*0.6)/3);
-    cairo_set_font_size (w->crb, font_size);
-    cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                               CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
     cairo_text_extents(w->crb,w->label , &extents);
     if(IS_UTF8(w->label[0])) {
-        font_size = ((height/1.5 < (width)/1.5) ? height/1.5 : (width)/1.5);
-        cairo_set_font_size (w->crb, font_size);
+        cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
         cairo_text_extents(w->crb,w->label , &extents);
     }
 
@@ -283,7 +293,7 @@ void _draw_check_button(void *w_, void* user_data) {
         _draw_button_base(w, width, height);
 
         if(w->state==3) {
-            use_fg_color_scheme(w, ACTIVE_);
+            use_fg_color_scheme(w, get_color_state(w));
             float offset = 1.0;
             int wa = width/1.3;
             int h = height/2.2;
@@ -307,7 +317,6 @@ void _draw_check_box(void *w_, void* user_data) {
     if (!w) return;
     XWindowAttributes attrs;
     XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width-2;
     int height = attrs.height-2;
     if (attrs.map_state != IsViewable) return;
     if (w->image) {
@@ -315,8 +324,8 @@ void _draw_check_box(void *w_, void* user_data) {
     } else {
         _draw_button_base(w, height, height);
 
-        if(w->state==3) {
-            use_fg_color_scheme(w, ACTIVE_);
+        if(adj_get_value(w->adj)) {
+            use_fg_color_scheme(w, get_color_state(w));
             float offset = 1.0;
             int wa = height/1.3;
             int h = height/2.2;
@@ -335,10 +344,7 @@ void _draw_check_box(void *w_, void* user_data) {
 
         cairo_text_extents_t extents;
         use_text_color_scheme(w, get_color_state(w));
-        float font_size = ((height/1.2 < (width*0.5)/3) ? height/1.2 : (width*0.6)/3);
-        cairo_set_font_size (w->crb, font_size);
-        cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                                   CAIRO_FONT_WEIGHT_BOLD);
+        cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
         cairo_text_extents(w->crb,w->label , &extents);
         cairo_move_to (w->crb, height+5 , (height+extents.height)*0.5 );
         cairo_show_text(w->crb, w->label);
@@ -370,7 +376,8 @@ void _button_released(void *w_, void* button_, void* user_data) {
 ----------------------------------------------------------------------*/
 
 void _toggle_button_pressed(void *w_, void* button, void* user_data) {
-    expose_widget(w_);
+    Widget_t *w = (Widget_t*)w_;
+    expose_widget(w);
 }
 
 void _toggle_button_released(void *w_, void* button_, void* user_data) {
@@ -387,5 +394,5 @@ void _toggle_button_released(void *w_, void* button_, void* user_data) {
     } else {
         w->state = (int) w->adj->value ? 3 : 0;
     }
-    expose_widget(w_);
+    expose_widget(w);
 }

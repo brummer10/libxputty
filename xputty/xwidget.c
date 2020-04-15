@@ -73,6 +73,9 @@ void destroy_widget(Widget_t * w, Xputty *main) {
     if (count == 0 && main->run == true) {
         quit(w);
     } else if(childlist_find_child(main->childlist, w)>=0) {
+        if(w->flags & REUSE_IMAGE) {
+            w->image = NULL;
+        }
         if(w->flags & HAS_MEM) {
             w->func.mem_free_callback(w, NULL);
         }
@@ -175,9 +178,11 @@ Widget_t *create_window(Xputty *app, Window win,
 
     XSizeHints* win_size_hints;
     win_size_hints = XAllocSizeHints();
-    win_size_hints->flags =  PMinSize|PWinGravity;
+    win_size_hints->flags =  PMinSize|PBaseSize|PWinGravity;
     win_size_hints->min_width = width/2;
     win_size_hints->min_height = height/2;
+    win_size_hints->base_width = width;
+    win_size_hints->base_height = height;
     win_size_hints->win_gravity = CenterGravity;
     XSetWMNormalHints(app->dpy, w->widget, win_size_hints);
     XFree(win_size_hints);
@@ -185,11 +190,17 @@ Widget_t *create_window(Xputty *app, Window win,
     w->surface =  cairo_xlib_surface_create (app->dpy, w->widget,  
                   DefaultVisual(app->dpy, DefaultScreen(app->dpy)), width, height);
 
+    assert(cairo_surface_status(w->surface) == CAIRO_STATUS_SUCCESS);
     w->cr = cairo_create(w->surface);
+    cairo_select_font_face (w->cr, "Roboto", CAIRO_FONT_SLANT_NORMAL,
+                               CAIRO_FONT_WEIGHT_NORMAL);
 
     w->buffer = cairo_surface_create_similar (w->surface, 
                         CAIRO_CONTENT_COLOR_ALPHA, width, height);
+    assert(cairo_surface_status(w->buffer) == CAIRO_STATUS_SUCCESS);
     w->crb = cairo_create (w->buffer);
+    cairo_select_font_face (w->crb, "Roboto", CAIRO_FONT_SLANT_NORMAL,
+                               CAIRO_FONT_WEIGHT_NORMAL);
 
     w->image = NULL;
 
@@ -197,10 +208,12 @@ Widget_t *create_window(Xputty *app, Window win,
     w->flags &= ~NO_AUTOREPEAT;
     w->flags &= ~FAST_REDRAW;
     w->flags &= ~HIDE_ON_DELETE;
+    w->flags &= ~REUSE_IMAGE;
     w->app = app;
     w->parent = &win;
     w->parent_struct = NULL;
     w->label = NULL;
+    memset(w->input_label, 0, 32 * (sizeof w->input_label[0]));
     w->state = 0;
     w->data = 0;
     w->x = x;
@@ -287,13 +300,17 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
 
     w->surface =  cairo_xlib_surface_create (app->dpy, w->widget,  
                   DefaultVisual(app->dpy, DefaultScreen(app->dpy)), width, height);
-
+    assert(cairo_surface_status(w->surface) == CAIRO_STATUS_SUCCESS);
     w->cr = cairo_create(w->surface);
+    cairo_select_font_face (w->cr, "Roboto", CAIRO_FONT_SLANT_NORMAL,
+                               CAIRO_FONT_WEIGHT_NORMAL);
 
     w->buffer = cairo_surface_create_similar (w->surface, 
                         CAIRO_CONTENT_COLOR_ALPHA, width, height);
-    
+    assert(cairo_surface_status(w->buffer) == CAIRO_STATUS_SUCCESS);
     w->crb = cairo_create (w->buffer);
+    cairo_select_font_face (w->crb, "Roboto", CAIRO_FONT_SLANT_NORMAL,
+                               CAIRO_FONT_WEIGHT_NORMAL);
 
     w->image = NULL;
     
@@ -301,10 +318,12 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     w->flags &= ~NO_AUTOREPEAT;
     w->flags &= ~FAST_REDRAW;
     w->flags &= ~HIDE_ON_DELETE;
+    w->flags &= ~REUSE_IMAGE;
     w->app = app;
     w->parent = parent;
     w->parent_struct = NULL;
     w->label = NULL;
+    memset(w->input_label, 0, 32 * (sizeof w->input_label[0]));
     w->state = 0;
     w->data = 0;
     w->x = x;
@@ -360,64 +379,6 @@ void connect_func(void (**event)(), void (*handler)()) {
     debug_print("address of b is: %p\n", (void*)handler);
     *event = handler;
     debug_print("address of a is: %p\n", (void*)(*event));
-}
-
-void signal_connect_func(Widget_t *w, EventType type, void (*handler)()) {
-    switch(type) {
-        case(EXPOSE):
-            w->func.expose_callback = handler;
-        break;
-        case(CONFIGURE):
-            w->func.configure_callback = handler;
-        break;
-        case(ENTER):
-            w->func.enter_callback = handler;
-        break;
-        case(LEAVE):
-            w->func.leave_callback = handler;
-        break;
-        case(ADJ_INTERN):
-            w->func.adj_callback = handler;
-        break;
-        case(VALUE_CHANGED):
-            w->func.value_changed_callback = handler;
-        break;
-        case(USER):
-            w->func.user_callback = handler;
-        break;
-        case(MEM_FREE):
-            w->func.mem_free_callback = handler;
-        break;
-        case(CONFIGURE_NOTIFY):
-            w->func.configure_notify_callback = handler;
-        break;
-        case(MAP_NOTIFY):
-            w->func.map_notify_callback = handler;
-        break;
-        case(UNMAP_NOTIFY):
-            w->func.unmap_notify_callback = handler;
-        break;
-        case(DIALOG_RESPONSE):
-            w->func.dialog_callback = handler;
-        break;
-        case(BUTTON_PRESS):
-            w->func.button_press_callback = handler;
-        break;
-        case(BUTTON_RELEASE):
-            w->func.button_release_callback = handler;
-        break;
-        case(POINTER_MOTION):
-            w->func.motion_callback = handler;
-        break;
-        case( KEY_PRESS):
-            w->func.key_press_callback = handler;
-        break;
-        case( KEY_RELEASE):
-            w->func.key_release_callback = handler;
-        break;
-        default:
-        break;
-    }
 }
 
 void widget_set_title(Widget_t *w, const char *title) {
@@ -551,6 +512,7 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
         break;
 
         case ButtonPress:
+            if (wid->state == 4) break;
             if (wid->flags & HAS_TOOLTIP) hide_tooltip(wid);
             _button_press(wid, &xev->xbutton, user_data);
             debug_print("Widget_t  ButtonPress %i\n", xev->xbutton.button);
@@ -558,6 +520,7 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
 
         case ButtonRelease:
             _check_grab(wid, &xev->xbutton, main);
+            if (wid->state == 4) break;
             _has_pointer(wid, &xev->xbutton);
             if(wid->flags & HAS_POINTER) wid->state = 1;
             else wid->state = 0;
@@ -567,12 +530,15 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
         break;
 
         case KeyPress:
+            if (wid->state == 4) break;
             _check_keymap(wid, xev->xkey);
             wid->func.key_press_callback(w_, &xev->xkey, user_data);
             debug_print("Widget_t KeyPress %u\n", xev->xkey.keycode);
         break;
 
-        case KeyRelease: {
+        case KeyRelease: 
+            if (wid->state == 4) break;
+            {
             unsigned short is_retriggered = 0;
             if(wid->flags & NO_AUTOREPEAT) {
                 if (XEventsQueued(main->dpy, QueuedAlready)) {
@@ -595,6 +561,7 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
 
         case LeaveNotify:
             wid->flags &= ~HAS_FOCUS;
+            if (wid->state == 4) break;
             if(!(xev->xcrossing.state & Button1Mask)) {
                 wid->state = 0;
                 wid->func.leave_callback(w_, user_data);
@@ -605,6 +572,7 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
 
         case EnterNotify:
             wid->flags |= HAS_FOCUS;
+            if (wid->state == 4) break;
             if(!(xev->xcrossing.state & Button1Mask)) {
                 wid->state = 1;
                 wid->func.enter_callback(w_, user_data);
@@ -615,6 +583,7 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
         break;
 
         case MotionNotify:
+            if (wid->state == 4) break;
             adj_set_motion_state(wid, xev->xmotion.x, xev->xmotion.y);
             wid->func.motion_callback(w_,&xev->xmotion, user_data);
             debug_print("Widget_t MotionNotify x = %i Y = %i \n",xev->xmotion.x,xev->xmotion.y );
@@ -697,8 +666,14 @@ void send_button_release_event(Widget_t *w) {
 
 void send_systray_message(Widget_t *w) {
     XEvent event;
+    Screen *xscreen;
+    char buf[256];
+    buf[0]=0;
+    
+    xscreen=DefaultScreenOfDisplay(w->app->dpy);
+    sprintf(buf,"_NET_SYSTEM_TRAY_S%d",XScreenNumberOfScreen (xscreen));
+    Atom selection_atom = XInternAtom (w->app->dpy,buf,0);
 
-    Atom selection_atom = XInternAtom (w->app->dpy,"_NET_SYSTEM_TRAY_S0",False);
     Window tray = XGetSelectionOwner (w->app->dpy,selection_atom);
     Atom visualatom = XInternAtom(w->app->dpy, "_NET_SYSTEM_TRAY_VISUAL", False);
     VisualID value = XVisualIDFromVisual(DefaultVisual(w->app->dpy, DefaultScreen(w->app->dpy)));

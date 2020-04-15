@@ -52,9 +52,6 @@ static void draw_window(void *w_, void* user_data) {
     widget_set_scale(w);
     use_fg_color_scheme(w, NORMAL_);
     cairo_set_font_size (w->crb, 12.0);
-    cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                               CAIRO_FONT_WEIGHT_BOLD);
-
     cairo_move_to (w->crb, 20, 35);
     cairo_show_text(w->crb, "Directory");
     cairo_move_to (w->crb, 20, 85);
@@ -70,7 +67,7 @@ static void draw_window(void *w_, void* user_data) {
 
 static void button_quit_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    FileDialog *file_dialog = w->parent_struct;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
    
     if (w->flags & HAS_POINTER && !adj_get_value(w->adj)){
         file_dialog->parent->func.dialog_callback(file_dialog->parent,NULL);
@@ -88,7 +85,7 @@ static inline int set_files(FileDialog *file_dialog) {
     listview_set_list(file_dialog->ft,file_dialog->fp->file_names , (int)file_dialog->fp->file_counter);
     int ret = 0;
     int i = 0;
-    for (; i<file_dialog->fp->file_counter; i++) {
+    for (; i<(int)file_dialog->fp->file_counter; i++) {
         if(file_dialog->fp->selected_file && strcmp(file_dialog->fp->file_names[i],
           basename(file_dialog->fp->selected_file))==0 )  ret = i;
     }
@@ -97,7 +94,7 @@ static inline int set_files(FileDialog *file_dialog) {
 
 static void set_dirs(FileDialog *file_dialog) {
     int i = 0;
-    for (; i<file_dialog->fp->dir_counter; i++) {
+    for (; i<(int)file_dialog->fp->dir_counter; i++) {
         combobox_add_entry(file_dialog->ct,file_dialog->fp->dir_names[i]);
     }
 }
@@ -126,7 +123,7 @@ static void set_selected_file(FileDialog *file_dialog) {
 
 static void file_released_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    FileDialog *file_dialog = w->parent_struct;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     set_selected_file(file_dialog);
     if(file_dialog->fp->selected_file) {
         file_dialog->w->label = file_dialog->fp->selected_file;
@@ -148,7 +145,7 @@ static void reload_file_entrys(FileDialog *file_dialog) {
 
 static void combo_response(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    FileDialog *file_dialog = w->parent_struct;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     Widget_t* menu =  w->childlist->childs[1];
     Widget_t* view_port =  menu->childlist->childs[0];
     if(!childlist_has_child(view_port->childlist)) return ;
@@ -162,7 +159,7 @@ static void combo_response(void *w_, void* user_data) {
 
 static void button_ok_callback(void *w_, void* user_data) {
    Widget_t *w = (Widget_t*)w_;
-    FileDialog *file_dialog = w->parent_struct;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     if (w->flags & HAS_POINTER && !*(int*)user_data){
         if(!file_dialog->fp->selected_file) {
             set_selected_file(file_dialog);
@@ -204,7 +201,7 @@ static void reload_all(FileDialog *file_dialog) {
 
 static void open_dir_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    FileDialog *file_dialog = w->parent_struct;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     if (w->flags & HAS_POINTER && !*(int*)user_data){
         reload_all(file_dialog);
     }
@@ -212,7 +209,7 @@ static void open_dir_callback(void *w_, void* user_data) {
 
 static void button_hidden_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    FileDialog *file_dialog = w->parent_struct;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     if (w->flags & HAS_POINTER) {
         file_dialog->fp->show_hidden = adj_get_value(w->adj) ? true : false;
         reload_all(file_dialog);
@@ -221,7 +218,7 @@ static void button_hidden_callback(void *w_, void* user_data) {
 
 static void set_filter_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    FileDialog *file_dialog = w->parent_struct;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     if (file_dialog->fp->use_filter != (int)adj_get_value(w->adj)) {
         file_dialog->fp->use_filter = (int)adj_get_value(w->adj);
         Widget_t* menu =  w->childlist->childs[1];
@@ -239,7 +236,7 @@ static void set_filter_callback(void *w_, void* user_data) {
 
 static void fd_mem_free(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    FileDialog *file_dialog = w->parent_struct;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     if(file_dialog->icon) {
         XFreePixmap(w->app->dpy, (*file_dialog->icon));
         file_dialog->icon = NULL;
@@ -336,7 +333,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
 
 static void fdialog_response(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    FileButton *filebutton = w->parent_struct;
+    FileButton *filebutton = (FileButton *)w->parent_struct;
     if(user_data !=NULL) {
         char *tmp = strdup(*(const char**)user_data);
         free(filebutton->last_path);
@@ -352,7 +349,7 @@ static void fdialog_response(void *w_, void* user_data) {
 
 static void fbutton_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    FileButton *filebutton = w->parent_struct;
+    FileButton *filebutton = (FileButton *)w->parent_struct;
     if (w->flags & HAS_POINTER && adj_get_value(w->adj)){
         filebutton->w = open_file_dialog(w,filebutton->path,filebutton->filter);
         filebutton->is_active = true;
@@ -364,7 +361,7 @@ static void fbutton_callback(void *w_, void* user_data) {
 
 static void fbutton_mem_free(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    FileButton *filebutton = w->parent_struct;
+    FileButton *filebutton = (FileButton *)w->parent_struct;
     free(filebutton->last_path);
     filebutton->last_path = NULL;
     free(filebutton);

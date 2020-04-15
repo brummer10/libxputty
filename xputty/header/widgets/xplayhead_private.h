@@ -20,54 +20,38 @@
 
 #pragma once
 
-#ifndef XKNOB_PRIVATE_H_
-#define XKNOB_PRIVATE_H_
+#ifndef XPLAYHEAD_PRIVATE_H_
+#define XPLAYHEAD_PRIVATE_H_
 
-#include "xknob.h"
+#include "xplayhead.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 /**
- * @brief _draw_image_knob       - internal draw the knob from image
- * to the buffer
- * @param *w                     - pointer to the Widget_t knob
+ * @brief _create_playhead_image            - internal draw the playhead image
+ * to the cairo image surface
+ * @param *w                                - pointer to the Widget_t meter
+ * @param width                             - widget width
+ * @param height                            - widget height
  * @return void
  */
 
-void _draw_image_knob(Widget_t *w, int width_t, int height_t);
+void _create_playhead_image(Widget_t *w, int width, int height);
 
 /**
- * @brief _draw_knob_image       - internal draw the knob to the buffer
+ * @brief _draw_playhead          - internal draw the playhead to the buffer
  * @param *w_                    - void pointer to the Widget_t button
  * @param *user_data             - void pointer to attached user_data
  * @return void
  */
 
-void _draw_knob_image(void *w_, void* user_data);
-
-/**
- * @brief _draw_knob             - internal draw the knob to the buffer
- * @param *w_                    - void pointer to the Widget_t button
- * @param *user_data             - void pointer to attached user_data
- * @return void
- */
-
-void _draw_knob(void *w_, void* user_data);
-
-/**
- * @brief _knob_released  - redraw the slider when buttob released 
- * @param *w_               - void pointer to the Widget_t button
- * @param *user_data        - void pointer to attached user_data
- * @return void
- */
-
-void _knob_released(void *w_, void* button_, void* user_data);
-
+void _draw_playhead(void *w_, void* user_data);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //XKNOB_PRIVATE_H_
+#endif //XPLAYHEAD_PRIVATE_H_

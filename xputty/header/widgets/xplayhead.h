@@ -18,15 +18,32 @@
  *
  */
 
-#include "xchildlist_private.h"
+#pragma once
 
-void _childlist_add_elem(Childlist_t *childlist) {
-    childlist->childs = (Widget_t**)realloc(childlist->childs, sizeof(Widget_t*) * (4+childlist->cap));
-    assert(childlist->childs != NULL);
-    childlist->cap +=4;
-    childlist->size = sizeof(childlist);
-    int i = childlist->elem+1;
-    for(;i<childlist->cap;i++) {
-        childlist->childs[i] = NULL;
-    }
+#ifndef XPLAYHEAD_H_
+#define XPLAYHEAD_H_
+
+#include "xputty.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+/**
+ * @brief add_playhead        - add a playhead to a Widget_t
+ * connect to func.value_changed_callback to implement your actions
+ * @param *parent             - pointer to the Widget_t request the vumeter
+ * @param *label              - Label to show on the vumeter
+ * @param x,y,width,height    - the position/geometry to create the vumeter
+ * @return Widget_t*          - pointer to the Widget_t meter struct
+ */
+
+Widget_t* add_playhead(Widget_t *parent, const char * label, Adjustment_t *clip,
+                Adjustment_t *cut, int x, int y, int width, int height);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif //XPLAYHEAD_H_

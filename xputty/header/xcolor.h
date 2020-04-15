@@ -40,6 +40,7 @@ typedef enum {
     PRELIGHT_,
     SELECTED_,
     ACTIVE_,
+    INSENSITIVE_,
 } Color_state;
 
 /**
@@ -89,6 +90,7 @@ struct XColor_t {
     Colors prelight;
     Colors selected;
     Colors active;
+    Colors insensitive;
 };
 
 /**

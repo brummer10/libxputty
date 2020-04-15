@@ -74,8 +74,6 @@ void _draw_list(void *w_, void* user_data) {
         else
             use_text_color_scheme(w,NORMAL_ );
         cairo_set_font_size (w->crb, 12);
-        cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                                   CAIRO_FONT_WEIGHT_BOLD);
         cairo_text_extents(w->crb,filelist->list_names[i] , &extents);
 
         cairo_move_to (w->crb, (width-extents.width)/2., (25*(i+1)) - extents.height );
@@ -154,7 +152,7 @@ void _list_entry_released(void *w_, void* button_, void* user_data) {
                 filelist->prelight_item = prelight_item;
             }
         } else if(xbutton->button == Button1) {
-            Widget_t* listview = w->parent;
+            Widget_t* listview = (Widget_t*) w->parent;
             filelist->active_item = filelist->prelight_item;
             adj_set_value(listview->adj,filelist->active_item);
         }
@@ -171,7 +169,7 @@ void _leave_list(void *w_, void* user_data) {
 void _reconfigure_listview_viewport(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     float st = adj_get_state(w->adj);
-    Widget_t* listview = w->parent;
+    Widget_t* listview = (Widget_t*) w->parent;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
     XWindowAttributes attrs;
     XGetWindowAttributes(listview->app->dpy, (Window)listview->widget, &attrs);
@@ -183,7 +181,7 @@ void _reconfigure_listview_viewport(void *w_, void* user_data) {
 
 void _configure_listview(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t* listview = w->parent;
+    Widget_t* listview = (Widget_t*) w->parent;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
     XWindowAttributes attrs;
     XGetWindowAttributes(listview->app->dpy, (Window)listview->widget, &attrs);

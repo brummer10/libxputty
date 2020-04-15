@@ -22,14 +22,12 @@
 
 
 static void draw_message_label(Widget_t *w, int width, int height) {
-    MessageBox *mb = w->parent_struct;
+    MessageBox *mb = (MessageBox *)w->parent_struct;
     cairo_text_extents_t extents;
     use_fg_color_scheme(w, NORMAL_);
     cairo_set_font_size (w->crb, 12.0);
-    cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                               CAIRO_FONT_WEIGHT_BOLD);
     int i = 0;
-    for(;i<mb->lin;i++) {
+    for(;i<(int)mb->lin;i++) {
         cairo_text_extents(w->crb,mb->message[i] , &extents);
         cairo_move_to (w->crb, 100, ((40)+(extents.height * (2*i))));
         cairo_show_text(w->crb, mb->message[i]);
@@ -83,8 +81,6 @@ static void draw_entry(void *w_, void* user_data) {
     cairo_stroke(w->cr);
 
     cairo_set_font_size (w->cr, 9.0);
-    cairo_select_font_face (w->cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                               CAIRO_FONT_WEIGHT_BOLD);
 
     cairo_move_to (w->cr, 2, 9);
     cairo_show_text(w->cr, " ");
@@ -95,7 +91,7 @@ static void entry_add_text(void  *w_, void *label_) {
     if (!w) return;
     char *label = (char*)label_;
     if (!label) {
-        label = "";
+        label = (char*)"";
     }
     draw_entry(w,NULL);
     cairo_text_extents_t extents;
@@ -110,8 +106,6 @@ static void entry_add_text(void  *w_, void *label_) {
     w->label = w->input_label;
     strcat( w->input_label, "|");
     cairo_set_font_size (w->cr, 12.0);
-    cairo_select_font_face (w->cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                               CAIRO_FONT_WEIGHT_BOLD);
     cairo_text_extents(w->cr, w->input_label , &extents);
 
     cairo_move_to (w->cr, 2, 12.0+extents.height);
@@ -144,8 +138,6 @@ static void entry_clip(Widget_t *w) {
         strcat( w->input_label, "|");
     }
     cairo_set_font_size (w->cr, 12.0);
-    cairo_select_font_face (w->cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                               CAIRO_FONT_WEIGHT_BOLD);
     cairo_text_extents(w->cr, w->input_label , &extents);
 
     cairo_move_to (w->cr, 2, 12.0+extents.height);
@@ -157,7 +149,7 @@ static void message_okay_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (w->flags & HAS_POINTER && !*(int*)user_data){
         Widget_t *p = (Widget_t*)w->parent;
-        MessageBox *mb = p->parent_struct;
+        MessageBox *mb = (MessageBox *)p->parent_struct;
         if(mb->message_type == QUESTION_BOX || mb->message_type == SELECTION_BOX) {
             Widget_t *pa = (Widget_t*)p->parent;
             pa->func.dialog_callback(pa,&mb->response);
@@ -176,7 +168,7 @@ static void message_no_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (w->flags & HAS_POINTER && !*(int*)user_data){
         Widget_t *p = (Widget_t*)w->parent;
-        MessageBox *mb = p->parent_struct;
+        MessageBox *mb = (MessageBox *)p->parent_struct;
         if(mb->message_type == QUESTION_BOX) {
             Widget_t *pa = (Widget_t*)p->parent;
             mb->response = -1;
@@ -187,8 +179,8 @@ static void message_no_callback(void *w_, void* user_data) {
 }
 
 static void radio_box_set_active(Widget_t *w) {
-    Widget_t * p = w->parent;
-    MessageBox *mb = p->parent_struct;
+    Widget_t * p = (Widget_t*)w->parent;
+    MessageBox *mb = (MessageBox *)p->parent_struct;
     int response = 0;
     int i = 0;
     for(;i<p->childlist->elem;i++) {
@@ -209,10 +201,10 @@ static void radio_box_button_pressed(void *w_, void* button_, void* user_data) {
 }
 
 static void create_checkboxes(Widget_t *w) {
-    MessageBox *mb = w->parent_struct;
+    MessageBox *mb = (MessageBox *)w->parent_struct;
     int y = (mb->lin + 1) * 24 +12;
     int i = 0;
-    for(;i<mb->sel;i++) {
+    for(;i<(int)mb->sel;i++) {
         Widget_t *wid = add_check_box(w,mb->choices[i] , 100, y + (24*i), 15, 15);
         wid->flags |= IS_RADIO;
         wid->func.button_press_callback = radio_box_button_pressed;
@@ -230,7 +222,7 @@ static void entry_get_text(void *w_, void *key_, void *user_data) {
             case 10: 
                 {
                 Widget_t *p = (Widget_t*)w->parent;
-                MessageBox *mb = p->parent_struct;
+                MessageBox *mb = (MessageBox *)p->parent_struct;
                 Widget_t *pa = (Widget_t*)p->parent;
                 if (strlen( mb->text_entry->input_label))
                     mb->text_entry->input_label[strlen( mb->text_entry->input_label)-1] = 0;
@@ -257,7 +249,7 @@ static void entry_get_text(void *w_, void *key_, void *user_data) {
 }
 
 static void create_entry_box(Widget_t *w) {
-    MessageBox *mb = w->parent_struct;
+    MessageBox *mb = (MessageBox *)w->parent_struct;
 
     mb->text_entry = create_widget(w->app, w, 20, mb->height-90, mb->width-40, 40);
     memset(mb->text_entry->input_label, 0, 32 * (sizeof mb->text_entry->input_label[0]) );
@@ -274,9 +266,9 @@ static void check_for_message(MessageBox *mb, const char *message) {
     char *ms =strdup(message);
     char * p = strtok (ms, "|");
     while (p) {
-        mb->message = realloc (mb->message, sizeof (char*) * ++mb->lin);
+        mb->message = (char**)realloc (mb->message, sizeof (char*) * ++mb->lin);
         mb->message[mb->lin-1] = strdup(p);
-        len = max(len, strlen(mb->message[mb->lin-1]));
+        len = max(len, (int)strlen(mb->message[mb->lin-1]));
         p = strtok (NULL, "|");
     }
     free(ms);
@@ -291,13 +283,13 @@ static void check_for_choices(MessageBox *mb, const char *choices) {
     char *ms =strdup(choices);
     char * p = strtok (ms, "|");
     while (p) {
-        mb->choices = realloc (mb->choices, sizeof (char*) * ++mb->sel);
+        mb->choices = (char**)realloc (mb->choices, sizeof (char*) * ++mb->sel);
         mb->choices[mb->sel-1] = strdup(p);
-        len = max(len, strlen(mb->choices[mb->sel-1]));
+        len = max(len, (int)strlen(mb->choices[mb->sel-1]));
         p = strtok (NULL, "|");
     }
     free(ms);
-    mb->width = max(len*12,mb->width);
+    mb->width = max(len*12,(int)mb->width);
     mb->height += mb->sel*12+50;
 }
 
@@ -310,17 +302,17 @@ static void check_for_style(MessageBox *mb, int style) {
 
 static void mg_mem_free(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    MessageBox *mb = w->parent_struct;
+    MessageBox *mb = (MessageBox *)w->parent_struct;
     if(mb->icon) {
         XFreePixmap(w->app->dpy, (*mb->icon));
         mb->icon = NULL;
     }
     int i = 0;
-    for(;i<mb->lin;i++) {
+    for(;i<(int)mb->lin;i++) {
         free(mb->message[i]);
     }
     i = 0;
-    for(;i<mb->sel;i++) {
+    for(;i<(int)mb->sel;i++) {
         free(mb->choices[i]);
     }
     free(mb->choices);
@@ -352,46 +344,47 @@ Widget_t *open_message_dialog(Widget_t *w, int style, const char *title,
     wid->func.mem_free_callback = mg_mem_free;
     wid->func.expose_callback = draw_message_window;
     char *alternate_title = NULL;
-    char *button_title = "OK";
+    char *button_title = (char*)"OK";
+    Widget_t *no;
     switch (style) {
         case INFO_BOX:
             widget_get_png(wid, LDVAR(info_png));
-            alternate_title = "INFO";
+            alternate_title = (char*)"INFO";
             mb->message_type = INFO_BOX;
             widget_set_icon_from_surface(wid,mb->icon,wid->image);
         break;
         case WARNING_BOX:
             widget_get_png(wid, LDVAR(warning_png));
-            alternate_title = "WARNING";
+            alternate_title = (char*)"WARNING";
             mb->message_type = WARNING_BOX;
             widget_set_icon_from_surface(wid,mb->icon,wid->image);
         break;
         case ERROR_BOX:
             widget_get_png(wid, LDVAR(error_png));
-            alternate_title = "ERROR";
+            alternate_title = (char*)"ERROR";
             mb->message_type = ERROR_BOX;
             widget_set_icon_from_surface(wid,mb->icon,wid->image);
         break;
         case QUESTION_BOX:
             widget_get_png(wid, LDVAR(question_png));
-            alternate_title = "QUESTION";
-            Widget_t *no = add_button(wid, "NO", 10, mb->height-40, 60, 30);
+            alternate_title = (char*)"QUESTION";
+            no = add_button(wid, "NO", 10, mb->height-40, 60, 30);
             no->scale.gravity = CENTER;
             no->func.value_changed_callback = message_no_callback;
             mb->message_type = QUESTION_BOX;
-            button_title = "YES";
+            button_title = (char*)"YES";
             widget_set_icon_from_surface(wid,mb->icon,wid->image);
         break;
         case SELECTION_BOX:
             widget_get_png(wid, LDVAR(choice_png));
-            alternate_title = "SELECTION";
+            alternate_title = (char*)"SELECTION";
             mb->message_type = SELECTION_BOX;
             create_checkboxes(wid);
             widget_set_icon_from_surface(wid,mb->icon,wid->image);
         break;
         case ENTRY_BOX:
             widget_get_png(wid, LDVAR(message_png));
-            alternate_title = "TEXT ENTRY";
+            alternate_title = (char*)"TEXT ENTRY";
             mb->message_type = ENTRY_BOX;
             create_entry_box(wid);
             widget_set_icon_from_surface(wid,mb->icon,wid->image);

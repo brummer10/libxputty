@@ -86,6 +86,22 @@ Widget_t* add_image_toggle_button(Widget_t *parent, const char * label,
     return wid;
 }
 
+Widget_t* add_switch_image_button(Widget_t *parent, const char * label,
+                int x, int y, int width, int height) {
+
+    Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
+    wid->label = label;
+    wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, 1.0,1.0, CL_TOGGLE);
+    wid->adj = wid->adj_y;
+    wid->scale.gravity = ASPECT;
+    wid->func.expose_callback = _draw_switch_image_button;
+    wid->func.enter_callback = transparent_draw;
+    wid->func.leave_callback = transparent_draw;
+    wid->func.button_press_callback = _toggle_button_pressed;
+    wid->func.button_release_callback = _toggle_button_released;
+    return wid;
+}
+
 Widget_t* add_check_button(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 
@@ -103,7 +119,7 @@ Widget_t* add_check_button(Widget_t *parent, const char * label,
 }
 
 int get_width(const char *label) {
-    return max(1, strlen(label)*24);    
+    return max(1, strlen(label)*12);    
 }
 
 Widget_t* add_check_box(Widget_t *parent, const char * label,

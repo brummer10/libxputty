@@ -18,15 +18,28 @@
  *
  */
 
-#include "xchildlist_private.h"
+#pragma once
 
-void _childlist_add_elem(Childlist_t *childlist) {
-    childlist->childs = (Widget_t**)realloc(childlist->childs, sizeof(Widget_t*) * (4+childlist->cap));
-    assert(childlist->childs != NULL);
-    childlist->cap +=4;
-    childlist->size = sizeof(childlist);
-    int i = childlist->elem+1;
-    for(;i<childlist->cap;i++) {
-        childlist->childs[i] = NULL;
-    }
+#ifndef XVALUEDISPLAY_PRIVATE_H_
+#define XVALUEDISPLAY_PRIVATE_H_
+
+#include "xvaluedisplay.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @brief _draw_valuedisplay   - draw a valuedisplay on expose call
+ * @param *w_                  - The Widget_t contain the valuedisplay
+ * @param *user_data           - attached user_data
+ * @return void
+ */
+
+void _draw_valuedisplay(void *w_, void* user_data);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif //XVALUEDISPLAY_PRIVATE_H_

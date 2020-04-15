@@ -253,6 +253,8 @@ enum {
     FAST_REDRAW       = 1<<11,
     /** Hide Widget_t instead delete on "WM_DELETE_WINDOW"  */
     HIDE_ON_DELETE    = 1<<12,
+    /** Widget_t reuse a surface from a other Widget_t  */
+    REUSE_IMAGE       = 1<<13,
 };
 
 /**
@@ -380,16 +382,6 @@ Widget_t *create_widget(Xputty *app, Widget_t *win,
                           int x, int y, int width, int height);
 
 /**
- * @brief connect_func      - connect a event with a handler
- * without type check. For supported events see: Func_t
- * @param **event           - the event to connect
- * @param *handler          - the handler to handle the event
- * @return void
- */
-
-void connect_func(void (**event)(), void (*handler)());
-
-/**
  * @brief signal_connect_func - connect a event with a handler
  * by EventType identifier, without type check
  * \n You must ensure that the handler coresponde to the event type
@@ -400,7 +392,7 @@ void connect_func(void (**event)(), void (*handler)());
  * @return void
  */
 
-void signal_connect_func(Widget_t *w, EventType type, void (*handler)());
+void signal_connect_func(Widget_t *w, EventType type, void (*handler)(void*, void*, void*));
 
 /**
  * @brief widget_set_title  - set window title for a Widget_t

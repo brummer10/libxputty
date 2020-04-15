@@ -21,6 +21,16 @@
 
 #include "xknob_private.h"
 
+static void _show_label(Widget_t *w, int width, int height) {
+    use_text_color_scheme(w, get_color_state(w));
+    cairo_text_extents_t extents;
+    /** show label below the knob**/
+    cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
+    cairo_text_extents(w->crb,w->label , &extents);
+    cairo_move_to (w->crb, (width*0.5)-extents.width/2, height );
+    cairo_show_text(w->crb, w->label);
+    cairo_new_path (w->crb);
+}
 
 void _draw_image_knob(Widget_t *w, int width_t, int height_t) {
     int width = cairo_xlib_surface_get_width(w->image);
@@ -36,6 +46,12 @@ void _draw_image_knob(Widget_t *w, int width_t, int height_t) {
     cairo_fill(w->crb);
     //widget_reset_scale(w);
     cairo_scale(w->crb, y,y);
+}
+
+void _draw_knob_image(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    _draw_image_knob(w, w->width, w->height);
+    _show_label(w, w->width-2, w->height-2);
 }
 
 void _draw_knob(void *w_, void* user_data) {
@@ -98,43 +114,32 @@ void _draw_knob(void *w_, void* user_data) {
         cairo_stroke(w->crb);
         cairo_new_path (w->crb);
     }
+    use_text_color_scheme(w, get_color_state(w));
     cairo_text_extents_t extents;
     /** show value on the kob**/
     if (w->state) {
         char s[64];
         const char* format[] = {"%.1f", "%.2f", "%.3f"};
-        if (fabs(w->adj_y->value)>9.99) {
-            snprintf(s, 63,"%d",  (int) w->adj_y->value);
-        } else if (fabs(w->adj_y->value)>0.99) {
-            snprintf(s, 63, format[1-1], w->adj_y->value);
+        float value = adj_get_value(w->adj);
+        if (fabs(w->adj->step)>0.99) {
+            snprintf(s, 63,"%d",  (int) value);
+        } else if (fabs(w->adj->step)>0.09) {
+            snprintf(s, 63, format[1-1], value);
         } else {
-            snprintf(s, 63, format[2-1], w->adj_y->value);
+            snprintf(s, 63, format[2-1], value);
         }
-        cairo_set_source_rgb (w->crb, 0.6, 0.6, 0.6);
-        cairo_set_font_size (w->crb, knobx1/4);
-        cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                                   CAIRO_FONT_WEIGHT_BOLD);
+        cairo_set_font_size (w->crb, w->app->small_font/w->scale.ascale);
         cairo_text_extents(w->crb, s, &extents);
         cairo_move_to (w->crb, knobx1-extents.width/2, knoby1+extents.height/2);
         cairo_show_text(w->crb, s);
         cairo_new_path (w->crb);
     }
 
-    /** show label below the knob**/
-    use_text_color_scheme(w, get_color_state(w));
-    float font_size = ((height/2.2 < (width*0.5)/3) ? height/2.2 : (width*0.5)/3);
-    cairo_set_font_size (w->crb, font_size);
-    cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                               CAIRO_FONT_WEIGHT_BOLD);
-    cairo_text_extents(w->crb,w->label , &extents);
-
-    cairo_move_to (w->crb, knobx1-extents.width/2, height );
-    cairo_show_text(w->crb, w->label);
-    cairo_new_path (w->crb);
+    _show_label(w, width, height);
 }
 
 void _knob_released(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (w->flags & HAS_POINTER) w->state= 1;
-    expose_widget(w_);
+    expose_widget(w);
 }

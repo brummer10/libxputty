@@ -38,8 +38,8 @@ void _draw_listbox_item(void *w_, void* user_data) {
     int width = attrs.width;
     int height = attrs.height;
     if (attrs.map_state != IsViewable) return;
-    Widget_t* view_port = w->parent;
-    Widget_t* listbox =  view_port->parent;
+    Widget_t* view_port = (Widget_t*)w->parent;
+    Widget_t* listbox =  (Widget_t*)view_port->parent;
     int j = (int)listbox->adj->value;
     if(w == view_port->childlist->childs[j]) 
       w->state = (w->state == 1) ? 1 : 3;
@@ -61,8 +61,6 @@ void _draw_listbox_item(void *w_, void* user_data) {
     /** show label **/
     use_text_color_scheme(w, get_color_state(w));
     cairo_set_font_size (w->crb, height/2);
-    cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                               CAIRO_FONT_WEIGHT_BOLD);
     cairo_text_extents(w->crb,w->label , &extents);
 
     cairo_move_to (w->crb, (width-extents.width)/2., height - extents.height );
@@ -79,7 +77,7 @@ void _draw_listbox_item(void *w_, void* user_data) {
 void _reconfigure_listbox_viewport(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     float st = adj_get_state(w->adj);
-    Widget_t* listbox = w->parent;
+    Widget_t* listbox = (Widget_t*)w->parent;
     XWindowAttributes attrs;
     XGetWindowAttributes(listbox->app->dpy, (Window)listbox->widget, &attrs);
     int height = attrs.height;
@@ -92,7 +90,7 @@ void _reconfigure_listbox_viewport(void *w_, void* user_data) {
 void _configure_listbox(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     int si = max(1,childlist_has_child(w->childlist));
-    Widget_t* listbox = w->parent;
+    Widget_t* listbox = (Widget_t*)w->parent;
     XWindowAttributes attrs;
     XGetWindowAttributes(listbox->app->dpy, (Window)listbox->widget, &attrs);
     int width = attrs.width;
@@ -133,12 +131,12 @@ void _set_listbox_viewpoint(void *w_, void* user_data) {
 
 void _listbox_entry_released(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t* view_port = w->parent;
+    Widget_t* view_port = (Widget_t*)w->parent;
     int direction = 0 ;
     if (w->flags & HAS_POINTER) {
         XButtonEvent *xbutton = (XButtonEvent*)button_;
         if(xbutton->button == Button1) {
-            Widget_t* listbox =  view_port->parent;
+            Widget_t* listbox =  (Widget_t*)view_port->parent;
             int i = view_port->childlist->elem-1;
             int old_value = (int) listbox->adj->value;
             for(;i>-1;i--) {

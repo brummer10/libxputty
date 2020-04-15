@@ -89,6 +89,7 @@ libxputty.a:  $(RESOURCES_OBJ) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
 	cp $(DIALOG_HEADER_DIR)*.h $(RELEASE_DIR)include/
 	cp $(RESOURCEHEADER) $(RELEASE_DIR)include/
 	cp $(XDG_DIR)*.h $(RELEASE_DIR)include/
+	cp -r $(LIB_DIR)lv2_plugin $(RELEASE_DIR)
 	cp libxputty.a $(RELEASE_DIR)
 
 doc:

@@ -39,6 +39,7 @@ extern "C" {
  * @param CL_TOGGLE      - Widget_t request a toggle adjustment
  * @param CL_BUTTON      - Widget_t request a button adjustment
  * @param CL_ENUM        - Widget_t request a enum adjustment
+ * @param CL_LOGARITHMIC - Widget_t request a logarithmic adjustment
  */
 
 typedef enum {
@@ -56,6 +57,10 @@ typedef enum {
     CL_VIEWPORT     = 0x0032,
 /** Widget_t request a viewport adjustment */
     CL_METER        = 0x0064,
+/** Widget_t request a logarithmic adjustment */
+    CL_LOGARITHMIC  = 0x0128,
+/** Widget_t request a logarithmic scaled adjustment */
+    CL_LOGSCALE     = 0x0256,
 }CL_type;
 
 /**
@@ -91,6 +96,8 @@ struct  Adjustment_t {
     float scale;
 /** should be on of the CL_ type */
     CL_type type;
+/** scale factor for logarithmic adjustment **/
+    float log_scale;
 };
 
 /**
@@ -183,6 +190,15 @@ void adj_set_start_value(void *w);
  */
 
 void adj_set_scale(Adjustment_t *adj, float value);
+
+/**
+ * @brief adj_set_log_scale  - internal use to set the logarithmic scale 
+ * @param *adj               - pointer to the Adjustment_t
+ * @param value              - value to set the scaleing factor to 
+ * @return void
+ */
+
+void adj_set_log_scale(Adjustment_t *adj, float value);
 
 /**
  * @brief adj_set_motion_state   - internal use to set value and state of the Adjustment_t

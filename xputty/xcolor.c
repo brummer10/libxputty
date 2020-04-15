@@ -62,6 +62,16 @@ void set_dark_theme(Xputty *main) {
         .frame =    { 0.18, 0.38, 0.38, 1.0},
         .light =    { 0.18, 0.38, 0.38, 1.0}
     };
+
+    main->color_scheme->insensitive = (Colors) {
+        .fg =       { 0.85, 0.85, 0.85, 0.5},
+        .bg =       { 0.1, 0.1, 0.1, 0.5},
+        .base =     { 0.0, 0.0, 0.0, 0.5},
+        .text =     { 0.9, 0.9, 0.9, 0.5},
+        .shadow =   { 0.0, 0.0, 0.0, 0.1},
+        .frame =    { 0.0, 0.0, 0.0, 0.5},
+        .light =    { 0.1, 0.1, 0.1, 0.5}
+    };
 }
 
 void set_light_theme(Xputty *main) {
@@ -105,6 +115,16 @@ void set_light_theme(Xputty *main) {
         .frame =    { 0.18, 0.38, 0.38, 1.0},
         .light =    { 0.3, 0.3, 0.3, 1.0}
     };
+
+    main->color_scheme->insensitive = (Colors) {
+        .fg =       { 0.15, 0.15, 0.15, 0.5},
+        .bg =       { 0.85, 0.85, 0.85, 0.5},
+        .base =     { 0.9, 0.9, 0.9, 0.5},
+        .text =     { 0.25, 0.25, 0.25, 0.5},
+        .shadow =   { 0.0, 0.0, 0.0, 0.1},
+        .frame =    { 0.2, 0.2, 0.2, 0.5},
+        .light =    { 0.9, 0.9, 0.9, 0.5}
+    };
 }
 
 Colors *get_color_scheme(Xputty *main, Color_state st) {
@@ -120,6 +140,9 @@ Colors *get_color_scheme(Xputty *main, Color_state st) {
         break;
         case ACTIVE_:
             return &main->color_scheme->active;
+        break;
+        case INSENSITIVE_:
+            return &main->color_scheme->insensitive;
         break;
         default:
             return &main->color_scheme->normal;
@@ -142,6 +165,9 @@ Color_state get_color_state(Widget_t *wid) {
         break;
         case 3:
             return ACTIVE_;
+        break;
+        case 4:
+            return INSENSITIVE_;
         break;
         default:
             return NORMAL_;

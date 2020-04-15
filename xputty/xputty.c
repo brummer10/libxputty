@@ -32,6 +32,9 @@ void main_init(Xputty *main) {
     set_dark_theme(main);
     main->hold_grab = NULL;
     main->run = true;
+    main->small_font = 10;
+    main->normal_font = 12;
+    main->big_font = 16;
 }
 
 void main_run(Xputty *main) {
@@ -73,7 +76,7 @@ void main_run(Xputty *main) {
             break;
             case ClientMessage:
                 /* delete window event */
-                if (xev.xclient.data.l[0] == WM_DELETE_WINDOW &&
+                if (xev.xclient.data.l[0] == (long int)WM_DELETE_WINDOW &&
                         xev.xclient.window == wid->widget) {
                     main->run = false;
                 } else {
@@ -123,7 +126,7 @@ void run_embedded(Xputty *main) {
         break;
         case ClientMessage:
             /* delete window event */
-            if (xev.xclient.data.l[0] == XInternAtom(main->dpy, "WM_DELETE_WINDOW", True) ) {
+            if (xev.xclient.data.l[0] == (long int)XInternAtom(main->dpy, "WM_DELETE_WINDOW", True) ) {
                 int i = childlist_find_widget(main->childlist, xev.xclient.window);
                 if(i<1) return;
                 Widget_t *w = main->childlist->childs[i];

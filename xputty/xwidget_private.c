@@ -31,6 +31,8 @@ void _scroll_event(Widget_t * wid, int direction) {
     if (adj) {
         float value = adj->value;
         switch(adj->type) {
+            case (CL_LOGSCALE):
+            case (CL_LOGARITHMIC):
             case (CL_CONTINUOS):
                 value = min(adj->max_value,max(adj->min_value, 
                                 adj->value + (adj->step * direction)));
@@ -155,7 +157,7 @@ void _check_keymap (void *w_ ,XKeyEvent xkey) {
     int i = 0;
     for(;i<wid->childlist->elem;i++) {
         Widget_t *w = wid->childlist->childs[i];
-        if(w->flags & HAS_FOCUS) {
+        if(w->flags & HAS_FOCUS && w->state != 4) {
              wid=w;
             break;
         }
@@ -180,7 +182,7 @@ void _check_keymap (void *w_ ,XKeyEvent xkey) {
                 int i = 0;
                 for(;i<wid->childlist->elem;i++) {
                     Widget_t *w = wid->childlist->childs[i];
-                    if(w->flags & HAS_FOCUS) {
+                    if(w->flags & HAS_FOCUS && w->state != 4) {
                          wid=w;
                         break;
                     }
@@ -244,11 +246,14 @@ void _resize_surface(Widget_t *wid, int width, int height) {
     wid->width = width;
     wid->height = height;
     cairo_xlib_surface_set_size( wid->surface, wid->width, wid->height);
+    cairo_font_face_t *ff = cairo_get_font_face(wid->crb);
     cairo_destroy(wid->crb);
     cairo_surface_destroy(wid->buffer);
     wid->buffer = cairo_surface_create_similar (wid->surface, 
                         CAIRO_CONTENT_COLOR_ALPHA, width, height);
+    assert(cairo_surface_status(wid->buffer) == CAIRO_STATUS_SUCCESS);
     wid->crb = cairo_create (wid->buffer);
+    cairo_set_font_face(wid->crb, ff);
 }
 
 void _resize_childs(Widget_t *wid) {
@@ -283,8 +288,11 @@ void _resize_childs(Widget_t *wid) {
                     max(1,w->scale.init_height / (wid->scale.cscale_y)));
             break;
             case(ASPECT):
-                XMoveWindow(wid->app->dpy,w->widget,w->scale.init_x /
-                    wid->scale.cscale_x,w->scale.init_y / wid->scale.cscale_y);
+                XMoveWindow(wid->app->dpy,w->widget,(
+                    (w->scale.init_x + w->scale.init_width/2.0) /
+                    wid->scale.cscale_x) - w->width/2.0,
+                    ((w->scale.init_y + w->scale.init_height/2.0) /
+                    wid->scale.cscale_y)- w->height/2.0) ;
                 XResizeWindow (wid->app->dpy, w->widget, max(1,
                     w->scale.init_width / (wid->scale.ascale)), 
                     max(1,w->scale.init_height / (wid->scale.ascale)));
