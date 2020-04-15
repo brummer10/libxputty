@@ -80,7 +80,6 @@ static void set_default_knob_color(KnobColors* kp) {
 // draw the window
 static void draw_window(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    X11_UI* ui = (X11_UI*)w->parent_struct;
     set_pattern(w,&w->app->color_scheme->selected,&w->app->color_scheme->normal,BACKGROUND_);
     cairo_paint (w->crb);
     set_pattern(w,&w->app->color_scheme->normal,&w->app->color_scheme->selected,BACKGROUND_);
