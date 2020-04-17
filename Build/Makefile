@@ -94,6 +94,8 @@ libxputty.a:  $(RESOURCES_OBJ) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
 
 doc:
 
+mod:
+
 install:
 
 uninstall:
