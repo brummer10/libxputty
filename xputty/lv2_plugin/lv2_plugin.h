@@ -57,7 +57,6 @@ typedef struct {
     Widget_t *widget[CONTROLS];
     KnobColors *kp;
     void *private_ptr;
-    cairo_surface_t *screw;
     int block_event;
     int need_resize;
 

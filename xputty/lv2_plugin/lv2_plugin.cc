@@ -349,7 +349,6 @@ static LV2UI_Handle instantiate(const struct _LV2UI_Descriptor * descriptor,
 // cleanup after usage
 static void cleanup(LV2UI_Handle handle) {
     X11_UI* ui = (X11_UI*)handle;
-    cairo_surface_destroy(ui->screw);
     free(ui->kp);
     plugin_cleanup(ui);
     // Xputty free all memory used
