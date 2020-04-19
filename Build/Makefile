@@ -68,7 +68,7 @@ $(XDG_OBJ): $(XDG_SOURCES)
 	$(CC) -MMD -Wall -DHAVE_MMAP -c $(addprefix $(XDG_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
 
 $(RESOURCES_OBJ): $(RESOURCES)
-	cd $(RESOURCES_DIR) && ld -r -b binary $(patsubst %.o,%.png,$@) -o ../../Build/$@
+	cd $(RESOURCES_DIR) && $(LD) -r -b binary $(patsubst %.o,%.png,$@) -o ../../Build/$@
 
 $(DIALOG_OBJ): $(DIALOG_SOURCES)
 	$(CC) -MMD -Wall -c $(addprefix $(DIALOG_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
