@@ -131,6 +131,7 @@ void configure_event(void *w_, void* user_data) {
 
         _resize_childs(wid);
     }
+    wid->func.configure_notify_callback(wid,NULL);
 }
 
 void widget_reset_scale(Widget_t *w) {
