@@ -93,6 +93,16 @@ void radio_item_set_active(Widget_t *w);
 
 Widget_t* menu_add_radio_item(Widget_t *menu, const char * label);
 
+/**
+ * @brief menu_add_numeric_items - add numeric items from imin to imax to menu
+ * @param *menu                  - pointer to the Widget_t menu
+ * @param *imin                  - the low number of the numeric items
+ * @param *imax                  - the high number of the numeric items
+ * @return void
+ */
+
+void menu_add_numeric_items(Widget_t *menu, int *imin, int *imax);
+
 #ifdef __cplusplus
 }
 #endif

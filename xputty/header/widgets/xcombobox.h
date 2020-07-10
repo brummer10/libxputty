@@ -49,6 +49,16 @@ Widget_t* add_combobox(Widget_t *parent, const char  * label, int x, int y, int 
 Widget_t *combobox_add_entry(Widget_t *wid, const char  * label);
 
 /**
+ * @brief combobox_add_numeric_items - add numeric items from imin to imax to wid
+ * @param *wid                       - pointer to the Widget_t combobox
+ * @param *imin                      - the low number of the numeric items
+ * @param *imax                      - the high number of the numeric items
+ * @return void
+ */
+
+void combobox_add_numeric_entrys(Widget_t *wid, int imin, int imax);
+
+/**
  * @brief combobox_set_active_entry  - set the active combobox entry
  * @param *w_                        - void pointer to the Widget_t combobox
  * @param active                     - the active entry (int)

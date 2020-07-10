@@ -116,3 +116,29 @@ Widget_t* menu_add_radio_item(Widget_t *menu, const char * label) {
     return wid;
 }
 
+
+void menu_add_numeric_items(Widget_t *menu, int *imin, int *imax) {
+    Widget_t* view_port =  menu->childlist->childs[0];
+    XWindowAttributes attrs;
+    XGetWindowAttributes(menu->app->dpy, (Window)menu->widget, &attrs);
+    int width = attrs.width;
+    int height = attrs.height;
+    int si = childlist_has_child(view_port->childlist);
+    float max_value = view_port->adj->max_value;
+    Widget_t *wid;
+    int i = (*imin);
+    int o = (*imax)+1;
+    for (;i<o;i++) {
+        si = childlist_has_child(view_port->childlist);
+        wid = create_widget(menu->app, view_port, 0, height*si, width, height);
+        max_value += 1.0;
+        set_adjustment(view_port->adj,0.0, 0.0, 0.0, max_value,1.0, CL_VIEWPORT);
+        wid->scale.gravity = MENUITEM;
+        wid->flags &= ~USE_TRANSPARENCY;
+        snprintf(wid->input_label, 31, "%i",i);
+        wid->label = wid->input_label;
+        wid->func.expose_callback = _draw_item;
+        wid->func.enter_callback = transparent_draw;
+        wid->func.leave_callback = transparent_draw;
+    }
+}

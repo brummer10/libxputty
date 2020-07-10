@@ -62,3 +62,10 @@ Widget_t *combobox_add_entry(Widget_t *wid, const char  * label) {
     
     return item;
 }
+
+void combobox_add_numeric_entrys(Widget_t *wid, int imin, int imax) {
+    Widget_t *menu = wid->childlist->childs[1];
+    menu_add_numeric_items(menu, &imin, &imax);
+    float max_value = wid->adj->max_value+(imax-imin)+1;
+    set_adjustment(wid->adj,0.0, max_value, 0.0, max_value,1.0, CL_ENUM);
+}
