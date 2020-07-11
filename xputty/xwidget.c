@@ -143,14 +143,14 @@ void widget_set_scale(Widget_t *w) {
 }
 
 Widget_t *create_window(Xputty *app, Window win,
-                          int x, int y, int width, int height) {
+                          int x, int y, int width, int height, bool temporary) {
 
     Widget_t *w = (Widget_t*)malloc(sizeof(Widget_t));
     assert(w != NULL);
     debug_print("assert(w)\n");
     XSetWindowAttributes attributes;
     attributes.save_under = True;
-    attributes.override_redirect = 0;
+    attributes.override_redirect = temporary ? True : False;
 
     long event_mask = StructureNotifyMask|ExposureMask|KeyPressMask 
                     |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask
@@ -160,7 +160,7 @@ Widget_t *create_window(Xputty *app, Window win,
 
     w->widget = XCreateWindow(app->dpy, win , x, y, width, height, 0,
                             CopyFromParent, InputOutput, CopyFromParent,
-                            CopyFromParent, &attributes);
+                            CopyFromParent | CWOverrideRedirect, &attributes);
     debug_print("XCreateWindow\n");
 
     XSetLocaleModifiers("");

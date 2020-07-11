@@ -335,7 +335,7 @@ Widget_t *open_message_dialog(Widget_t *w, int style, const char *title,
     check_for_message(mb, message);
     check_for_choices(mb, choices);
     check_for_style(mb, style);
-    Widget_t *wid = create_window(w->app, DefaultRootWindow(w->app->dpy), 0, 0, mb->width, mb->height);
+    Widget_t *wid = create_window(w->app, DefaultRootWindow(w->app->dpy), 0, 0, mb->width, mb->height, false);
     wid->label = message;
     wid->flags |= HAS_MEM;
     wid->scale.gravity = CENTER;

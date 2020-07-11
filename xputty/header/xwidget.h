@@ -364,11 +364,12 @@ struct Widget_t {
  * @param *app               - pointer to the Xputty *main struct to use
  * @param win                - pointer to the Parrent Window (may be Root)
  * @param x,y,width,height   - the position/geometry to create the window
+ * @param temporary          - wherever the window is temporary (like a menu dropdown or a tooltip)
  * @return Widget_t *        - pointer to the Widget_t struct
  */
 
 Widget_t *create_window(Xputty *app, Window win,
-                          int x, int y, int width, int height);
+                          int x, int y, int width, int height, bool temporary);
 
 /**
  * @brief *create_widget      - create a widget

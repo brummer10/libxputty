@@ -53,13 +53,17 @@ Widget_t* create_menu(Widget_t *parent, int height) {
     int x1, y1;
     Window child;
     XTranslateCoordinates( parent->app->dpy, parent->widget, DefaultRootWindow(parent->app->dpy), 0, 0, &x1, &y1, &child );
-    Widget_t *wid = create_window(parent->app, DefaultRootWindow(parent->app->dpy), x1, y1, 10, height);
+    Widget_t *wid = create_window(parent->app, DefaultRootWindow(parent->app->dpy), x1, y1, 10, height, true);
     create_viewport(wid, 10, 5*height);
     Atom window_type = XInternAtom(wid->app->dpy, "_NET_WM_WINDOW_TYPE", False);
-    long vale = XInternAtom(wid->app->dpy, "_NET_WM_WINDOW_TYPE_POPUP_MENU", False);
+    Atom window_type_popup = XInternAtom(wid->app->dpy, "_NET_WM_WINDOW_TYPE_DROPDOWN_MENU", False);
     XChangeProperty(wid->app->dpy, wid->widget, window_type,
-        XA_ATOM, 32, PropModeReplace, (unsigned char *) &vale,1 );
-    XSetTransientForHint(parent->app->dpy,wid->widget,parent->widget);
+        XA_ATOM, 32, PropModeReplace, (unsigned char *) &window_type_popup, 1);
+    Atom window_state = XInternAtom(wid->app->dpy, "_NET_WM_STATE", False);
+    Atom window_state_modal = XInternAtom(wid->app->dpy, "_NET_WM_STATE_MODAL", False);
+    XChangeProperty(wid->app->dpy, wid->widget, window_state,
+        XA_ATOM, 32, PropModeReplace, (unsigned char *) &window_state_modal, 1);
+    XSetTransientForHint(parent->app->dpy, wid->widget, parent->widget);
     wid->func.expose_callback = _draw_menu;
     wid->flags |= IS_POPUP;
     wid->scale.gravity = NONE;
