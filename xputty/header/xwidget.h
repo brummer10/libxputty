@@ -255,6 +255,9 @@ enum {
     HIDE_ON_DELETE    = 1<<12,
     /** Widget_t reuse a surface from a other Widget_t  */
     REUSE_IMAGE       = 1<<13,
+    /** Widget_t didn't receive redraw events on propagate  */
+    NO_PROPAGATE      = 1<<14,
+
 };
 
 /**
@@ -316,7 +319,7 @@ struct Widget_t {
 /** int to hold user data */
     int data;
 /** int to hold Widget_t flags */
-    long int flags;
+    long long flags;
 /** pointer to the widget label */
     const char* label;
 /** char array to hold user input */
