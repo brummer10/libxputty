@@ -34,7 +34,7 @@ void _draw_label(void *w_, void* user_data) {
     cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
     cairo_text_extents(w->crb,w->label , &extents);
 
-    cairo_move_to (w->crb, (width*0.5)-(extents.width/2), height);
+    cairo_move_to (w->crb, (width*0.5)-(extents.width/2), height-(extents.height/4));
     cairo_show_text(w->crb, w->label);
     cairo_new_path (w->crb);
 }
