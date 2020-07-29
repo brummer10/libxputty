@@ -169,6 +169,25 @@ void _draw_button_base(Widget_t *w, int width, int height) {
     }
 }
 
+int _remove_low_dash(char *str) {
+
+    char *src;
+    char *dst;
+    int i = 0;
+    int r = 0;
+    for (src = dst = str; *src != '\0'; src++) {
+        *dst = *src;
+        if (*dst != '_') {
+            dst++;
+        } else {
+            r = i;
+        }
+        i++;
+    }
+    *dst = '\0';
+    return r;
+}
+
 void _draw_button(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
@@ -198,17 +217,25 @@ void _draw_button(void *w_, void* user_data) {
     } else {
 
         cairo_text_extents_t extents;
-        use_text_color_scheme(w, get_color_state(w));
-        cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
-        cairo_text_extents(w->crb,w->label , &extents);
-        if(IS_UTF8(w->label[0])) {
+
+        if (strstr(w->label, "_")) {
+            cairo_text_extents(w->crb, "--", &extents);
+            double underline = extents.width;
+            strcpy(w->input_label,w->label);
+            int pos = _remove_low_dash(w->input_label);
+            cairo_text_extents(w->crb,w->input_label , &extents);
+            cairo_move_to (w->crb, (width-extents.width)*0.5 +offset, (height+extents.height)*0.5 +offset);
+            cairo_show_text(w->crb, w->input_label);
+            cairo_set_line_width(w->crb, 1.0);
+            cairo_move_to (w->crb, (width-extents.width)*0.5 +offset + (pos * underline), (height+extents.height)*0.55 +offset);
+            cairo_line_to(w->crb,(width-extents.width)*0.5 +offset + ((pos+1) * underline), (height+extents.height)*0.55 +offset);
+            cairo_stroke(w->crb);
+        } else {
             cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
             cairo_text_extents(w->crb,w->label , &extents);
+            cairo_move_to (w->crb, (width-extents.width)*0.5 +offset, (height+extents.height)*0.5 +offset);
+            cairo_show_text(w->crb, w->label);
         }
-
-        cairo_move_to (w->crb, (width-extents.width)*0.5 +offset, (height+extents.height)*0.5 +offset);
-        cairo_show_text(w->crb, w->label);
-        cairo_new_path (w->crb);
     }
 }
 
