@@ -217,6 +217,7 @@ void _draw_button(void *w_, void* user_data) {
     } else {
 
         cairo_text_extents_t extents;
+        use_text_color_scheme(w, get_color_state(w));
 
         if (strstr(w->label, "_")) {
             cairo_text_extents(w->crb, "--", &extents);
