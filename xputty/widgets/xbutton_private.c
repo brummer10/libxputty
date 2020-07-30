@@ -218,6 +218,7 @@ void _draw_button(void *w_, void* user_data) {
 
         cairo_text_extents_t extents;
         use_text_color_scheme(w, get_color_state(w));
+        cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
 
         if (strstr(w->label, "_")) {
             cairo_text_extents(w->crb, "--", &extents);
@@ -232,7 +233,6 @@ void _draw_button(void *w_, void* user_data) {
             cairo_line_to(w->crb,(width-extents.width)*0.5 +offset + ((pos+1) * underline), (height+extents.height)*0.55 +offset);
             cairo_stroke(w->crb);
         } else {
-            cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
             cairo_text_extents(w->crb,w->label , &extents);
             cairo_move_to (w->crb, (width-extents.width)*0.5 +offset, (height+extents.height)*0.5 +offset);
             cairo_show_text(w->crb, w->label);
