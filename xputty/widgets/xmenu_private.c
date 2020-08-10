@@ -22,6 +22,82 @@
 #include "xmenu_private.h"
 
 
+int _menu_remove_low_dash(char *str) {
+
+    char *src;
+    char *dst;
+    int i = 0;
+    int r = 0;
+    for (src = dst = str; *src != '\0'; src++) {
+        *dst = *src;
+        if (*dst != '_') {
+            dst++;
+        } else {
+            r = i;
+        }
+        i++;
+    }
+    *dst = '\0';
+    return r;
+}
+
+void _draw_menu_label(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    int width = attrs.width;
+    int height = attrs.height;
+
+    cairo_text_extents_t extents;
+    use_text_color_scheme(w, get_color_state(w));
+    cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
+
+    if (strstr(w->label, "_")) {
+        cairo_text_extents(w->crb, "--", &extents);
+        double underline = extents.width;
+        strcpy(w->input_label,w->label);
+        int pos = _menu_remove_low_dash(w->input_label);
+        cairo_text_extents(w->crb,w->input_label , &extents);
+        cairo_move_to (w->crb, (width-extents.width)*0.5, (height+extents.height)*0.5);
+        cairo_show_text(w->crb, w->input_label);
+        cairo_set_line_width(w->crb, 1.0);
+        cairo_move_to (w->crb, (width-extents.width)*0.5 + (pos * underline), (height+extents.height)*0.55);
+        cairo_line_to(w->crb,(width-extents.width)*0.5 + ((pos+1) * underline), (height+extents.height)*0.55);
+        cairo_stroke(w->crb);
+    } else {
+        cairo_text_extents(w->crb,w->label , &extents);
+        cairo_move_to (w->crb, (width-extents.width)*0.5, (height+extents.height)*0.5);
+        cairo_show_text(w->crb, w->label);
+    }
+
+    cairo_new_path (w->crb);
+}
+
+void _menu_released(void *w_, void* button_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    XButtonEvent *xbutton = (XButtonEvent*)button_;
+    if (w->flags & HAS_POINTER && xbutton->button == Button1) {
+        pop_menu_show(w, w->childlist->childs[0], 6, true);
+    }
+}
+
+void _menu_entry_released(void *w_, void* item_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Widget_t * bar = NULL;
+    int i = w->app->childlist->elem-1;
+    for(;i>-1;i--) {
+        Widget_t *wid = w->app->childlist->childs[i];
+        if (wid == w) {
+            bar = w->app->childlist->childs[i-1];
+            int old_value = (int)adj_get_value(bar->adj);
+            adj_set_value(bar->adj, (float)*(int*)item_);
+            if (old_value == *(int*)item_)
+                bar->func.value_changed_callback(bar, NULL);
+            break;
+        }
+    }    
+}
+
 void _draw_menu(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
@@ -57,9 +133,56 @@ void _draw_item(void *w_, void* user_data) {
     use_text_color_scheme(w, get_color_state(w));
     cairo_set_font_size (w->crb, height/2);
     cairo_text_extents(w->crb,w->label , &extents);
-
-    cairo_move_to (w->crb, (width-extents.width)/2., height - extents.height );
+    cairo_move_to (w->crb, (width-extents.width)*0.5, (height+extents.height)*0.5);
     cairo_show_text(w->crb, w->label);
+    cairo_new_path (w->crb);
+}
+
+void _draw_accel_item(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    if (!w) return;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    int width = attrs.width;
+    int height = attrs.height;
+    if (attrs.map_state != IsViewable) return;
+
+    use_base_color_scheme(w, NORMAL_);
+    cairo_rectangle(w->crb, 0, 0, width , height);
+    if(w->state==1) {
+        use_base_color_scheme(w, PRELIGHT_);
+    } else if(w->state==2) {
+        use_base_color_scheme(w, SELECTED_);
+    } else if(w->state==3) {
+        use_base_color_scheme(w, ACTIVE_);
+    }
+    cairo_fill_preserve(w->crb);
+    cairo_set_line_width(w->crb, 1.0);
+    use_frame_color_scheme(w, PRELIGHT_);
+    cairo_stroke(w->crb); 
+
+    cairo_text_extents_t extents;
+    /** show label **/
+    use_text_color_scheme(w, get_color_state(w));
+    cairo_set_font_size (w->crb, height/2);
+
+    if (strstr(w->label, "_")) {
+        cairo_text_extents(w->crb, "--", &extents);
+        double underline = extents.width;
+        strcpy(w->input_label,w->label);
+        int pos = _menu_remove_low_dash(w->input_label);
+        cairo_text_extents(w->crb,w->input_label , &extents);
+        cairo_move_to (w->crb, (width-extents.width)*0.5, (height+extents.height)*0.5);
+        cairo_show_text(w->crb, w->input_label);
+        cairo_set_line_width(w->crb, 1.0);
+        cairo_move_to (w->crb, (width-extents.width)*0.5 + (pos * underline), (height+extents.height)*0.55);
+        cairo_line_to(w->crb,(width-extents.width)*0.5 + ((pos+1) * underline), (height+extents.height)*0.55);
+        cairo_stroke(w->crb);
+    } else {
+        cairo_text_extents(w->crb,w->label , &extents);
+        cairo_move_to (w->crb, (width-extents.width)*0.5, (height+extents.height)*0.5);
+        cairo_show_text(w->crb, w->label);
+    }
     cairo_new_path (w->crb);
 }
 

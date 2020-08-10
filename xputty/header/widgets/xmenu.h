@@ -50,6 +50,26 @@ void pop_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above);
 Widget_t* create_viewport(Widget_t *parent, int width, int height);
 
 /**
+ * @brief add_menu            - add a menu to a Widget_t
+ * @param *parent             - pointer to the Widget_t the menu should pop over
+ * @param *label              - the label of the menu
+ * @param x,y,width,height    - the position/geometry to create the menu
+ * @return Widget_t*          - pointer to the Widget_t button struct
+ */
+
+Widget_t* add_menu(Widget_t *parent, const char * label,
+                        int x, int y, int width, int height);
+
+/**
+ * @brief menu_add_entry      - add a entry to menu
+ * @param *menu               - pointer to the Widget_t menu
+ * @param *label              - Label to show on the menu
+ * @return Widget_t*          - pointer to the Widget_t menu_item struct
+ */
+
+Widget_t *menu_add_entry(Widget_t *wid, const char  * label);
+
+/**
  * @brief create_menu         - create a menu to a Widget_t
  * @param *parent             - pointer to the Widget_t the menu should pop over
  * @param height              - define the height of a single menu item
@@ -66,6 +86,15 @@ Widget_t* create_menu(Widget_t *parent, int height);
  */
 
 Widget_t* menu_add_item(Widget_t *menu, const char * label);
+
+/**
+ * @brief menu_add_accel_item - add a accel item to menu
+ * @param *menu               - pointer to the Widget_t menu
+ * @param *label              - Label to show on the menu
+ * @return Widget_t*          - pointer to the Widget_t menu_item struct
+ */
+
+Widget_t* menu_add_accel_item(Widget_t *menu, const char * label);
 
 /**
  * @brief menu_add_check_item - add a item to menu

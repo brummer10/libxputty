@@ -29,6 +29,34 @@
 extern "C" {
 #endif
 
+/**
+ * @brief _draw_menu_label     - draw the menu label on expose call
+ * @param *w_                  - the menu to draw
+ * @param *user_data           - attached user_data
+ * @return void
+ */
+
+void _draw_menu_label(void *w_, void* user_data);
+
+/**
+ * @brief _menu_released             - popup the menu on click
+ * @param *w_                        - void pointer to the Widget_t button
+ * @param *button                    - void pointer to XEvent.xbutton struct
+ * @param *user_data                 - void pointer to attached user_data
+ * @return void
+ */
+
+void _menu_released(void *w_, void* button_, void* user_data);
+
+/**
+ * @brief _menu_entry_released       - the menu release func
+ * @param *w_                        - void pointer to the Widget_t menu
+ * @param *item                      - void pointer to the selected item *(int*)
+ * @param *user_data                 - void pointer to the item label *(const char**)
+ * @return void
+ */
+
+void _menu_entry_released(void *w_, void* item_, void* user_data);
 
 /**
  * @brief _draw_menu           - draw menu on expose call
@@ -47,6 +75,15 @@ void _draw_menu(void *w_, void* user_data);
  */
 
 void _draw_item(void *w_, void* user_data);
+
+/**
+ * @brief _draw_accel_item     - draw accel item on expose call
+ * @param *w_                  - the item to draw
+ * @param *user_data           - attached user_data
+ * @return void
+ */
+
+void _draw_accel_item(void *w_, void* user_data);
 
 /**
  * @brief _draw_check_item     - draw item on expose call

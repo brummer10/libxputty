@@ -48,6 +48,33 @@ Widget_t* create_viewport(Widget_t *parent, int width, int height) {
     return wid;
 }
 
+Widget_t* add_menu(Widget_t *parent, const char * label,
+                        int x, int y, int width, int height) {
+    Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
+    wid->label = label;
+    wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, -1.0,1.0, CL_NONE);
+    wid->adj = wid->adj_y;
+    wid->scale.gravity = NONE;
+    wid->func.expose_callback = _draw_menu_label;
+    wid->func.enter_callback = transparent_draw;
+    wid->func.leave_callback = transparent_draw;
+    wid->func.button_release_callback = _menu_released;
+
+    Widget_t* menu = create_menu(wid, 25);
+    menu->func.button_release_callback = _menu_entry_released;
+
+    return wid;
+}
+
+Widget_t *menu_add_entry(Widget_t *wid, const char  * label) {
+    Widget_t *menu = wid->childlist->childs[0];
+    Widget_t *item = menu_add_accel_item(menu,label);
+    float max_value = wid->adj->max_value+1.0;
+    set_adjustment(wid->adj,0.0, max_value, 0.0, max_value,1.0, CL_NONE);
+    
+    return item;
+}
+
 Widget_t* create_menu(Widget_t *parent, int height) {
 
     int x1, y1;
@@ -94,6 +121,12 @@ Widget_t* menu_add_item(Widget_t *menu,const char * label) {
     wid->func.expose_callback = _draw_item;
     wid->func.enter_callback = transparent_draw;
     wid->func.leave_callback = transparent_draw;
+    return wid;
+}
+
+Widget_t* menu_add_accel_item(Widget_t *menu,const char * label) {
+    Widget_t *wid = menu_add_item(menu, label);
+    wid->func.expose_callback = _draw_accel_item;
     return wid;
 }
 
