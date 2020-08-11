@@ -52,10 +52,10 @@
 
 .NOTPARALLEL:
 
+all:  $(RESOURCEHEADER) libxputty.a
+
 debug: LDFLAGS=$(DEBUG_LDFLAGS)
 debug: all
-
-all:  $(RESOURCEHEADER) libxputty.a
 
 clean:
 	rm -f libxputty.a $(LIB_OBJ) $(WIDGET_OBJ) $(RESOURCES_OBJ) $(DIALOG_OBJ) $(XDG_OBJ) $(DEP) $(RESOURCEHEADER)
