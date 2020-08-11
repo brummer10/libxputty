@@ -48,9 +48,12 @@
 
 	DEP = $(LIB_OBJ:%.o=%.d) $(WIDGET_OBJ:%.o=%.d) $(DIALOG_OBJ:%.o=%.d) $(XDG_OBJ:%.o=%.d)
 
-.PHONY : all clean
+.PHONY : all clean debug
 
 .NOTPARALLEL:
+
+debug: LDFLAGS=$(DEBUG_LDFLAGS)
+debug: all
 
 all:  $(RESOURCEHEADER) libxputty.a
 
