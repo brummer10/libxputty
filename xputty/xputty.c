@@ -47,6 +47,7 @@ void main_run(Xputty *main) {
     int ew;
 
     while (main->run && (XNextEvent(main->dpy, &xev)>=0)) {
+        if (XFilterEvent(&xev, None)) continue;
         ew = childlist_find_widget(main->childlist, xev.xany.window);
         if(ew  >= 0) {
             Widget_t * w = main->childlist->childs[ew];

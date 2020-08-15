@@ -497,8 +497,6 @@ void transparent_draw(void * w_, void* user_data) {
 void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
     Widget_t *wid = (Widget_t*)w_;
     XEvent *xev = (XEvent*)event;
-    if (XFilterEvent(xev, wid->widget))
-        return;
     
     switch(xev->type) {
         case ConfigureNotify:
