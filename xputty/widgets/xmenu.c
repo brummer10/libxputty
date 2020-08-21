@@ -55,8 +55,9 @@ Widget_t* add_menu(Widget_t *parent, const char * label,
     wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, -1.0,1.0, CL_NONE);
     wid->adj = wid->adj_y;
     wid->scale.gravity = NONE;
+    wid->state = 0;
     wid->func.expose_callback = _draw_menu_label;
-    wid->func.enter_callback = transparent_draw;
+    wid->func.enter_callback = _check_menu_state;
     wid->func.leave_callback = transparent_draw;
     wid->func.button_release_callback = _menu_released;
 

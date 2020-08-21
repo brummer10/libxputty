@@ -73,6 +73,25 @@ void _draw_menu_label(void *w_, void* user_data) {
     cairo_new_path (w->crb);
 }
 
+void _check_menu_state(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Widget_t *parent = w->parent;
+    int i = parent->childlist->elem-1;
+    for(;i>-1;i--) {
+        Widget_t *wid = parent->childlist->childs[i];
+        if (childlist_has_child(wid->childlist)) {
+            if ((wid->childlist->childs[0] == w->app->hold_grab) && (wid !=w)) {
+                XUngrabPointer(w->app->dpy,CurrentTime);
+                widget_hide(w->app->hold_grab);
+                w->app->hold_grab = NULL;
+                pop_menu_show(w, w->childlist->childs[0], 6, true);
+                break;
+            }
+        }
+    }
+    transparent_draw(w_, user_data);
+}
+
 void _menu_released(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     XButtonEvent *xbutton = (XButtonEvent*)button_;

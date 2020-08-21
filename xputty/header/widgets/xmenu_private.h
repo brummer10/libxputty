@@ -39,6 +39,15 @@ extern "C" {
 void _draw_menu_label(void *w_, void* user_data);
 
 /**
+ * @brief _check_menu_state    - follow the mouse pointer when a menu is active
+ * @param *w_                  - the menu to check
+ * @param *user_data           - attached user_data
+ * @return void
+ */
+
+void _check_menu_state(void *w_, void* user_data);
+
+/**
  * @brief _menu_released             - popup the menu on click
  * @param *w_                        - void pointer to the Widget_t button
  * @param *button                    - void pointer to XEvent.xbutton struct
