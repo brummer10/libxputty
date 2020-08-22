@@ -48,6 +48,24 @@ Widget_t* create_viewport(Widget_t *parent, int width, int height) {
     return wid;
 }
 
+void set_active_radio_entry(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    int v = (int)adj_get_value(w->adj);
+    Widget_t *menu = w->childlist->childs[0];
+    Widget_t *view_port =  menu->childlist->childs[0];
+    if (!childlist_has_child(view_port->childlist)) return;
+    int i = view_port->childlist->elem-1;
+    if (v > i || v < 0) return;
+    Widget_t *wi = view_port->childlist->childs[v];
+    for(;i>-1;i--) {
+        Widget_t *wid = view_port->childlist->childs[i];
+        if (wid->adj && wid->flags & IS_RADIO) {
+            if (wid == wi) adj_set_value(wid->adj_y, 1.0);
+            else adj_set_value(wid->adj_y, 0.0);
+        }
+    }
+}
+
 Widget_t* add_menu(Widget_t *parent, const char * label,
                         int x, int y, int width, int height) {
     Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
@@ -56,6 +74,7 @@ Widget_t* add_menu(Widget_t *parent, const char * label,
     wid->adj = wid->adj_y;
     wid->scale.gravity = NONE;
     wid->state = 0;
+    wid->func.adj_callback = set_active_radio_entry;
     wid->func.expose_callback = _draw_menu_label;
     wid->func.enter_callback = _check_menu_state;
     wid->func.leave_callback = transparent_draw;
@@ -70,6 +89,15 @@ Widget_t* add_menu(Widget_t *parent, const char * label,
 Widget_t *menu_add_entry(Widget_t *wid, const char  * label) {
     Widget_t *menu = wid->childlist->childs[0];
     Widget_t *item = menu_add_accel_item(menu,label);
+    float max_value = wid->adj->max_value+1.0;
+    set_adjustment(wid->adj,0.0, max_value, 0.0, max_value,1.0, CL_NONE);
+    
+    return item;
+}
+
+Widget_t *menu_add_radio_entry(Widget_t *wid, const char  * label) {
+    Widget_t *menu = wid->childlist->childs[0];
+    Widget_t *item = menu_add_radio_item(menu,label);
     float max_value = wid->adj->max_value+1.0;
     set_adjustment(wid->adj,0.0, max_value, 0.0, max_value,1.0, CL_NONE);
     

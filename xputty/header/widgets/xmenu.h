@@ -62,12 +62,21 @@ Widget_t* add_menu(Widget_t *parent, const char * label,
 
 /**
  * @brief menu_add_entry      - add a entry to menu
- * @param *menu               - pointer to the Widget_t menu
+ * @param *wid                - pointer to the Widget_t menu
  * @param *label              - Label to show on the menu
  * @return Widget_t*          - pointer to the Widget_t menu_item struct
  */
 
 Widget_t *menu_add_entry(Widget_t *wid, const char  * label);
+
+/**
+ * @brief menu_add_radio_entry- add a radio entry to menu
+ * @param *wid                - pointer to the Widget_t menu
+ * @param *label              - Label to show on the menu
+ * @return Widget_t*          - pointer to the Widget_t menu_item struct
+ */
+
+Widget_t *menu_add_radio_entry(Widget_t *wid, const char  * label);
 
 /**
  * @brief create_menu         - create a menu to a Widget_t

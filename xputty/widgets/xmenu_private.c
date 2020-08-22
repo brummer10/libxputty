@@ -51,6 +51,8 @@ void _draw_menu_label(void *w_, void* user_data) {
     cairo_text_extents_t extents;
     use_text_color_scheme(w, get_color_state(w));
     cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
+    cairo_text_extents(w->crb, "A", &extents);
+    double lh = extents.height;
 
     if (strstr(w->label, "_")) {
         cairo_text_extents(w->crb, "--", &extents);
@@ -58,15 +60,15 @@ void _draw_menu_label(void *w_, void* user_data) {
         strcpy(w->input_label,w->label);
         int pos = _menu_remove_low_dash(w->input_label);
         cairo_text_extents(w->crb,w->input_label , &extents);
-        cairo_move_to (w->crb, (width-extents.width)*0.5, (height+extents.height)*0.5);
+        cairo_move_to (w->crb, (width-extents.width)*0.5, (height+lh)*0.5);
         cairo_show_text(w->crb, w->input_label);
         cairo_set_line_width(w->crb, 1.0);
-        cairo_move_to (w->crb, (width-extents.width)*0.5 + (pos * underline), (height+extents.height)*0.55);
-        cairo_line_to(w->crb,(width-extents.width)*0.5 + ((pos+1) * underline), (height+extents.height)*0.55);
+        cairo_move_to (w->crb, (width-extents.width)*0.5 + (pos * underline), (height+lh)*0.55);
+        cairo_line_to(w->crb,(width-extents.width)*0.5 + ((pos+1) * underline), (height+lh)*0.55);
         cairo_stroke(w->crb);
     } else {
         cairo_text_extents(w->crb,w->label , &extents);
-        cairo_move_to (w->crb, (width-extents.width)*0.5, (height+extents.height)*0.5);
+        cairo_move_to (w->crb, (width-extents.width)*0.5, (height+lh)*0.5);
         cairo_show_text(w->crb, w->label);
     }
 
