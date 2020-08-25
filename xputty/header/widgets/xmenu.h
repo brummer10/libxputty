@@ -40,6 +40,15 @@ extern "C" {
 void pop_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above);
 
 /**
+ * @brief pop_submenu_show    - pop up a submenu to a Widget_t
+ * @param *parent             - pointer to the Widget_t the menu should pop over
+ * @param *menu               - the menu to show
+ * @return void
+ */
+
+void pop_submenu_show(Widget_t *parent, Widget_t *menu, int elem, bool above);
+
+/**
  * @brief create_viewport     - create a viewport on a menu to a Widget_t
  * @param *parent             - pointer to the Widget_t the menu should pop over
  * @param width               - define the width of the viewport
@@ -77,6 +86,8 @@ Widget_t *menu_add_entry(Widget_t *wid, const char  * label);
  */
 
 Widget_t *menu_add_radio_entry(Widget_t *wid, const char  * label);
+
+Widget_t *menu_add_submenu(Widget_t *wid, const char  * label);
 
 /**
  * @brief create_menu         - create a menu to a Widget_t

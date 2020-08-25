@@ -31,6 +31,7 @@ void main_init(Xputty *main) {
     assert(main->color_scheme);
     set_dark_theme(main);
     main->hold_grab = NULL;
+    main->submenu = NULL;
     main->run = true;
     main->small_font = 10;
     main->normal_font = 12;
@@ -55,23 +56,36 @@ void main_run(Xputty *main) {
         }
 
         switch (xev.type) {
-        case ButtonPress:
-            if(main->hold_grab != NULL) {
-                Widget_t *view_port = main->hold_grab->childlist->childs[0];
+            case ButtonPress:
+            {
                 bool is_item = False;
-                int i = view_port->childlist->elem-1;
-                for(;i>-1;i--) {
-                    Widget_t *w = view_port->childlist->childs[i];
-                    if (xev.xbutton.window == w->widget) {
-                        is_item = True;
-                        break;
+                if(main->submenu != NULL) {
+                    Widget_t *view_port = main->submenu->childlist->childs[0];
+                    int i = view_port->childlist->elem-1;
+                    for(;i>-1;i--) {
+                        Widget_t *w = view_port->childlist->childs[i];
+                        if (xev.xbutton.window == w->widget) {
+                            is_item = True;
+                            break;
+                        }
                     }
                 }
-                if (xev.xbutton.window == view_port->widget) is_item = True;
-                if (!is_item) {
-                    XUngrabPointer(main->dpy,CurrentTime);
-                    widget_hide(main->hold_grab);
-                    main->hold_grab = NULL;
+                if(main->hold_grab != NULL) {
+                    Widget_t *view_port = main->hold_grab->childlist->childs[0];
+                    int i = view_port->childlist->elem-1;
+                    for(;i>-1;i--) {
+                        Widget_t *w = view_port->childlist->childs[i];
+                        if (xev.xbutton.window == w->widget) {
+                            is_item = True;
+                            break;
+                        }
+                    }
+                    if (xev.xbutton.window == view_port->widget) is_item = True;
+                    if (!is_item) {
+                        XUngrabPointer(main->dpy,CurrentTime);
+                        widget_hide(main->hold_grab);
+                        main->hold_grab = NULL;
+                    }
                 }
             }
             break;

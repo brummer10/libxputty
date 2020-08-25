@@ -211,6 +211,7 @@ Widget_t *create_window(Xputty *app, Window win,
     w->flags &= ~HIDE_ON_DELETE;
     w->flags &= ~REUSE_IMAGE;
     w->flags &= ~NO_PROPAGATE;
+    w->flags &= ~IS_SUBMENU;
     w->app = app;
     w->parent = &win;
     w->parent_struct = NULL;
@@ -322,6 +323,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     w->flags &= ~HIDE_ON_DELETE;
     w->flags &= ~REUSE_IMAGE;
     w->flags &= ~NO_PROPAGATE;
+    w->flags &= ~IS_SUBMENU;
     w->app = app;
     w->parent = parent;
     w->parent_struct = NULL;
@@ -403,7 +405,8 @@ void widget_hide(Widget_t *w) {
 }
 
 void widget_show_all(Widget_t *w) {
-    if (w->flags & IS_POPUP || w->flags & IS_TOOLTIP) {
+    if (w->flags & IS_POPUP || w->flags & IS_TOOLTIP ||
+        w->flags & IS_SUBMENU) {
         return;
     } else {
         w->func.map_notify_callback(w, NULL);
@@ -416,11 +419,21 @@ void widget_show_all(Widget_t *w) {
 }
 
 void pop_widget_show_all(Widget_t *w) {
+    if (w->flags & IS_SUBMENU) return;
     w->func.map_notify_callback(w, NULL);
     XMapWindow(w->app->dpy, w->widget);
     int i=0;
     for(;i<w->childlist->elem;i++) {
-        pop_widget_show_all(w->childlist->childs[i]);
+            pop_widget_show_all(w->childlist->childs[i]);
+    }
+}
+
+void submenu_widget_show_all(Widget_t *w) {
+    w->func.map_notify_callback(w, NULL);
+    XMapWindow(w->app->dpy, w->widget);
+    int i=0;
+    for(;i<w->childlist->elem;i++) {
+            submenu_widget_show_all(w->childlist->childs[i]);
     }
 }
 
@@ -521,6 +534,7 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
 
         case ButtonRelease:
             _check_grab(wid, &xev->xbutton, main);
+            _check_submenu(wid, &xev->xbutton, main);
             if (wid->state == 4) break;
             _has_pointer(wid, &xev->xbutton);
             if(wid->flags & HAS_POINTER) wid->state = 1;

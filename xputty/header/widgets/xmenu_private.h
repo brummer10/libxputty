@@ -77,6 +77,33 @@ void _menu_entry_released(void *w_, void* item_, void* user_data);
 void _draw_menu(void *w_, void* user_data);
 
 /**
+ * @brief _draw_submenu        - draw submenu on expose call
+ * @param *w_                  - the menu to draw
+ * @param *user_data           - attached user_data
+ * @return void
+ */
+
+void _draw_submenu(void *w_, void* user_data);
+
+/**
+ * @brief _enter_submenu       - enter submenu 
+ * @param *w_                  - the submenu entered
+ * @param *user_data           - attached user_data
+ * @return void
+ */
+
+void _enter_submenu(void *w_, void* user_data);
+
+/**
+ * @brief _leave_submenu       - leave submenu 
+ * @param *w_                  - the submenu leaved
+ * @param *user_data           - attached user_data
+ * @return void
+ */
+
+void _leave_submenu(void *w_, void* user_data);
+
+/**
  * @brief _draw_item           - draw item on expose call
  * @param *w_                  - the item to draw
  * @param *user_data           - attached user_data

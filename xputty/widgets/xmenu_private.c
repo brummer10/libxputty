@@ -86,6 +86,10 @@ void _check_menu_state(void *w_, void* user_data) {
                 XUngrabPointer(w->app->dpy,CurrentTime);
                 widget_hide(w->app->hold_grab);
                 w->app->hold_grab = NULL;
+                if (w->app->submenu) {
+                    widget_hide(w->app->submenu);
+                    w->app->submenu = NULL;
+                }
                 pop_menu_show(w, w->childlist->childs[0], 6, true);
                 break;
             }
@@ -112,8 +116,9 @@ void _menu_entry_released(void *w_, void* item_, void* user_data) {
             bar = w->app->childlist->childs[i-1];
             int old_value = (int)adj_get_value(bar->adj);
             adj_set_value(bar->adj, (float)*(int*)item_);
-            if (old_value == *(int*)item_)
+            if (old_value == *(int*)item_) {
                 bar->func.value_changed_callback(bar, NULL);
+            }
             break;
         }
     }    
@@ -124,6 +129,110 @@ void _draw_menu(void *w_, void* user_data) {
     if (!w) return;
     use_bg_color_scheme(w, get_color_state(w));
     cairo_paint (w->crb);
+}
+
+void _draw_submenu(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    if (!w) return;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    int width = attrs.width;
+    int height = attrs.height;
+    if (attrs.map_state != IsViewable) return;
+
+    use_base_color_scheme(w, NORMAL_);
+    cairo_rectangle(w->crb, 0, 0, width , height);
+    if(w->state==1) {
+        use_base_color_scheme(w, PRELIGHT_);
+    } else if(w->state==2) {
+        use_base_color_scheme(w, SELECTED_);
+    } else if(w->state==3) {
+        use_base_color_scheme(w, ACTIVE_);
+    }
+    cairo_fill_preserve(w->crb);
+    cairo_set_line_width(w->crb, 1.0);
+    use_frame_color_scheme(w, PRELIGHT_);
+    cairo_stroke(w->crb); 
+
+    cairo_text_extents_t extents;
+    /** show label **/
+    use_text_color_scheme(w, get_color_state(w));
+    cairo_set_font_size (w->crb, height/2);
+
+    if (strstr(w->label, "_")) {
+        cairo_text_extents(w->crb, "--", &extents);
+        double underline = extents.width;
+        strcpy(w->input_label,w->label);
+        int pos = _menu_remove_low_dash(w->input_label);
+        cairo_text_extents(w->crb,w->input_label , &extents);
+        cairo_move_to (w->crb, (width-extents.width)*0.5, (height+extents.height)*0.5);
+        cairo_show_text(w->crb, w->input_label);
+        cairo_set_line_width(w->crb, 1.0);
+        cairo_move_to (w->crb, (width-extents.width)*0.5 + (pos * underline), (height+extents.height)*0.55);
+        cairo_line_to(w->crb,(width-extents.width)*0.5 + ((pos+1) * underline), (height+extents.height)*0.55);
+        cairo_stroke(w->crb);
+    } else {
+        cairo_text_extents(w->crb,w->label , &extents);
+        cairo_move_to (w->crb, (width-extents.width)*0.5, (height+extents.height)*0.5);
+        cairo_show_text(w->crb, w->label);
+    }
+    cairo_move_to (w->crb, (width-15), (height+extents.height)*0.5);
+    cairo_show_text(w->crb, ">");
+    cairo_new_path (w->crb);
+}
+
+void _enter_submenu(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    if (attrs.map_state != IsViewable) return;
+    if (childlist_has_child(w->childlist)) {
+        if (w->app->submenu) {
+            if (w->app->submenu != w->childlist->childs[0]) {
+                widget_hide(w->app->submenu);
+                w->app->submenu = NULL;
+            }
+        }
+        pop_submenu_show(w, w->childlist->childs[0], 6, false);
+    }
+    transparent_draw(w_, user_data);
+}
+
+void _leave_submenu(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+
+    if (!w->data) {
+        XCrossingEvent notify;
+        memset(&notify, 0, sizeof(notify));
+        notify.type = LeaveNotify;
+        notify.display = w->app->dpy;
+        notify.send_event = True;
+        notify.subwindow = w->widget;
+        notify.window = w->widget;
+        notify.x = 1;
+        notify.y = 1;
+        notify.same_screen = True;
+        notify.focus = False;
+        XSendEvent(w->app->dpy, w->widget,True,LeaveWindowMask, (XEvent*)&notify);
+
+        w->data = 1;
+        return;
+    }
+    w->data = 0;
+    if (childlist_has_child(w->childlist)) {
+        Widget_t *parent = (Widget_t*) w->parent;
+        int i=0;
+        for(;i<parent->childlist->elem;i++) {
+            if (parent->childlist->childs[i]->flags & HAS_FOCUS) {
+                widget_hide(w->childlist->childs[0]);
+                if (w->app->submenu == w->childlist->childs[0])
+                    w->app->submenu = NULL;
+                break;
+            }
+        }
+        
+    }
+    transparent_draw(w_, user_data);
 }
 
 void _draw_item(void *w_, void* user_data) {
@@ -286,8 +395,9 @@ void _configure_menu(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     int height = attrs.height;
     int x1, y1;
     int posy = (above) ? parent->height : 0;
+    int posx = (above) ? 0 : parent->width ;
     Window child;
-    XTranslateCoordinates( parent->app->dpy, parent->widget, DefaultRootWindow(parent->app->dpy), 0, posy, &x1, &y1, &child );
+    XTranslateCoordinates( parent->app->dpy, parent->widget, DefaultRootWindow(parent->app->dpy), posx, posy, &x1, &y1, &child );
     int item_width = 1.0;
     cairo_text_extents_t extents;
     int i = view_port->childlist->elem-1;

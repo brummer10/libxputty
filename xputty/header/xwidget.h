@@ -259,6 +259,8 @@ enum {
     REUSE_IMAGE       = 1<<13,
     /** Widget_t didn't receive redraw events on propagate  */
     NO_PROPAGATE      = 1<<14,
+    /** Widget_t is a sub Widget_t from a Popup Widget_t  */
+    IS_SUBMENU        = 1<<15,
 
 };
 
@@ -420,6 +422,14 @@ void widget_show(Widget_t *w);
  */
 
 void pop_widget_show_all(Widget_t *w);
+
+/**
+ * @brief submenu_widget_show_all   - map/show submenu Widget_t with all childs
+ * @param *w                        - pointer to the Widget_t to map
+ * @return void 
+ */
+
+void submenu_widget_show_all(Widget_t *w);
 
 /**
  * @brief widget_hide       - unmap/hide a Widget_t

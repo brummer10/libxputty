@@ -136,6 +136,32 @@ void _check_grab(Widget_t * wid, XButtonEvent *xbutton, Xputty *main) {
     }
 }
 
+void _check_submenu(Widget_t * wid, XButtonEvent *xbutton, Xputty *main) {
+    if(main->submenu != NULL) {
+        Widget_t *view_port = main->submenu->childlist->childs[0];
+        if(xbutton->button == Button1) {
+            //if (xbutton->window == view_port->widget) return;
+            int i = view_port->childlist->elem-1;
+            for(;i>-1;i--) {
+                Widget_t *w = view_port->childlist->childs[i];
+                if (xbutton->window == w->widget) {
+                    const char *l = view_port->childlist->childs[i]->label;
+                    main->submenu->func.button_release_callback
+                        (main->submenu, &i, &l);
+                    break;
+                }
+            }
+            widget_hide(main->submenu);
+            main->submenu = NULL;
+
+        } else if(xbutton->button == Button4) {
+            _scroll_event(view_port, 1);
+        } else if(xbutton->button == Button5) {
+            _scroll_event(view_port, -1);
+        }
+    }
+}
+
 void _propagate_child_expose(Widget_t *wid) {
 
     if (childlist_has_child(wid->childlist)) {

@@ -37,6 +37,15 @@ void pop_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     if (err) debug_print("Error grap pointer\n");
 }
 
+void pop_submenu_show(Widget_t *parent, Widget_t *menu, int elem, bool above) {
+    if (!childlist_has_child(menu->childlist)) return;
+    Widget_t* view_port =  menu->childlist->childs[0];
+    if (!view_port->childlist->elem) return;
+    _configure_menu(parent, menu, elem, above);
+    submenu_widget_show_all(menu);
+    menu->app->submenu = menu;
+}
+
 Widget_t* create_viewport(Widget_t *parent, int width, int height) {
     Widget_t *wid = create_widget(parent->app, parent, 0, 0, width, height);
     wid->scale.gravity = NONE;
@@ -102,6 +111,35 @@ Widget_t *menu_add_radio_entry(Widget_t *wid, const char  * label) {
     set_adjustment(wid->adj,0.0, max_value, 0.0, max_value,1.0, CL_NONE);
     
     return item;
+}
+
+Widget_t *menu_add_submenu(Widget_t *w, const char  * label) {
+    Widget_t *menu = w->childlist->childs[0];
+    Widget_t* view_port =  menu->childlist->childs[0];
+    XWindowAttributes attrs;
+    XGetWindowAttributes(menu->app->dpy, (Window)menu->widget, &attrs);
+    int width = attrs.width;
+    int height = attrs.height;
+    int si = childlist_has_child(view_port->childlist);
+    Widget_t *wid = create_widget(menu->app, view_port, 0, height*si, width, height);
+    float max_value1 = view_port->adj->max_value+1.0;
+    set_adjustment(view_port->adj,0.0, 0.0, 0.0, max_value1,1.0, CL_VIEWPORT);
+    wid->scale.gravity = MENUITEM;
+    wid->flags &= ~USE_TRANSPARENCY;
+    wid->label = label;
+    wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, -1.0,1.0, CL_NONE);
+    wid->adj = wid->adj_y;
+    float max_value = wid->adj->max_value+1.0;
+    set_adjustment(wid->adj,0.0, max_value, 0.0, max_value,1.0, CL_NONE);
+    wid->func.adj_callback = set_active_radio_entry;
+    wid->func.expose_callback = _draw_submenu;
+    wid->func.enter_callback = _enter_submenu;
+    wid->func.leave_callback = _leave_submenu;
+    Widget_t* submenu = create_menu(wid, 25);
+    submenu->flags |= IS_SUBMENU;
+
+    submenu->func.button_release_callback = _menu_entry_released;
+    return wid;
 }
 
 Widget_t* create_menu(Widget_t *parent, int height) {
@@ -174,8 +212,12 @@ void radio_item_set_active(Widget_t *w) {
     for(;i>-1;i--) {
         Widget_t *wid = p->childlist->childs[i];
         if (wid->adj && wid->flags & IS_RADIO) {
-            if (wid == w) adj_set_value(wid->adj_y, 1.0);
-            else adj_set_value(wid->adj_y, 0.0);
+            if (wid == w) {
+                adj_set_value(wid->adj_y, 1.0);
+            } else {
+                adj_set_value(wid->adj_y, 0.0);
+            }
+            wid->state=0;
         }
     }
 }

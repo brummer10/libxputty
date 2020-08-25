@@ -183,6 +183,8 @@ struct Xputty{
     XColor_t *color_scheme;
 /** pointer to a modal Widget_t */
     Widget_t *hold_grab;
+/** pointer to a modal sub Widget_t */
+    Widget_t *submenu;
 /** bool to quit the main loop */
     bool run;
 /** small fontsize for all Widget_t*/

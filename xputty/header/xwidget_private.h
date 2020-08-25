@@ -84,6 +84,18 @@ void _button_press(Widget_t * wid, XButtonEvent *xbutton, void* user_data);
 void _check_grab(Widget_t * wid, XButtonEvent *xbutton, Xputty *main);
 
 /**
+ * @brief _check_submenu    - internal check if a Widgt_t is a submenu
+ * when a BUTTON_PRESS event occur. If so, check if the button is pressed
+ * inside the submenu Widget_t. If yes, handle the event. In any case destroy the submenu
+ * @param *wid              - pointer to the Widget_t receiving a event
+ * @param *xbutton          - pointer to the XButtonEvent
+ * @param *main             - pointer to main struct
+ * @return void 
+ */
+
+void _check_submenu(Widget_t * wid, XButtonEvent *xbutton, Xputty *main);
+
+/**
  * @brief _propagate_child_expose - send expose to any child Widget_t
  * @param *wid                    - pointer to the Widget_t send the event
  * @return void 
