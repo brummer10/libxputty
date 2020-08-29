@@ -113,6 +113,15 @@ Widget_t *menu_add_radio_entry(Widget_t *wid, const char  * label) {
     return item;
 }
 
+Widget_t *menu_add_check_entry(Widget_t *wid, const char  * label) {
+    Widget_t *menu = wid->childlist->childs[0];
+    Widget_t *item = menu_add_check_item(menu,label);
+    float max_value = wid->adj->max_value+1.0;
+    set_adjustment(wid->adj,0.0, max_value, 0.0, max_value,1.0, CL_NONE);
+    
+    return item;
+}
+
 Widget_t *menu_add_submenu(Widget_t *w, const char  * label) {
     Widget_t *menu = w->childlist->childs[0];
     Widget_t* view_port =  menu->childlist->childs[0];

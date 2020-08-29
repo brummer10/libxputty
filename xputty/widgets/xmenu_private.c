@@ -157,7 +157,7 @@ void _draw_submenu(void *w_, void* user_data) {
     cairo_text_extents_t extents;
     /** show label **/
     use_text_color_scheme(w, get_color_state(w));
-    cairo_set_font_size (w->crb, height/2);
+    cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
 
     if (strstr(w->label, "_")) {
         cairo_text_extents(w->crb, "--", &extents);
@@ -261,7 +261,7 @@ void _draw_item(void *w_, void* user_data) {
     cairo_text_extents_t extents;
     /** show label **/
     use_text_color_scheme(w, get_color_state(w));
-    cairo_set_font_size (w->crb, height/2);
+    cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
     cairo_text_extents(w->crb,w->label , &extents);
     cairo_move_to (w->crb, (width-extents.width)*0.5, (height+extents.height)*0.5);
     cairo_show_text(w->crb, w->label);
@@ -294,7 +294,7 @@ void _draw_accel_item(void *w_, void* user_data) {
     cairo_text_extents_t extents;
     /** show label **/
     use_text_color_scheme(w, get_color_state(w));
-    cairo_set_font_size (w->crb, height/2);
+    cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
 
     if (strstr(w->label, "_")) {
         cairo_text_extents(w->crb, "--", &extents);
@@ -409,7 +409,7 @@ void _configure_menu(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     }
     for(;i>-1;i--) {
         Widget_t *w = view_port->childlist->childs[i];
-        cairo_set_font_size (w->crb, height/2);
+        cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
         cairo_text_extents(w->crb,w->label , &extents);
         
         item_width = max(item_width, (int)extents.width+40);
@@ -420,5 +420,6 @@ void _configure_menu(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     }
     XResizeWindow (menu->app->dpy, menu->widget, item_width, height*elem);
     XResizeWindow (view_port->app->dpy, view_port->widget, item_width, height*view_port->childlist->elem);
-    XMoveWindow(menu->app->dpy,menu->widget,x1, y1);   
+    XMoveWindow(menu->app->dpy,menu->widget,x1, y1);
 }
+
