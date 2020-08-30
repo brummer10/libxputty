@@ -123,6 +123,8 @@ Widget_t *menu_add_check_entry(Widget_t *wid, const char  * label) {
 }
 
 Widget_t *menu_add_submenu(Widget_t *w, const char  * label) {
+    float max_value2 = w->adj->max_value+1.0;
+    set_adjustment(w->adj,0.0, max_value2, 0.0, max_value2,1.0, CL_NONE);
     Widget_t *menu = w->childlist->childs[0];
     Widget_t* view_port =  menu->childlist->childs[0];
     XWindowAttributes attrs;

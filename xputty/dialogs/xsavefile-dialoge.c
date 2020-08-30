@@ -214,6 +214,20 @@ static void button_ok_callback(void *w_, void* user_data) {
    }
 }
 
+static void save_on_enter(void *w_) {
+    Widget_t *w = (Widget_t*)w_;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+    set_selected_file(file_dialog);
+    if( access(file_dialog->fp->selected_file, F_OK ) != -1 ) {
+        open_message_dialog(w, QUESTION_BOX, file_dialog->fp->selected_file, 
+            "File already exsist, would you overwrite it?",NULL);
+        w->func.dialog_callback = question_response;
+    } else {
+        save_and_exit(w_);
+    }
+
+}
+
 static void dummy(void *w_, void* user_data) {
     
 }
@@ -378,6 +392,11 @@ static void entry_get_text(void *w_, void *key_, void *user_data) {
         KeySym keysym;
         char buf[32];
         Xutf8LookupString(w->xic, key, buf, sizeof(buf) - 1, &keysym, &status);
+        if (keysym == XK_Return) {
+            FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+            save_on_enter(file_dialog->w_okay);
+            return;
+        }
         if(status == XLookupChars || status == XLookupBoth){
             entry_add_text(w, buf);
         }
@@ -445,6 +464,7 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->text_entry->func.key_press_callback = entry_get_text;
     file_dialog->text_entry->flags &= ~USE_TRANSPARENCY;
     file_dialog->text_entry->scale.gravity = CENTER;
+    file_dialog->text_entry->parent_struct = file_dialog;
 
     file_dialog->w_quit = add_button(file_dialog->w, "Quit", 580, 350, 60, 60);
     file_dialog->w_quit->parent_struct = file_dialog;
