@@ -44,23 +44,25 @@ extern "C" {
 
 typedef enum {
 /** Widget_t didn't request a adjustment */
-    CL_NONE         = 0x0001,
+    CL_NONE            = 0x0001,
 /** Widget_t request a continuos adjustment */
-    CL_CONTINUOS    = 0x0002,
+    CL_CONTINUOS       = 0x0002,
 /** Widget_t request a toggle adjustment */
-    CL_TOGGLE       = 0x0004,
+    CL_TOGGLE          = 0x0004,
 /** Widget_t request a button adjustment */
-    CL_BUTTON       = 0x0008,
+    CL_BUTTON          = 0x0008,
 /** Widget_t request a enum adjustment */
-    CL_ENUM         = 0x0016,
+    CL_ENUM            = 0x0016,
 /** Widget_t request a viewport adjustment */
-    CL_VIEWPORT     = 0x0032,
+    CL_VIEWPORT        = 0x0032,
 /** Widget_t request a viewport adjustment */
-    CL_METER        = 0x0064,
+    CL_METER           = 0x0064,
 /** Widget_t request a logarithmic adjustment */
-    CL_LOGARITHMIC  = 0x0128,
+    CL_LOGARITHMIC     = 0x0128,
 /** Widget_t request a logarithmic scaled adjustment */
-    CL_LOGSCALE     = 0x0256,
+    CL_LOGSCALE        = 0x0256,
+/** Widget_t request a viewport slider adjustment */
+    CL_VIEWPORTSLIDER  = 0x0512,
 }CL_type;
 
 /**

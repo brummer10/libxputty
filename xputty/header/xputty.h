@@ -38,6 +38,14 @@
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 
+#ifdef ENABLE_NLS
+#include <libintl.h>
+#include <locale.h>
+#define _(S) gettext(S)
+#else
+#define _(S) S
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {

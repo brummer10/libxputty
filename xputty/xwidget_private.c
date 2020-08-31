@@ -38,6 +38,7 @@ void _scroll_event(Widget_t * wid, int direction) {
                                 adj->value + (adj->step * direction)));
             break;
             case (CL_VIEWPORT):
+            case (CL_VIEWPORTSLIDER):
             case (CL_ENUM):
                 value = min(adj->max_value,max(adj->min_value, 
                                 adj->value + (adj->step * -direction)));

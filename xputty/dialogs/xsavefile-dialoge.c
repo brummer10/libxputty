@@ -54,13 +54,13 @@ static void draw_window(void *w_, void* user_data) {
     use_fg_color_scheme(w, NORMAL_);
     cairo_set_font_size (w->crb, 12.0);
     cairo_move_to (w->crb, 20, 35);
-    cairo_show_text(w->crb, "Directory");
+    cairo_show_text(w->crb, _("Directory"));
     cairo_move_to (w->crb, 20, 85);
-    cairo_show_text(w->crb, "File");
+    cairo_show_text(w->crb, _("File"));
     cairo_move_to (w->crb, 20, 340);
-    cairo_show_text(w->crb, "Save as: ");
+    cairo_show_text(w->crb, _("Save as: "));
     cairo_move_to (w->crb, 45, 380);
-    cairo_show_text(w->crb, "Show hidden files"); 
+    cairo_show_text(w->crb, _("Show hidden files")); 
     //cairo_move_to (w->crb, 60, 340);
     //cairo_show_text(w->crb, w->label);
     widget_reset_scale(w);
@@ -184,8 +184,8 @@ static void save_and_exit(void *w_) {
         file_dialog->send_clear_func = false;
         destroy_widget(file_dialog->w,file_dialog->w->app);
     } else {
-        open_message_dialog(w, INFO_BOX, "MAMBA INFO", 
-                "Please enter a file name",NULL);
+        open_message_dialog(w, INFO_BOX, _("INFO"), 
+                _("Please enter a file name"),NULL);
     }
     
 }
@@ -206,7 +206,7 @@ static void button_ok_callback(void *w_, void* user_data) {
         set_selected_file(file_dialog);
         if( access(file_dialog->fp->selected_file, F_OK ) != -1 ) {
             open_message_dialog(w, QUESTION_BOX, file_dialog->fp->selected_file, 
-                "File already exsist, would you overwrite it?",NULL);
+                _("File already exsist, would you overwrite it?"),NULL);
             w->func.dialog_callback = question_response;
         } else {
             save_and_exit(w_);
@@ -220,7 +220,7 @@ static void save_on_enter(void *w_) {
     set_selected_file(file_dialog);
     if( access(file_dialog->fp->selected_file, F_OK ) != -1 ) {
         open_message_dialog(w, QUESTION_BOX, file_dialog->fp->selected_file, 
-            "File already exsist, would you overwrite it?",NULL);
+           _("File already exsist, would you overwrite it?"),NULL);
         w->func.dialog_callback = question_response;
     } else {
         save_and_exit(w_);
@@ -429,7 +429,7 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->w = create_window(w->app, DefaultRootWindow(w->app->dpy), 0, 0, 660, 420);
     file_dialog->w->flags |= HAS_MEM;
     file_dialog->w->parent_struct = file_dialog;
-    widget_set_title(file_dialog->w, "File Save");
+    widget_set_title(file_dialog->w, _("File Save"));
     file_dialog->w->func.expose_callback = draw_window;
     file_dialog->w->func.key_press_callback = forward_key_press;
     file_dialog->w->func.mem_free_callback = fd_mem_free;
@@ -440,10 +440,10 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->ct->func.value_changed_callback = combo_response;
     file_dialog->ct->func.key_press_callback = forward_key_press;
 
-    file_dialog->sel_dir = add_button(file_dialog->w, "Open", 580, 40, 60, 30);
+    file_dialog->sel_dir = add_button(file_dialog->w, _("Open"), 580, 40, 60, 30);
     file_dialog->sel_dir->parent_struct = file_dialog;
     file_dialog->sel_dir->scale.gravity = CENTER;
-    add_tooltip(file_dialog->sel_dir,"Open sub-directory's");
+    add_tooltip(file_dialog->sel_dir,_("Open sub-directory's"));
     file_dialog->sel_dir->func.value_changed_callback = open_dir_callback;
     file_dialog->sel_dir->func.key_press_callback = forward_key_press;
 
@@ -466,42 +466,42 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->text_entry->scale.gravity = CENTER;
     file_dialog->text_entry->parent_struct = file_dialog;
 
-    file_dialog->w_quit = add_button(file_dialog->w, "Quit", 580, 350, 60, 60);
+    file_dialog->w_quit = add_button(file_dialog->w, _("Quit"), 580, 350, 60, 60);
     file_dialog->w_quit->parent_struct = file_dialog;
     file_dialog->w_quit->scale.gravity = CENTER;
-    add_tooltip(file_dialog->w_quit,"Exit File Saver");
+    add_tooltip(file_dialog->w_quit,_("Exit File Saver"));
     file_dialog->w_quit->func.value_changed_callback = button_quit_callback;
     file_dialog->w_quit->func.key_press_callback = forward_key_press;
 
-    file_dialog->w_okay = add_button(file_dialog->w, "Save", 510, 350, 60, 60);
+    file_dialog->w_okay = add_button(file_dialog->w, _("Save"), 510, 350, 60, 60);
     file_dialog->w_okay->parent_struct = file_dialog;
     file_dialog->w_okay->scale.gravity = CENTER;
-    add_tooltip(file_dialog->w_okay,"Save as selected file");
+    add_tooltip(file_dialog->w_okay,_("Save as selected file"));
     file_dialog->w_okay->func.value_changed_callback = button_ok_callback;
     file_dialog->w_okay->func.key_press_callback = forward_key_press;
 
     file_dialog->set_filter = add_combobox(file_dialog->w, "", 360, 355, 120, 30);
     file_dialog->set_filter->parent_struct = file_dialog;
-    combobox_add_entry(file_dialog->set_filter,"all");
-    combobox_add_entry(file_dialog->set_filter,"application");
-    combobox_add_entry(file_dialog->set_filter,"audio");
-    combobox_add_entry(file_dialog->set_filter,"font");
-    combobox_add_entry(file_dialog->set_filter,"image");
-    combobox_add_entry(file_dialog->set_filter,"text");
-    combobox_add_entry(file_dialog->set_filter,"video");
-    combobox_add_entry(file_dialog->set_filter,"x-content");
+    combobox_add_entry(file_dialog->set_filter,_("all"));
+    combobox_add_entry(file_dialog->set_filter,_("application"));
+    combobox_add_entry(file_dialog->set_filter,_("audio"));
+    combobox_add_entry(file_dialog->set_filter,_("font"));
+    combobox_add_entry(file_dialog->set_filter,_("image"));
+    combobox_add_entry(file_dialog->set_filter,_("text"));
+    combobox_add_entry(file_dialog->set_filter,_("video"));
+    combobox_add_entry(file_dialog->set_filter,_("x-content"));
     if(filter !=NULL && strlen(filter))
         combobox_add_entry(file_dialog->set_filter,filter);
     combobox_set_active_entry(file_dialog->set_filter, 0);
     file_dialog->set_filter->func.value_changed_callback = set_filter_callback;
     if(filter !=NULL && strlen(filter))
         combobox_set_active_entry(file_dialog->set_filter, 8);
-    add_tooltip(file_dialog->set_filter->childlist->childs[0], "File filter type");
+    add_tooltip(file_dialog->set_filter->childlist->childs[0], _("File filter type"));
 
     file_dialog->w_hidden = add_check_button(file_dialog->w, "", 20, 365, 20, 20);
     file_dialog->w_hidden->parent_struct = file_dialog;
     file_dialog->w_hidden->scale.gravity = CENTER;
-    add_tooltip(file_dialog->w_hidden,"Show hidden files and folders");
+    add_tooltip(file_dialog->w_hidden,_("Show hidden files and folders"));
     file_dialog->w_hidden->func.value_changed_callback = button_hidden_callback;
 
     widget_show_all(file_dialog->w);

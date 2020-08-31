@@ -344,47 +344,47 @@ Widget_t *open_message_dialog(Widget_t *w, int style, const char *title,
     wid->func.mem_free_callback = mg_mem_free;
     wid->func.expose_callback = draw_message_window;
     char *alternate_title = NULL;
-    char *button_title = (char*)"OK";
+    char *button_title = (char*)_("OK");
     Widget_t *no;
     switch (style) {
         case INFO_BOX:
             widget_get_png(wid, LDVAR(info_png));
-            alternate_title = (char*)"INFO";
+            alternate_title = (char*)_("INFO");
             mb->message_type = INFO_BOX;
             widget_set_icon_from_surface(wid,mb->icon,wid->image);
         break;
         case WARNING_BOX:
             widget_get_png(wid, LDVAR(warning_png));
-            alternate_title = (char*)"WARNING";
+            alternate_title = (char*)_("WARNING");
             mb->message_type = WARNING_BOX;
             widget_set_icon_from_surface(wid,mb->icon,wid->image);
         break;
         case ERROR_BOX:
             widget_get_png(wid, LDVAR(error_png));
-            alternate_title = (char*)"ERROR";
+            alternate_title = (char*)_("ERROR");
             mb->message_type = ERROR_BOX;
             widget_set_icon_from_surface(wid,mb->icon,wid->image);
         break;
         case QUESTION_BOX:
             widget_get_png(wid, LDVAR(question_png));
-            alternate_title = (char*)"QUESTION";
-            no = add_button(wid, "NO", 10, mb->height-40, 60, 30);
+            alternate_title = (char*)_("QUESTION");
+            no = add_button(wid, _("NO"), 10, mb->height-40, 60, 30);
             no->scale.gravity = CENTER;
             no->func.value_changed_callback = message_no_callback;
             mb->message_type = QUESTION_BOX;
-            button_title = (char*)"YES";
+            button_title = (char*)_("YES");
             widget_set_icon_from_surface(wid,mb->icon,wid->image);
         break;
         case SELECTION_BOX:
             widget_get_png(wid, LDVAR(choice_png));
-            alternate_title = (char*)"SELECTION";
+            alternate_title = (char*)_("SELECTION");
             mb->message_type = SELECTION_BOX;
             create_checkboxes(wid);
             widget_set_icon_from_surface(wid,mb->icon,wid->image);
         break;
         case ENTRY_BOX:
             widget_get_png(wid, LDVAR(message_png));
-            alternate_title = (char*)"TEXT ENTRY";
+            alternate_title = (char*)_("TEXT ENTRY");
             mb->message_type = ENTRY_BOX;
             create_entry_box(wid);
             widget_set_icon_from_surface(wid,mb->icon,wid->image);

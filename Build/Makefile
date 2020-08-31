@@ -48,14 +48,21 @@
 
 	DEP = $(LIB_OBJ:%.o=%.d) $(WIDGET_OBJ:%.o=%.d) $(DIALOG_OBJ:%.o=%.d) $(XDG_OBJ:%.o=%.d)
 
-.PHONY : all clean debug
+.PHONY : all clean debug nls updatepot po
 
 .NOTPARALLEL:
 
 all:  $(RESOURCEHEADER) libxputty.a
 
-debug: LDFLAGS=$(DEBUG_LDFLAGS)
+debug: LDFLAGS = $(DEBUG_LDFLAGS)
 debug: all
+
+nls: LDFLAGS += -DENABLE_NLS
+nls: all
+
+updatepot:
+
+po:
 
 clean:
 	rm -f libxputty.a $(LIB_OBJ) $(WIDGET_OBJ) $(RESOURCES_OBJ) $(DIALOG_OBJ) $(XDG_OBJ) $(DEP) $(RESOURCEHEADER)

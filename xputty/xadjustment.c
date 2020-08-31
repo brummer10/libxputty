@@ -202,6 +202,17 @@ void adj_set_motion_state(void *w, float x, float y) {
                 value = min(wid->adj_x->max_value,max(wid->adj_x->min_value,mulscale*wid->adj_x->step));
             }
             break;
+            case (CL_VIEWPORTSLIDER):
+            {
+                float state = (wid->adj_x->start_value - wid->adj_x->min_value) / 
+                    (wid->adj_x->max_value - wid->adj_x->min_value);
+                float nsteps = wid->adj_x->step / (wid->adj_x->max_value - wid->adj_x->min_value);
+                float nvalue = min(1.0,max(0.0,state - ((float)(x - wid->pos_x)*wid->adj_x->scale *nsteps)));
+                float prevalue = nvalue * (wid->adj_x->max_value - wid->adj_x->min_value) + wid->adj_x->min_value;
+                float mulscale = round(prevalue/wid->adj_x->step);
+                value = min(wid->adj_x->max_value,max(wid->adj_x->min_value,mulscale*wid->adj_x->step));
+            }
+            break;
             case (CL_TOGGLE):
                 // dont toggle on motion!
                 // value = wid->adj_x->value ? 0.0 : 1.0;
@@ -222,6 +233,17 @@ void adj_set_motion_state(void *w, float x, float y) {
                     (wid->adj_y->max_value - wid->adj_y->min_value);
                 float nsteps = wid->adj_y->step / (wid->adj_y->max_value - wid->adj_y->min_value);
                 float nvalue = min(1.0,max(0.0,state + ((float)(wid->pos_y - y)*wid->adj_y->scale *nsteps)));
+                float prevalue = nvalue * (wid->adj_y->max_value - wid->adj_y->min_value) + wid->adj_y->min_value;
+                float mulscale = round(prevalue/wid->adj_y->step);
+                value = min(wid->adj_y->max_value,max(wid->adj_y->min_value,mulscale*wid->adj_y->step));
+            }
+            break;
+            case (CL_VIEWPORTSLIDER):
+            {
+                float state = (wid->adj_y->start_value - wid->adj_y->min_value) / 
+                    (wid->adj_y->max_value - wid->adj_y->min_value);
+                float nsteps = wid->adj_y->step / (wid->adj_y->max_value - wid->adj_y->min_value);
+                float nvalue = min(1.0,max(0.0,state - ((float)(wid->pos_y - y)*wid->adj_y->scale *nsteps)));
                 float prevalue = nvalue * (wid->adj_y->max_value - wid->adj_y->min_value) + wid->adj_y->min_value;
                 float mulscale = round(prevalue/wid->adj_y->step);
                 value = min(wid->adj_y->max_value,max(wid->adj_y->min_value,mulscale*wid->adj_y->step));
