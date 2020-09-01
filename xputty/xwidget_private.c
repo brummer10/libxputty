@@ -256,8 +256,18 @@ void _set_adj_value(void *w_, bool x, int direction) {
         adj = wid->adj_y;
     }
     if (adj) {
-        float value = min(adj->max_value,max(adj->min_value, 
-        adj->value + (adj->step * direction)));
+        float value = adj->value;
+        switch(adj->type) {
+            case (CL_VIEWPORT):
+            case (CL_VIEWPORTSLIDER):
+                value = min(adj->max_value,max(adj->min_value,
+                    adj->value + (adj->step * -direction)));
+            break;
+            default:
+                value = min(adj->max_value,max(adj->min_value,
+                    adj->value + (adj->step * direction)));
+            break;
+        }
         check_value_changed(adj, &value);
     }
 }
