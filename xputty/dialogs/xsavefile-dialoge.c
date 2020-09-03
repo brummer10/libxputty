@@ -263,7 +263,7 @@ static void button_ok_callback(void *w_, void* user_data) {
         set_selected_file(file_dialog, 0);
         if( access(file_dialog->fp->selected_file, F_OK ) != -1 ) {
             open_message_dialog(w, QUESTION_BOX, file_dialog->fp->selected_file, 
-                _("File already exsist, would you overwrite it?"),NULL);
+                _("File already exists, would you overwrite it?"),NULL);
             w->func.dialog_callback = question_response;
         } else {
             save_and_exit(w_);
@@ -277,7 +277,7 @@ static void save_on_enter(void *w_) {
     set_selected_file(file_dialog, 0);
     if( access(file_dialog->fp->selected_file, F_OK ) != -1 ) {
         open_message_dialog(w, QUESTION_BOX, file_dialog->fp->selected_file, 
-           _("File already exsist, would you overwrite it?"),NULL);
+           _("File already exists, would you overwrite it?"),NULL);
         w->func.dialog_callback = question_response;
     } else {
         save_and_exit(w_);
