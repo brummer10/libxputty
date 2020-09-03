@@ -160,12 +160,12 @@ int fp_get_files(FilePicker *filepicker, char *path, int get_dirs) {
         } else if(get_dirs && dp -> d_type == DT_DIR && strlen(dp->d_name)!=0
           && strcmp(dp->d_name,"..")!=0 && fp_show_hidden_files(filepicker, dp->d_name)) {
 
-            filepicker->dir_names = (char **)realloc(filepicker->dir_names,
-              (filepicker->dir_counter + 1) * sizeof(char *));
-            assert(filepicker->dir_names != NULL);
-            asprintf(&filepicker->dir_names[filepicker->dir_counter++], (strcmp(path, PATH_SEPARATOR) != 0) ?
+            filepicker->file_names = (char **)realloc(filepicker->file_names,
+              (filepicker->file_counter + 1) * sizeof(char *));
+            assert(filepicker->file_names != NULL);
+            asprintf(&filepicker->file_names[filepicker->file_counter++], (strcmp(path, PATH_SEPARATOR) != 0) ?
               "%s" PATH_SEPARATOR "%s" : "%s%s" , path,dp->d_name);
-            assert(&filepicker->dir_names[filepicker->dir_counter] != NULL);
+            assert(&filepicker->dir_names[filepicker->file_counter] != NULL);
         }
     }
     closedir(dirp);

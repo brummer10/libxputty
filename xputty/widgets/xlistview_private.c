@@ -21,6 +21,7 @@
 
 #include "xlistview_private.h"
 #include "xtooltip.h"
+#include <sys/stat.h>
 
 
 void _draw_listview(void *w_, void* user_data) {
@@ -73,6 +74,11 @@ void _draw_list(void *w_, void* user_data) {
             use_text_color_scheme(w, SELECTED_);
         else
             use_text_color_scheme(w,NORMAL_ );
+
+        struct stat sb;
+        if (stat(filelist->list_names[i], &sb) == 0 && S_ISDIR(sb.st_mode)) {
+            use_text_color_scheme(w, INSENSITIVE_);
+        }
         cairo_set_font_size (w->crb, 12);
         cairo_text_extents(w->crb,filelist->list_names[i] , &extents);
 
@@ -155,6 +161,7 @@ void _list_entry_released(void *w_, void* button_, void* user_data) {
             Widget_t* listview = (Widget_t*) w->parent;
             filelist->active_item = filelist->prelight_item;
             adj_set_value(listview->adj,filelist->active_item);
+            listview->func.button_release_callback(listview,NULL,NULL);
         }
     }
 }

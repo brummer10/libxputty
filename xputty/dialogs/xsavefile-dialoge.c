@@ -38,6 +38,10 @@
 #include "xmessage-dialog.h"
 
 
+static void file_released_callback(void *w_, void* user_data);
+static void combo_response(void *w_, void* user_data);
+static void set_selected_file(FileDialog *file_dialog, int reload);
+
 static void draw_window(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     XWindowAttributes attrs;
@@ -116,7 +120,43 @@ static void get_entry(Widget_t *w) {
     file_dialog->text_entry->label = file_dialog->text_entry->input_label;
 }
 
-static void set_selected_file(FileDialog *file_dialog) {
+static void file_released_b_callback(void *w_, void *button, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+    set_selected_file(file_dialog, 1);
+    if(file_dialog->fp->selected_file) {
+        file_dialog->w->label = file_dialog->fp->selected_file;
+        expose_widget(file_dialog->w);
+    }
+}
+
+static void dummy(void *w_, void* user_data) {
+    
+}
+
+static void reload_from_dir(FileDialog *file_dialog) {
+    file_dialog->ct->func.value_changed_callback = dummy;
+    file_dialog->ft->func.value_changed_callback = dummy;
+    assert(file_dialog->fp->path != NULL);
+    clear(file_dialog->ft);
+    clear(file_dialog->ct);
+    int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1);
+    file_dialog->ct = add_combobox(file_dialog->w, "", 20, 40, 550, 30);
+    center_widget(file_dialog->w,file_dialog->ct);
+    file_dialog->ct->parent_struct = file_dialog;
+    file_dialog->ct->func.value_changed_callback = combo_response;
+    file_dialog->ft = add_listview(file_dialog->w, "", 20, 90, 620, 225);
+    file_dialog->ft->parent_struct = file_dialog;
+    file_dialog->ft->func.button_release_callback = file_released_b_callback;
+    int set_f = set_files(file_dialog);
+    center_widget(file_dialog->w,file_dialog->ft);
+    set_dirs(file_dialog);
+    combobox_set_active_entry(file_dialog->ct, ds);
+    listview_set_active_entry(file_dialog->ft, set_f);
+    widget_show_all(file_dialog->w);
+}
+
+static void set_selected_file(FileDialog *file_dialog, int reload) {
     Widget_t* menu =  file_dialog->ct->childlist->childs[1];
     Widget_t* view_port =  menu->childlist->childs[0];
     if(!childlist_has_child(view_port->childlist)) return ;
@@ -128,6 +168,12 @@ static void set_selected_file(FileDialog *file_dialog) {
         asprintf(&file_dialog->fp->selected_file, "%s/%s",dir->label,
             file_dialog->text_entry->label);
     } else if(file_dialog->fp->file_counter ) {
+        struct stat sb;
+        if (stat(file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)], &sb) == 0 && S_ISDIR(sb.st_mode)) {
+            asprintf(&file_dialog->fp->path, "%s",file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)]);
+            if (reload) reload_from_dir(file_dialog);
+            return;
+        }
         asprintf(&file_dialog->fp->selected_file, "%s/%s",dir->label,
             file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)]);
     }
@@ -136,7 +182,7 @@ static void set_selected_file(FileDialog *file_dialog) {
 static void file_released_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
-    set_selected_file(file_dialog);
+    set_selected_file(file_dialog, 1);
     if(file_dialog->fp->selected_file) {
         file_dialog->w->label = file_dialog->fp->selected_file;
         expose_widget(file_dialog->w);
@@ -162,6 +208,12 @@ static void reload_file_entrys(FileDialog *file_dialog) {
     widget_show_all(file_dialog->w);
 }
 
+static void entry_callback(void *w_, void *button, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+    reload_from_dir(file_dialog);
+}
+
 static void combo_response(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
@@ -173,7 +225,12 @@ static void combo_response(void *w_, void* user_data) {
     file_dialog->fp->path = NULL;
     asprintf(&file_dialog->fp->path, "%s",entry->label);
     assert(file_dialog->fp->path != NULL);
-    reload_file_entrys(file_dialog);
+    //reload_file_entrys(file_dialog);
+    entry->parent_struct = file_dialog;
+    entry->func.button_release_callback = entry_callback;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)menu->widget, &attrs);
+    if (attrs.map_state != IsViewable) entry->func.button_release_callback(entry,NULL,NULL);
 }
 
 static void save_and_exit(void *w_) {
@@ -203,7 +260,7 @@ static void button_ok_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     if (w->flags & HAS_POINTER && !*(int*)user_data){
-        set_selected_file(file_dialog);
+        set_selected_file(file_dialog, 0);
         if( access(file_dialog->fp->selected_file, F_OK ) != -1 ) {
             open_message_dialog(w, QUESTION_BOX, file_dialog->fp->selected_file, 
                 _("File already exsist, would you overwrite it?"),NULL);
@@ -217,7 +274,7 @@ static void button_ok_callback(void *w_, void* user_data) {
 static void save_on_enter(void *w_) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
-    set_selected_file(file_dialog);
+    set_selected_file(file_dialog, 0);
     if( access(file_dialog->fp->selected_file, F_OK ) != -1 ) {
         open_message_dialog(w, QUESTION_BOX, file_dialog->fp->selected_file, 
            _("File already exsist, would you overwrite it?"),NULL);
@@ -226,10 +283,6 @@ static void save_on_enter(void *w_) {
         save_and_exit(w_);
     }
 
-}
-
-static void dummy(void *w_, void* user_data) {
-    
 }
 
 static void reload_all(FileDialog *file_dialog) {
