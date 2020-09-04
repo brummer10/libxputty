@@ -116,6 +116,7 @@ void _configure_listview(void *w_, void* user_data);
 
 void _draw_listview_viewslider(void *w_, void* user_data);
 
+void _draw_listviewslider(void *w_, void* user_data);
 /**
  * @brief _set_listview_viewpoint  - move the view_port to position
  * @param *w_                      - void pointer to view_port
@@ -124,6 +125,8 @@ void _draw_listview_viewslider(void *w_, void* user_data);
  */
 
 void _set_listview_viewpoint(void *w_, void* user_data);
+
+void _set_listviewport(void *w_, void* user_data);
 
 #ifdef __cplusplus
 }

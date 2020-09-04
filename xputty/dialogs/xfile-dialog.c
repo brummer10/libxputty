@@ -59,7 +59,7 @@ static void draw_window(void *w_, void* user_data) {
     cairo_move_to (w->crb, 20, 35);
     cairo_show_text(w->crb, _("Directory"));
     cairo_move_to (w->crb, 20, 85);
-    cairo_show_text(w->crb, "File");
+    cairo_show_text(w->crb, _("File"));
     cairo_move_to (w->crb, 20, 340);
     cairo_show_text(w->crb, _("Load: "));
     cairo_move_to (w->crb, 45, 380);
@@ -212,7 +212,9 @@ static void combo_response(void *w_, void* user_data) {
     entry->func.button_release_callback = entry_callback;
     XWindowAttributes attrs;
     XGetWindowAttributes(w->app->dpy, (Window)menu->widget, &attrs);
-    if (attrs.map_state != IsViewable) entry->func.button_release_callback(entry,NULL,NULL);
+    if (attrs.map_state != IsViewable) {
+        send_button_release_event(w->childlist->childs[0]);
+    }
 }
 
 static void button_ok_callback(void *w_, void* user_data) {
@@ -349,7 +351,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     combobox_set_active_entry(file_dialog->ct, ds);
     listview_set_active_entry(file_dialog->ft, set_f);
 
-    file_dialog->w_quit = add_button(file_dialog->w, _("Quit"), 580, 350, 60, 60);
+    file_dialog->w_quit = add_button(file_dialog->w, _("Cancel"), 580, 350, 60, 60);
     file_dialog->w_quit->parent_struct = file_dialog;
     file_dialog->w_quit->scale.gravity = CENTER;
     add_tooltip(file_dialog->w_quit,_("Exit file selector"));

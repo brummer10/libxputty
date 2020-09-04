@@ -70,6 +70,26 @@ Widget_t* add_menu(Widget_t *parent, const char * label,
                         int x, int y, int width, int height);
 
 /**
+ * @brief add_menubar         - add a menubar to a Widget_t
+ * @param *parent             - pointer to the Widget_t hold the menubar
+ * @param *label              - unused
+ * @param x,y,width,height    - the position/geometry to create the menubar
+ * @return Widget_t*          - pointer to the Widget_t menu struct
+ */
+
+Widget_t *add_menubar(Widget_t *parent, const char * label,
+                        int x, int y, int width, int height);
+
+/**
+ * @brief menubar_add_menu    - add a menu to a menubar
+ * @param *wid                - pointer to the Widget_t menu
+ * @param *label              - Label to show on the menu
+ * @return Widget_t*          - pointer to the Widget_t menu_item struct
+ */
+
+Widget_t *menubar_add_menu(Widget_t *parent, const char * label);
+
+/**
  * @brief menu_add_entry      - add a entry to menu
  * @param *wid                - pointer to the Widget_t menu
  * @param *label              - Label to show on the menu

@@ -223,7 +223,7 @@ void _draw_button(void *w_, void* user_data) {
         if (strstr(w->label, "_")) {
             cairo_text_extents(w->crb, "--", &extents);
             double underline = extents.width;
-            strcpy(w->input_label,w->label);
+            strncpy(w->input_label,w->label, sizeof(w->input_label));
             int pos = _remove_low_dash(w->input_label);
             cairo_text_extents(w->crb,w->input_label , &extents);
             cairo_move_to (w->crb, (width-extents.width)*0.5 +offset, (height+extents.height)*0.5 +offset);

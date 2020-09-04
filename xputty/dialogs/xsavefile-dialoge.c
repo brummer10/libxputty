@@ -230,7 +230,9 @@ static void combo_response(void *w_, void* user_data) {
     entry->func.button_release_callback = entry_callback;
     XWindowAttributes attrs;
     XGetWindowAttributes(w->app->dpy, (Window)menu->widget, &attrs);
-    if (attrs.map_state != IsViewable) entry->func.button_release_callback(entry,NULL,NULL);
+    if (attrs.map_state != IsViewable) {
+        send_button_release_event(w->childlist->childs[0]);
+    }
 }
 
 static void save_and_exit(void *w_) {
@@ -511,7 +513,7 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     listview_set_active_entry(file_dialog->ft, set_f);
     file_dialog->ft->func.value_changed_callback = file_released_callback;
     
-    file_dialog->text_entry = create_widget(file_dialog->w->app, file_dialog->w, 80, 320, 200, 30);
+    file_dialog->text_entry = create_widget(file_dialog->w->app, file_dialog->w, 130, 320, 200, 30);
     memset(file_dialog->text_entry->input_label, 0, 32 * (sizeof file_dialog->text_entry->input_label[0]) );
     file_dialog->text_entry->func.expose_callback = entry_add_text;
     file_dialog->text_entry->func.key_press_callback = entry_get_text;
@@ -519,21 +521,21 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->text_entry->scale.gravity = CENTER;
     file_dialog->text_entry->parent_struct = file_dialog;
 
-    file_dialog->w_quit = add_button(file_dialog->w, _("Quit"), 580, 350, 60, 60);
+    file_dialog->w_quit = add_button(file_dialog->w, _("Cancel"), 580, 350, 60, 60);
     file_dialog->w_quit->parent_struct = file_dialog;
     file_dialog->w_quit->scale.gravity = CENTER;
     add_tooltip(file_dialog->w_quit,_("Exit File Saver"));
     file_dialog->w_quit->func.value_changed_callback = button_quit_callback;
     file_dialog->w_quit->func.key_press_callback = forward_key_press;
 
-    file_dialog->w_okay = add_button(file_dialog->w, _("Save"), 510, 350, 60, 60);
+    file_dialog->w_okay = add_button(file_dialog->w, _("Save"), 490, 350, 80, 60);
     file_dialog->w_okay->parent_struct = file_dialog;
     file_dialog->w_okay->scale.gravity = CENTER;
     add_tooltip(file_dialog->w_okay,_("Save as selected file"));
     file_dialog->w_okay->func.value_changed_callback = button_ok_callback;
     file_dialog->w_okay->func.key_press_callback = forward_key_press;
 
-    file_dialog->set_filter = add_combobox(file_dialog->w, "", 360, 355, 120, 30);
+    file_dialog->set_filter = add_combobox(file_dialog->w, "", 340, 355, 120, 30);
     file_dialog->set_filter->parent_struct = file_dialog;
     combobox_add_entry(file_dialog->set_filter,_("all"));
     combobox_add_entry(file_dialog->set_filter,_("application"));

@@ -39,6 +39,7 @@ extern "C" {
  */
 
 typedef struct {
+    Widget_t *slider;
     int prelight_item;
     int active_item;
     int show_items;

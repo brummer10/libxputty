@@ -22,6 +22,7 @@
 #include "xlistview.h"
 #include "xlistview_private.h"
 #include "xtooltip.h"
+#include "xslider.h"
 
 
 void listview_set_active_entry(Widget_t *w, int active) {
@@ -72,7 +73,19 @@ Widget_t* add_listview(Widget_t *parent, const char * label,
     int elem = height/25;
     wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, -1.0,1.0, CL_NONE);
     wid->adj = wid->adj_y;
-    create_listview_viewport(wid, elem, width, height);
+    Widget_t *viewport = create_listview_viewport(wid, elem, width-10, height);
+
+    ViewList_t *filelist = (ViewList_t*)viewport->parent_struct;
+    filelist->slider = add_vslider(wid, "", width-10, 0, 10, height);
+    filelist->slider->func.expose_callback = _draw_listviewslider;
+    filelist->slider->adj_y = add_adjustment(filelist->slider,0.0, 0.0, 0.0, 1.0,0.0085, CL_VIEWPORTSLIDER);
+    filelist->slider->adj = filelist->slider->adj_y;
+    filelist->slider->func.value_changed_callback = _set_listviewport;
+    filelist->slider->scale.gravity = NORTHWEST;
+    filelist->slider->flags &= ~USE_TRANSPARENCY;
+    filelist->slider->flags |= NO_AUTOREPEAT | NO_PROPAGATE;
+    filelist->slider->parent_struct = viewport;
+
     return wid;
 }
 

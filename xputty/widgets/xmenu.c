@@ -75,7 +75,7 @@ void set_active_radio_entry(void *w_, void* user_data) {
     }
 }
 
-Widget_t* add_menu(Widget_t *parent, const char * label,
+Widget_t *add_menu(Widget_t *parent, const char * label,
                         int x, int y, int width, int height) {
     Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
     wid->label = label;
@@ -89,9 +89,35 @@ Widget_t* add_menu(Widget_t *parent, const char * label,
     wid->func.leave_callback = transparent_draw;
     wid->func.button_release_callback = _menu_released;
 
-    Widget_t* menu = create_menu(wid, 25);
+    Widget_t *menu = create_menu(wid, 25);
     menu->func.button_release_callback = _menu_entry_released;
 
+    return wid;
+}
+
+Widget_t *add_menubar(Widget_t *parent, const char * label,
+                        int x, int y, int width, int height) {
+    Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
+    wid->scale.gravity = NORTHWEST;
+    wid->flags |= NO_AUTOREPEAT | NO_PROPAGATE;
+    return wid;
+}
+
+Widget_t *menubar_add_menu(Widget_t *parent, const char * label) {
+    cairo_text_extents_t extents;
+    cairo_text_extents(parent->crb,label , &extents);
+    int width = (int)extents.width+20;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(parent->app->dpy, (Window)parent->widget, &attrs);
+    int height = attrs.height;
+    int x = 0;
+    int i = parent->childlist->elem-1;
+    for(;i>-1;i--) {
+        Widget_t *w = parent->childlist->childs[i];
+        XGetWindowAttributes(parent->app->dpy, (Window)w->widget, &attrs);
+        x += attrs.width;
+    }
+    Widget_t *wid = add_menu(parent, label, x, 0, width, height);
     return wid;
 }
 

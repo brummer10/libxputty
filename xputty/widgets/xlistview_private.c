@@ -33,7 +33,6 @@ void _draw_listview(void *w_, void* user_data) {
 
 void _draw_list(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    _draw_listview_viewslider(w, user_data);
     XWindowAttributes attrs;
     XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
     if (attrs.map_state != IsViewable) return;
@@ -41,8 +40,7 @@ void _draw_list(void *w_, void* user_data) {
     int height = attrs.height;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
 
-    int v = (int)w->adj->max_value;
-    int sub = (v<=0) ? 0 : 5;
+    int sub = 10;
     use_base_color_scheme(w, NORMAL_);
     cairo_rectangle(w->crb, 0, 0, width-sub , height);
     cairo_fill (w->crb);
@@ -82,7 +80,7 @@ void _draw_list(void *w_, void* user_data) {
         cairo_set_font_size (w->crb, 12);
         cairo_text_extents(w->crb,filelist->list_names[i] , &extents);
 
-        cairo_move_to (w->crb, (width-extents.width)/2., (25*(i+1)) - extents.height );
+        cairo_move_to (w->crb, 20, (25*(i+1)) - extents.height );
         cairo_show_text(w->crb, filelist->list_names[i]);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {
@@ -223,5 +221,32 @@ void _set_listview_viewpoint(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     int v = (int)max(0,adj_get_value(w->adj));
     XMoveWindow(w->app->dpy,w->widget,0, -25*v);
+    ViewList_t *filelist = (ViewList_t*)w->parent_struct;
+    adj_set_state(filelist->slider->adj,adj_get_state(w->adj));
 }
 
+void _draw_listviewslider(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    int v = (int)w->adj->max_value;
+    if (!v) return;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    if (attrs.map_state != IsViewable) return;
+    int width = attrs.width;
+    int height = attrs.height;
+    float sliderstate = adj_get_state(w->adj);
+    use_bg_color_scheme(w, get_color_state(w));
+    cairo_rectangle(w->crb, 0,0,width,height);
+    cairo_fill_preserve(w->crb);
+    use_shadow_color_scheme(w, NORMAL_);
+    cairo_fill(w->crb);
+    use_bg_color_scheme(w, NORMAL_);
+    cairo_rectangle(w->crb, 0,(height-10)*sliderstate,width,10);
+    cairo_fill(w->crb);
+}
+
+void _set_listviewport(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Widget_t *viewport = (Widget_t*)w->parent_struct;
+    adj_set_state(viewport->adj, adj_get_state(w->adj));
+}

@@ -388,6 +388,11 @@ void connect_func(void (**event)(), void (*handler)()) {
 
 void widget_set_title(Widget_t *w, const char *title) {
     XStoreName(w->app->dpy, w->widget, title);
+    XChangeProperty(w->app->dpy,  w->widget,
+    XInternAtom(w->app->dpy, "_NET_WM_NAME", False),
+        XInternAtom(w->app->dpy, "UTF8_STRING", False),
+        8, PropModeReplace, (unsigned char *) title,
+        strlen(title));
 }
 
 void widget_show(Widget_t *w) {
