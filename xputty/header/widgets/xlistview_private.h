@@ -107,16 +107,15 @@ void _reconfigure_listview_viewport(void *w_, void* user_data);
 void _configure_listview(void *w_, void* user_data);
 
 /**
- * @brief _draw_listview_viewslider - draw a slider on the viewport
+ * @brief _draw_listviewslider     - draw a slider on the viewport
  * to indicate the view point
  * @param *w_                      - void pointer to view_port
  * @param *user_data               - attached user_data
  * @return void
  */
 
-void _draw_listview_viewslider(void *w_, void* user_data);
-
 void _draw_listviewslider(void *w_, void* user_data);
+
 /**
  * @brief _set_listview_viewpoint  - move the view_port to position
  * @param *w_                      - void pointer to view_port
@@ -125,6 +124,13 @@ void _draw_listviewslider(void *w_, void* user_data);
  */
 
 void _set_listview_viewpoint(void *w_, void* user_data);
+/**
+ * @brief _set_listviewport        - move the view_port to position
+ * by listviewslider state
+ * @param *w_                      - void pointer to view_port
+ * @param *user_data               - attached user_data
+ * @return void
+ */
 
 void _set_listviewport(void *w_, void* user_data);
 

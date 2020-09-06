@@ -191,30 +191,11 @@ void _configure_listview(void *w_, void* user_data) {
     XWindowAttributes attrs;
     XGetWindowAttributes(listview->app->dpy, (Window)listview->widget, &attrs);
     int width = attrs.width;
-    XResizeWindow (w->app->dpy, w->widget, width, 25*(max(1,filelist->list_size)));
-}
-
-void _draw_listview_viewslider(void *w_, void* user_data) {
-    Widget_t *w = (Widget_t*)w_;
-    int v = (int)w->adj->max_value;
-    if (v<=0) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    if (attrs.map_state != IsViewable) return;
-    int width = attrs.width;
     int height = attrs.height;
-    float sliderstate = adj_get_state(w->adj);
-    use_bg_color_scheme(w, NORMAL_);
-    cairo_rectangle(w->crb, width-5,0,5,height);
-    cairo_fill_preserve(w->crb);
-    use_shadow_color_scheme(w, NORMAL_);
-    cairo_fill(w->crb);
-    use_bg_color_scheme(w, NORMAL_);
-    cairo_rectangle(w->crb, width-5,(height-10)*sliderstate,5,10);
-    cairo_fill_preserve(w->crb);
-    use_fg_color_scheme(w, NORMAL_);
-    cairo_set_line_width(w->crb,1);
-    cairo_stroke(w->crb);
+    filelist->show_items = height/25;
+    filelist->slider->adj->step = max(0.0,1.0/(filelist->list_size-filelist->show_items));
+    adj_set_scale(filelist->slider->adj, ((float)filelist->list_size/(float)filelist->show_items)/25.0);
+    XResizeWindow (w->app->dpy, w->widget, width, 25*(max(1,filelist->list_size)));
 }
 
 void _set_listview_viewpoint(void *w_, void* user_data) {

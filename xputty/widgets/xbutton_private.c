@@ -225,12 +225,14 @@ void _draw_button(void *w_, void* user_data) {
             double underline = extents.width;
             strncpy(w->input_label,w->label, sizeof(w->input_label));
             int pos = _remove_low_dash(w->input_label);
+            int len = strlen(w->input_label);
             cairo_text_extents(w->crb,w->input_label , &extents);
+            int set_line = (extents.width/len) * pos;
             cairo_move_to (w->crb, (width-extents.width)*0.5 +offset, (height+extents.height)*0.5 +offset);
             cairo_show_text(w->crb, w->input_label);
             cairo_set_line_width(w->crb, 1.0);
-            cairo_move_to (w->crb, (width-extents.width)*0.5 +offset + (pos * underline), (height+extents.height)*0.55 +offset);
-            cairo_line_to(w->crb,(width-extents.width)*0.5 +offset + ((pos+1) * underline), (height+extents.height)*0.55 +offset);
+            cairo_move_to (w->crb, (width-extents.width)*0.5 +offset + set_line, (height+extents.height)*0.55 +offset);
+            cairo_line_to(w->crb,(width-extents.width)*0.5 +offset + set_line + underline, (height+extents.height)*0.55 +offset);
             cairo_stroke(w->crb);
         } else {
             cairo_text_extents(w->crb,w->label , &extents);
