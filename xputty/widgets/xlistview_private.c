@@ -46,6 +46,7 @@ void _draw_list(void *w_, void* user_data) {
     cairo_fill (w->crb);
 
     int i = (int)max(0,adj_get_value(w->adj));
+    int a = 0;
     int j = filelist->list_size<filelist->show_items+i+1 ? 
       filelist->list_size : filelist->show_items+i+1;
     for(;i<j;i++) {
@@ -57,7 +58,7 @@ void _draw_list(void *w_, void* user_data) {
             use_base_color_scheme(w, SELECTED_);
         else
             use_base_color_scheme(w,NORMAL_ );
-        cairo_rectangle(w->crb, 0, i*25, width-sub , 25);
+        cairo_rectangle(w->crb, 0, a*25, width-sub , 25);
         cairo_fill_preserve(w->crb);
         cairo_set_line_width(w->crb, 1.0);
         use_frame_color_scheme(w, PRELIGHT_);
@@ -80,7 +81,7 @@ void _draw_list(void *w_, void* user_data) {
         cairo_set_font_size (w->crb, 12);
         cairo_text_extents(w->crb,filelist->list_names[i] , &extents);
 
-        cairo_move_to (w->crb, 20, (25*(i+1)) - extents.height );
+        cairo_move_to (w->crb, 20, (25*(a+1)) - extents.height );
         cairo_show_text(w->crb, filelist->list_names[i]);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {
@@ -91,6 +92,7 @@ void _draw_list(void *w_, void* user_data) {
             w->flags &= ~HAS_TOOLTIP;
             hide_tooltip(w);
         }
+        a++;
     }
 }
 
@@ -102,11 +104,11 @@ void _list_motion(void *w_, void* xmotion_, void* user_data) {
     XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
     int height = attrs.height;
     int _items = height/(height/25);
-    int prelight_item = xmotion->y/_items;
+    int prelight_item = (xmotion->y/_items)  + (int)max(0,adj_get_value(w->adj));
     if(prelight_item != filelist->prelight_item) {
         filelist->prelight_item = prelight_item;
-        expose_widget(w);
     }
+    expose_widget(w);
 }
 
 void _list_key_pressed(void *w_, void* xkey_, void* user_data) {
@@ -117,17 +119,14 @@ void _list_key_pressed(void *w_, void* xkey_, void* user_data) {
     XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
     int height = attrs.height;
     int _items = height/(height/25);
-   // filelist->prelight_item = xkey->y/_items;
+    filelist->prelight_item = xkey->y/_items  + (int)max(0,adj_get_value(w->adj));
     int nk = key_mapping(w->app->dpy, xkey);
     if (nk) {
         switch (nk) {
-            case 3: filelist->prelight_item = (xkey->y+24)/_items;
-            break;
-            case 4: filelist->prelight_item = (xkey->y+24)/_items;
-            break;
-            case 5: filelist->prelight_item = (xkey->y-24)/_items;
-            break;
-            case 6: filelist->prelight_item = (xkey->y-24)/_items;
+            case 3:
+            case 4:
+            case 5:
+            case 6: filelist->prelight_item = xkey->y/_items  + (int)max(0,adj_get_value(w->adj));
             break;
             default:
             break;
@@ -144,14 +143,12 @@ void _list_entry_released(void *w_, void* button_, void* user_data) {
         XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
         int height = attrs.height;
         int _items = height/(height/25);
-        int prelight_item = xbutton->y/_items;
+        int prelight_item = xbutton->y/_items  + (int)max(0,adj_get_value(w->adj));
         if(xbutton->button == Button4) {
-            prelight_item = (xbutton->y-24)/_items;
             if(prelight_item != filelist->prelight_item) {
                 filelist->prelight_item = prelight_item;
             }
         } else if (xbutton->button == Button5) {
-            prelight_item = (xbutton->y+24)/_items;
             if(prelight_item != filelist->prelight_item) {
                 filelist->prelight_item = prelight_item;
             }
@@ -195,15 +192,14 @@ void _configure_listview(void *w_, void* user_data) {
     filelist->show_items = height/25;
     filelist->slider->adj->step = max(0.0,1.0/(filelist->list_size-filelist->show_items));
     adj_set_scale(filelist->slider->adj, ((float)filelist->list_size/(float)filelist->show_items)/25.0);
-    XResizeWindow (w->app->dpy, w->widget, width, 25*(max(1,filelist->list_size)));
+    XResizeWindow (w->app->dpy, w->widget, width, height);
 }
 
 void _set_listview_viewpoint(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    int v = (int)max(0,adj_get_value(w->adj));
-    XMoveWindow(w->app->dpy,w->widget,0, -25*v);
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
     adj_set_state(filelist->slider->adj,adj_get_state(w->adj));
+    expose_widget(w);
 }
 
 void _draw_listviewslider(void *w_, void* user_data) {
@@ -230,4 +226,5 @@ void _set_listviewport(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *viewport = (Widget_t*)w->parent_struct;
     adj_set_state(viewport->adj, adj_get_state(w->adj));
+    expose_widget(w);
 }
