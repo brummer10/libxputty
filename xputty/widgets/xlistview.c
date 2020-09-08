@@ -41,7 +41,7 @@ Widget_t* create_listview_viewport(Widget_t *parent, int elem, int width, int he
     XSelectInput(wid->app->dpy, wid->widget,StructureNotifyMask|ExposureMask|KeyPressMask 
                     |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask
                     |ButtonPressMask|Button1MotionMask|PointerMotionMask);
-    wid->scale.gravity = NORTHEAST;
+    wid->scale.gravity = CENTER;
     ViewList_t *filelist;
     filelist = (ViewList_t*)malloc(sizeof(ViewList_t));
     filelist->show_items = elem;

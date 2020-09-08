@@ -40,9 +40,8 @@ void _draw_list(void *w_, void* user_data) {
     int height = attrs.height;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
 
-    int sub = 10;
     use_base_color_scheme(w, NORMAL_);
-    cairo_rectangle(w->crb, 0, 0, width-sub , height);
+    cairo_rectangle(w->crb, 0, 0, width, height);
     cairo_fill (w->crb);
 
     int i = (int)max(0,adj_get_value(w->adj));
@@ -58,7 +57,7 @@ void _draw_list(void *w_, void* user_data) {
             use_base_color_scheme(w, SELECTED_);
         else
             use_base_color_scheme(w,NORMAL_ );
-        cairo_rectangle(w->crb, 0, a*25, width-sub , 25);
+        cairo_rectangle(w->crb, 0, a*25, width, 25);
         cairo_fill_preserve(w->crb);
         cairo_set_line_width(w->crb, 1.0);
         use_frame_color_scheme(w, PRELIGHT_);

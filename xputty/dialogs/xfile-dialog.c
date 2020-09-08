@@ -324,6 +324,20 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->icon = NULL;
 
     file_dialog->w = create_window(w->app, DefaultRootWindow(w->app->dpy), 0, 0, 660, 420);
+
+    XSizeHints* win_size_hints;
+    win_size_hints = XAllocSizeHints();
+    win_size_hints->flags =  PMinSize|PBaseSize|PMaxSize|PWinGravity;
+    win_size_hints->min_width = 660;
+    win_size_hints->min_height = 420;
+    win_size_hints->base_width = 660;
+    win_size_hints->base_height = 420;
+    win_size_hints->max_width = 660;
+    win_size_hints->max_height = 840;
+    win_size_hints->win_gravity = CenterGravity;
+    XSetWMNormalHints(file_dialog->w->app->dpy, file_dialog->w->widget, win_size_hints);
+    XFree(win_size_hints);
+
     file_dialog->w->flags |= HAS_MEM;
     file_dialog->w->parent_struct = file_dialog;
     widget_set_title(file_dialog->w, _("File Selector"));

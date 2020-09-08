@@ -490,6 +490,19 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->w->func.mem_free_callback = fd_mem_free;
     widget_set_icon_from_png(file_dialog->w,file_dialog->icon,LDVAR(directory_png));
 
+    XSizeHints* win_size_hints;
+    win_size_hints = XAllocSizeHints();
+    win_size_hints->flags =  PMinSize|PBaseSize|PMaxSize|PWinGravity;
+    win_size_hints->min_width = 660;
+    win_size_hints->min_height = 420;
+    win_size_hints->base_width = 660;
+    win_size_hints->base_height = 420;
+    win_size_hints->max_width = 660;
+    win_size_hints->max_height = 840;
+    win_size_hints->win_gravity = CenterGravity;
+    XSetWMNormalHints(file_dialog->w->app->dpy, file_dialog->w->widget, win_size_hints);
+    XFree(win_size_hints);
+
     file_dialog->ct = add_combobox(file_dialog->w, "", 20, 40, 550, 30);
     file_dialog->ct->parent_struct = file_dialog;
     file_dialog->ct->func.value_changed_callback = combo_response;
