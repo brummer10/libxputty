@@ -112,6 +112,12 @@ void _button_press(Widget_t * wid, XButtonEvent *xbutton, void* user_data) {
 
 void _check_grab(Widget_t * wid, XButtonEvent *xbutton, Xputty *main) {
     if(main->hold_grab != NULL) {
+        if (childlist_has_child(main->hold_grab->childlist)) {
+            Widget_t *slider = main->hold_grab->childlist->childs[1];
+            if (xbutton->window == slider->widget) {
+                return;
+            }
+        }
         Widget_t *view_port = main->hold_grab->childlist->childs[0];
         if(xbutton->button == Button1) {
             //if (xbutton->window == view_port->widget) return;

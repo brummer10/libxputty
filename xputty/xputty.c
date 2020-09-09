@@ -71,6 +71,12 @@ void main_run(Xputty *main) {
                     }
                 }
                 if(main->hold_grab != NULL) {
+                    if (childlist_has_child(main->hold_grab->childlist)) {
+                        Widget_t *slider = main->hold_grab->childlist->childs[1];
+                        if (xev.xbutton.window == slider->widget) {
+                            break;
+                        }
+                    }
                     Widget_t *view_port = main->hold_grab->childlist->childs[0];
                     int i = view_port->childlist->elem-1;
                     for(;i>-1;i--) {

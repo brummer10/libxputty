@@ -21,6 +21,7 @@
 
 #include "xmenu.h"
 #include "xmenu_private.h"
+#include "xslider.h"
 
 
 void pop_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above) {
@@ -29,6 +30,8 @@ void pop_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     if (!view_port->childlist->elem) return;
     _configure_menu(parent, menu, elem, above);
     pop_widget_show_all(menu);
+    if (view_port->childlist->elem <= elem)
+        widget_hide(menu->childlist->childs[1]);
     int err = XGrabPointer(menu->app->dpy, DefaultRootWindow(parent->app->dpy), True,
                  ButtonPressMask|ButtonReleaseMask|PointerMotionMask,
                  GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
@@ -53,7 +56,6 @@ Widget_t* create_viewport(Widget_t *parent, int width, int height) {
     wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, -1.0,1.0, CL_VIEWPORT);
     wid->adj = wid->adj_y;
     wid->func.adj_callback = _set_viewpoint;
-    wid->func.expose_callback = _draw_viewslider;
     return wid;
 }
 
@@ -206,6 +208,16 @@ Widget_t* create_menu(Widget_t *parent, int height) {
     wid->flags |= IS_POPUP;
     wid->scale.gravity = NONE;
     childlist_add_child(parent->childlist, wid);
+
+    Widget_t *slider = add_vslider(wid, "", 0, 0, 10, height);
+    slider->func.expose_callback = _draw_menu_slider;
+    slider->adj_y = add_adjustment(slider,0.0, 0.0, 0.0, 1.0,0.0085, CL_VIEWPORTSLIDER);
+    slider->adj = slider->adj_y;
+    slider->func.value_changed_callback = _set_menu_viewpoint;
+    slider->scale.gravity = NORTHWEST;
+    slider->flags &= ~USE_TRANSPARENCY;
+    slider->flags |= NO_AUTOREPEAT | NO_PROPAGATE;
+
     return wid;
 }
 

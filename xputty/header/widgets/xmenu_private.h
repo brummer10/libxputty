@@ -77,6 +77,15 @@ void _menu_entry_released(void *w_, void* item_, void* user_data);
 void _draw_menu(void *w_, void* user_data);
 
 /**
+ * @brief _draw_menu_slider    - draw the menu slider on expose call
+ * @param *w_                  - the menu to draw
+ * @param *user_data           - attached user_data
+ * @return void
+ */
+
+void _draw_menu_slider(void *w_, void* user_data);
+
+/**
  * @brief _draw_submenu        - draw submenu on expose call
  * @param *w_                  - the menu to draw
  * @param *user_data           - attached user_data
@@ -131,16 +140,6 @@ void _draw_accel_item(void *w_, void* user_data);
 void _draw_check_item(void *w_, void* user_data);
 
 /**
- * @brief _draw_viewslider     - draw a slider on the viewport
- * to indicate the view point
- * @param *w_                  - void pointer to view_port
- * @param *user_data           - attached user_data
- * @return void
- */
-
-void _draw_viewslider(void *w_, void* user_data);
-
-/**
  * @brief _set_viewpoint       - move the view_port to position
  * @param *w_                  - void pointer to view_port
  * @param *user_data           - attached user_data
@@ -148,6 +147,15 @@ void _draw_viewslider(void *w_, void* user_data);
  */
 
 void _set_viewpoint(void *w_, void* user_data);
+
+/**
+ * @brief _set_menu_viewpoint  - move the view_port to position by slider
+ * @param *w_                  - void pointer to view_port
+ * @param *user_data           - attached user_data
+ * @return void
+ */
+
+void _set_menu_viewpoint(void *w_, void* user_data);
 
 /**
  * @brief _check_item_button_pressed  - redraw item on button press

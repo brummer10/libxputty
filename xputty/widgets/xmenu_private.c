@@ -125,6 +125,26 @@ void _menu_entry_released(void *w_, void* item_, void* user_data) {
     }    
 }
 
+void _draw_menu_slider(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    int v = (int)w->adj->max_value;
+    if (!v) return;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    if (attrs.map_state != IsViewable) return;
+    int width = attrs.width;
+    int height = attrs.height;
+    float sliderstate = adj_get_state(w->adj);
+    use_bg_color_scheme(w, get_color_state(w));
+    cairo_rectangle(w->crb, 0,0,width,height);
+    cairo_fill_preserve(w->crb);
+    use_shadow_color_scheme(w, NORMAL_);
+    cairo_fill(w->crb);
+    use_bg_color_scheme(w, NORMAL_);
+    cairo_rectangle(w->crb, 0,(height-10)*sliderstate,width,10);
+    cairo_fill(w->crb);
+}
+
 void _draw_menu(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
@@ -345,36 +365,23 @@ void _draw_check_item(void *w_, void* user_data) {
     }
 }
 
-void _draw_viewslider(void *w_, void* user_data) {
-    Widget_t *w = (Widget_t*)w_;
-    int v = (int)w->adj->max_value;
-    if (!v) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    if (attrs.map_state != IsViewable) return;
-    int width = attrs.width;
-    int height = attrs.height;
-    float sliderstate = adj_get_state(w->adj);
-    use_bg_color_scheme(w, NORMAL_);
-    cairo_rectangle(w->crb, width-5,0,5,height);
-    cairo_fill_preserve(w->crb);
-    use_shadow_color_scheme(w, NORMAL_);
-    cairo_fill(w->crb);
-    use_bg_color_scheme(w, NORMAL_);
-    cairo_rectangle(w->crb, width-5,(height-10)*sliderstate,5,10);
-    cairo_fill_preserve(w->crb);
-    use_fg_color_scheme(w, NORMAL_);
-    cairo_set_line_width(w->crb,1);
-    cairo_stroke(w->crb);
-}
-
 void _set_viewpoint(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
+    Widget_t *menu = (Widget_t*)w->parent;
+    Widget_t* slider =  menu->childlist->childs[1];
     int v = (int)max(0,adj_get_value(w->adj));
     XWindowAttributes attrs;
     XGetWindowAttributes(w->app->dpy, (Window)w->childlist->childs[0]->widget, &attrs);
     int height = attrs.height;
     XMoveWindow(w->app->dpy,w->widget,0, -height*v);
+    adj_set_state(slider->adj,adj_get_state(w->adj));
+}
+
+void _set_menu_viewpoint(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Widget_t *menu = (Widget_t*)w->parent;
+    Widget_t*view_port =  menu->childlist->childs[0];
+    adj_set_state(view_port->adj,adj_get_state(w->adj));
 }
 
 void _check_item_button_pressed(void *w_, void* button_, void* user_data) {
@@ -394,6 +401,7 @@ void _radio_item_button_pressed(void *w_, void* button_, void* user_data) {
 
 void _configure_menu(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     Widget_t* view_port =  menu->childlist->childs[0];
+    Widget_t *slider =  menu->childlist->childs[1];
     if (!view_port->childlist->elem) return;
     XWindowAttributes attrs;
     XGetWindowAttributes(menu->app->dpy, (Window)view_port->childlist->childs[0]->widget, &attrs);
@@ -423,8 +431,12 @@ void _configure_menu(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     if(above) {
         if(item_width<parent->width)item_width = parent->width;
     }
+    slider->adj->step = max(0.0,1.0/(view_port->childlist->elem-elem));
+    adj_set_scale(slider->adj, ((float)view_port->childlist->elem/(float)elem)/25.0);
     XResizeWindow (menu->app->dpy, menu->widget, item_width, height*elem);
     XResizeWindow (view_port->app->dpy, view_port->widget, item_width, height*view_port->childlist->elem);
+    XMoveWindow(menu->app->dpy,slider->widget,item_width-10, 0);
+    XResizeWindow(menu->app->dpy,slider->widget,10,height*elem);
     XMoveWindow(menu->app->dpy,menu->widget,x1, y1);
 }
 
