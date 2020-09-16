@@ -157,7 +157,7 @@ void _draw_tuner(void *w_, void* user_data) {
         use_text_color_scheme(w, NORMAL_);
         cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
         cairo_text_extents(w->crb,s , &extents);
-        cairo_move_to (w->crb, width/1.2-extents.width/2, height-extents.height );
+        cairo_move_to (w->crb, width/1.1-extents.width, height-extents.height );
         cairo_show_text(w->crb, s);
     
         cairo_set_source(w->crb,pat);
