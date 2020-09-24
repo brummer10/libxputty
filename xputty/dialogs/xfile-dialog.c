@@ -99,7 +99,7 @@ static inline int set_files(FileDialog *file_dialog) {
 static void set_dirs(FileDialog *file_dialog) {
     int i = 0;
     for (; i<(int)file_dialog->fp->dir_counter; i++) {
-        combobox_add_entry(file_dialog->ct,file_dialog->fp->dir_names[i]);
+        combomenubox_add_entry(file_dialog->ct,file_dialog->fp->dir_names[i]);
     }
 }
 
@@ -132,7 +132,7 @@ static void reload_from_dir(FileDialog *file_dialog) {
     clear(file_dialog->ft);
     clear(file_dialog->ct);
     int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1);
-    file_dialog->ct = add_combobox(file_dialog->w, "", 20, 40, 550, 30);
+    file_dialog->ct = add_combomenubox(file_dialog->w, "", 20, 40, 550, 30);
     center_widget(file_dialog->w,file_dialog->ct);
     file_dialog->ct->parent_struct = file_dialog;
     file_dialog->ct->func.value_changed_callback = combo_response;
@@ -142,7 +142,7 @@ static void reload_from_dir(FileDialog *file_dialog) {
     int set_f = set_files(file_dialog);
     center_widget(file_dialog->w,file_dialog->ft);
     set_dirs(file_dialog);
-    combobox_set_active_entry(file_dialog->ct, ds);
+    combomenubox_set_active_entry(file_dialog->ct, ds);
     listview_set_active_entry(file_dialog->ft, set_f);
     widget_show_all(file_dialog->w);
 }
@@ -250,7 +250,7 @@ static void reload_all(FileDialog *file_dialog) {
     clear(file_dialog->ft);
     clear(file_dialog->ct);
     int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1);
-    file_dialog->ct = add_combobox(file_dialog->w, "", 20, 40, 550, 30);
+    file_dialog->ct = add_combomenubox(file_dialog->w, "", 20, 40, 550, 30);
     center_widget(file_dialog->w,file_dialog->ct);
     file_dialog->ct->parent_struct = file_dialog;
     file_dialog->ct->func.value_changed_callback = combo_response;
@@ -260,7 +260,7 @@ static void reload_all(FileDialog *file_dialog) {
     int set_f = set_files(file_dialog);
     center_widget(file_dialog->w,file_dialog->ft);
     set_dirs(file_dialog);
-    combobox_set_active_entry(file_dialog->ct, ds);
+    combomenubox_set_active_entry(file_dialog->ct, ds);
     listview_set_active_entry(file_dialog->ft, set_f);
     widget_show_all(file_dialog->w);
 }
@@ -345,7 +345,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->w->func.mem_free_callback = fd_mem_free;
     widget_set_icon_from_png(file_dialog->w,file_dialog->icon,LDVAR(directory_png));
 
-    file_dialog->ct = add_combobox(file_dialog->w, "", 20, 40, 550, 30);
+    file_dialog->ct = add_combomenubox(file_dialog->w, "", 20, 40, 550, 30);
     file_dialog->ct->parent_struct = file_dialog;
     file_dialog->ct->func.value_changed_callback = combo_response;
 
@@ -362,7 +362,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1);   
     int set_f = set_files(file_dialog); 
     set_dirs(file_dialog);
-    combobox_set_active_entry(file_dialog->ct, ds);
+    combomenubox_set_active_entry(file_dialog->ct, ds);
     listview_set_active_entry(file_dialog->ft, set_f);
 
     file_dialog->w_quit = add_button(file_dialog->w, _("Cancel"), 580, 350, 60, 60);
@@ -377,22 +377,22 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     add_tooltip(file_dialog->w_okay,_("Load selected file"));
     file_dialog->w_okay->func.value_changed_callback = button_ok_callback;
 
-    file_dialog->set_filter = add_combobox(file_dialog->w, "", 360, 355, 120, 30);
+    file_dialog->set_filter = add_combomenubox(file_dialog->w, "", 360, 355, 120, 30);
     file_dialog->set_filter->parent_struct = file_dialog;
-    combobox_add_entry(file_dialog->set_filter,_("all"));
-    combobox_add_entry(file_dialog->set_filter,_("application"));
-    combobox_add_entry(file_dialog->set_filter,_("audio"));
-    combobox_add_entry(file_dialog->set_filter,_("font"));
-    combobox_add_entry(file_dialog->set_filter,_("image"));
-    combobox_add_entry(file_dialog->set_filter,_("text"));
-    combobox_add_entry(file_dialog->set_filter,_("video"));
-    combobox_add_entry(file_dialog->set_filter,_("x-content"));
+    combomenubox_add_entry(file_dialog->set_filter,_("all"));
+    combomenubox_add_entry(file_dialog->set_filter,_("application"));
+    combomenubox_add_entry(file_dialog->set_filter,_("audio"));
+    combomenubox_add_entry(file_dialog->set_filter,_("font"));
+    combomenubox_add_entry(file_dialog->set_filter,_("image"));
+    combomenubox_add_entry(file_dialog->set_filter,_("text"));
+    combomenubox_add_entry(file_dialog->set_filter,_("video"));
+    combomenubox_add_entry(file_dialog->set_filter,_("x-content"));
     if(filter !=NULL && strlen(filter))
-        combobox_add_entry(file_dialog->set_filter,filter);
-    combobox_set_active_entry(file_dialog->set_filter, 0);
+        combomenubox_add_entry(file_dialog->set_filter,filter);
+    combomenubox_set_active_entry(file_dialog->set_filter, 0);
     file_dialog->set_filter->func.value_changed_callback = set_filter_callback;
     if(filter !=NULL && strlen(filter))
-        combobox_set_active_entry(file_dialog->set_filter, 8);
+        combomenubox_set_active_entry(file_dialog->set_filter, 8);
     add_tooltip(file_dialog->set_filter->childlist->childs[0], _("File filter type"));
 
     file_dialog->w_hidden = add_check_button(file_dialog->w, "", 20, 365, 20, 20);

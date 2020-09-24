@@ -148,9 +148,8 @@ void _draw_combobox(void *w_, void* user_data) {
     cairo_set_font_size (w->crb, font_size);
     cairo_text_extents(w->crb,"Ay", &extents);
     double h = extents.height;
-    cairo_text_extents(w->crb,w->label , &extents);
 
-    cairo_move_to (w->crb, (width-extents.width)*0.4, (height+h)*0.55);
+    cairo_move_to (w->crb, 15, (height+h)*0.55);
     cairo_show_text(w->crb, w->label);
     cairo_new_path (w->crb);
     if (extents.width > (float)width-20) {
