@@ -561,7 +561,7 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
             {
             unsigned short is_retriggered = 0;
             if(wid->flags & NO_AUTOREPEAT) {
-                if (XEventsQueued(main->dpy, QueuedAlready)) {
+                if (XEventsQueued(main->dpy, QueuedAfterReading)) {
                     XEvent nev;
                     XPeekEvent(main->dpy, &nev);
                     if (nev.type == KeyPress && nev.xkey.time == xev->xkey.time &&

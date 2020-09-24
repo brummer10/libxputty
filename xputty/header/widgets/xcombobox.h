@@ -30,6 +30,31 @@
 extern "C" {
 #endif
 
+/* comment out xasprintf and define _GNU_SOURCE on top of this file will remove this dependency.*/
+#include "xasprintf.h"
+
+/**
+ * @brief ComboBox_t         - struct to hold information for the combobox
+ * @param prelight_item      - the list item which has the focus
+ * @param active_item        - the list item which is selected(active)
+ * @param show_items         - the viewable amount of list items
+ * @param list_size          - total amount of list items in list
+ * @param **list_names       - the list entrys
+ */
+
+typedef struct {
+    Widget_t *slider;
+    Widget_t *combobox;
+    int prelight_item;
+    int active_item;
+    int show_items;
+    int list_size;
+    char **list_names;
+} ComboBox_t;
+
+
+void pop_combobox_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above);
+
 /**
  * @brief add_combobox        - add a combobox
  * @param *parent             - pointer to the Widget_t request the button
@@ -46,7 +71,7 @@ Widget_t* add_combobox(Widget_t *parent, const char  * label, int x, int y, int 
  * @return Widget_t*            - pointer to the Widget_t menu_item struct
  */
 
-Widget_t *combobox_add_entry(Widget_t *wid, const char  * label);
+void combobox_add_entry(Widget_t *wid, const char  * label);
 
 /**
  * @brief combobox_add_numeric_items - add numeric items from imin to imax to wid
@@ -66,6 +91,15 @@ void combobox_add_numeric_entrys(Widget_t *wid, int imin, int imax);
  */
 
 void combobox_set_active_entry(Widget_t *w, int active);
+
+/**
+ * @brief combobox_mem_free        - release additional used memory when destroy the Widget_t
+ * @param *w_                      - void pointer to the Widget_t
+ * @param *user_data               - void pointer to attached user_data
+ * @return void
+ */
+
+void combobox_mem_free(void *w_, void* user_data);
 
 #ifdef __cplusplus
 }

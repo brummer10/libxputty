@@ -49,6 +49,99 @@ void _draw_combobox_button(void *w_, void* user_data);
 void _draw_combobox(void *w_, void* user_data);
 
 /**
+ * @brief _draw_combobox_menu    - internal draw the combobox menu to the buffer
+ * @param *w_                    - void pointer to the Widget_t combobox
+ * @param *user_data             - void pointer to attached user_data
+ * @return void
+ */
+
+void _draw_combobox_menu(void *w_, void* user_data);
+
+/**
+ * @brief _draw_combobox_entrys  - internal draw the combobox entrys to the buffer
+ * @param *w_                    - void pointer to the Widget_t combobox
+ * @param *user_data             - void pointer to attached user_data
+ * @return void
+ */
+
+void _draw_combobox_entrys(void *w_, void* user_data);
+
+/**
+ * @brief _combobox_motion           - mouse pointer move in viewport
+ * @param *w_                        - void pointer to the Widget_t viewport
+ * @param *xmotion                   - void pointer to XEvent.xmotion struct
+ * @param *user_data                 - void pointer to attached user_data
+ * @return void
+ */
+
+void _combobox_motion(void *w_, void* xmotion_, void* user_data);
+
+/**
+ * @brief _combobox_key_released     - viewport entry released key
+ * @param *w_                        - void pointer to the Widget_t viewport
+ * @param *xkey                      - void pointer to XEvent.xkey struct
+ * @param *user_data                 - void pointer to attached user_data
+ * @return void
+ */
+
+void _combobox_key_pressed(void *w_, void* xkey_, void* user_data);
+
+/**
+ * @brief _combobox_entry_released   - viewport entry released mouse button
+ * @param *w_                        - void pointer to the Widget_t viewport
+ * @param *button                    - void pointer to XEvent.xbutton struct
+ * @param *user_data                 - void pointer to attached user_data
+ * @return void
+ */
+
+void _combobox_entry_released(void *w_, void* button_, void* user_data);
+
+/**
+ * @brief _leave_combobox         - mouse pointer leave the combobox
+ * @param *w_                     - void pointer to the Widget_t combobox
+ * @param *user_data              - void pointer to attached user_data
+ * @return void
+ */
+
+void _leave_combobox(void *w_, void* user_data);
+
+/**
+ * @brief _reconfigure_combobox_viewport - set slider scale and step to match viewport entrys
+ * @param *w_                            - void pointer to the Widget_t combobox
+ * @param *user_data                     - void pointer to attached user_data
+ * @return void
+ */
+
+void _reconfigure_combobox_viewport(void *w_, void* user_data);
+
+/**
+ * @brief _set_combobox_viewpoint     - set the slider state from viewport position
+ * @param *w_                         - void pointer to the Widget_t combobox
+ * @param *user_data                  - void pointer to attached user_data
+ * @return void
+ */
+
+void _set_combobox_viewpoint(void *w_, void* user_data);
+
+/**
+ * @brief _draw_combobox_menu_slider  - internal draw the combobox menu slider
+ * @param *w_                         - void pointer to the Widget_t combobox
+ * @param *user_data                  - void pointer to attached user_data
+ * @return void
+ */
+
+void _draw_combobox_menu_slider(void *w_, void* user_data);
+
+/**
+ * @brief _set_combobox_menu_viewport - set the viewport position from slider state
+ * @param *w_                         - void pointer to the Widget_t combobox
+ * @param *user_data                  - void pointer to attached user_data
+ * @return void
+ */
+
+void _set_combobox_menu_viewport(void *w_, void* user_data);
+
+/**
  * @brief _combobox_button_released  - popup menu on right click
  * @param *w_                        - void pointer to the Widget_t button
  * @param *button                    - void pointer to XEvent.xbutton struct
@@ -86,6 +179,17 @@ void _entry_released(void *w_, void* item_, void* user_data);
  */
 
 void _set_entry(void *w_, void* user_data);
+
+/**
+ * @brief _configure_combobox_menu   - set final size and position of menu to a Widget_t
+ * @param *parent                    - pointer to the Widget_t the menu should pop over
+ * @param *menu                      - the menu to show
+ * @param elem                       - how many entrys to show
+ * @param above                      - show menu below (0) or beside (1) the combobox
+ * @return void
+ */
+
+void _configure_combobox_menu(Widget_t *parent, Widget_t *menu, int elem, bool above);
 
 
 #ifdef __cplusplus
