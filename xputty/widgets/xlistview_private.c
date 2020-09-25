@@ -43,6 +43,10 @@ void _draw_list(void *w_, void* user_data) {
     use_base_color_scheme(w, NORMAL_);
     cairo_rectangle(w->crb, 0, 0, width, height);
     cairo_fill (w->crb);
+    cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
+    cairo_text_extents_t extents;
+    cairo_text_extents(w->crb,"Ay", &extents);
+    double h = extents.height;
 
     int i = (int)max(0,adj_get_value(w->adj));
     int a = 0;
@@ -62,7 +66,6 @@ void _draw_list(void *w_, void* user_data) {
         cairo_set_line_width(w->crb, 1.0);
         use_frame_color_scheme(w, PRELIGHT_);
         cairo_stroke(w->crb); 
-        cairo_text_extents_t extents;
         /** show label **/
         if(i == filelist->prelight_item && i == filelist->active_item)
             use_text_color_scheme(w, ACTIVE_);
@@ -77,10 +80,9 @@ void _draw_list(void *w_, void* user_data) {
         if (stat(filelist->list_names[i], &sb) == 0 && S_ISDIR(sb.st_mode)) {
             use_text_color_scheme(w, INSENSITIVE_);
         }
-        cairo_set_font_size (w->crb, 12);
         cairo_text_extents(w->crb,filelist->list_names[i] , &extents);
 
-        cairo_move_to (w->crb, 20, (25*(a+1)) - extents.height );
+        cairo_move_to (w->crb, 20, (25*(a+1)) - h +2 );
         cairo_show_text(w->crb, filelist->list_names[i]);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {

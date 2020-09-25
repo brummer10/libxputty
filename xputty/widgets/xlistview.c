@@ -95,6 +95,20 @@ void listview_mem_free(void *w_, void* user_data) {
     free(filelist);
 }
 
+void listview_remove_list(Widget_t *listview) {
+    Widget_t* view_port =  listview->childlist->childs[0];
+    ViewList_t *filelist = (ViewList_t*)view_port->parent_struct;
+    filelist->list_names = NULL;
+    filelist->list_size = 0;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(listview->app->dpy, (Window)listview->widget, &attrs);
+    int height = attrs.height;
+    float elem = height/25;
+    set_adjustment(listview->adj,0.0, 0.0, 0.0, -1.0,1.0, CL_NONE);
+    set_adjustment(view_port->adj,0.0, 0.0, 0.0, -elem,1.0, CL_VIEWPORT);
+    adj_set_value(filelist->slider->adj,0.0);
+}
+
 void listview_set_list(Widget_t *listview, char **list, int list_size) {
     Widget_t* view_port =  listview->childlist->childs[0];
     ViewList_t *filelist = (ViewList_t*)view_port->parent_struct;

@@ -105,6 +105,11 @@ void _draw_combobox(void *w_, void* user_data) {
     int width = attrs.width-2;
     int height = attrs.height-2;
     if (attrs.map_state != IsViewable) return;
+    int v = (int)adj_get_value(w->adj);
+    if (v<0) return;
+    Widget_t * menu = w->childlist->childs[1];
+    Widget_t* view_port =  menu->childlist->childs[0];
+    ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
 
     cairo_rectangle(w->crb,2.0, 2.0, width, height);
 
@@ -150,10 +155,10 @@ void _draw_combobox(void *w_, void* user_data) {
     double h = extents.height;
 
     cairo_move_to (w->crb, 15, (height+h)*0.55);
-    cairo_show_text(w->crb, w->label);
+    cairo_show_text(w->crb, comboboxlist->list_names[v]);
     cairo_new_path (w->crb);
     if (extents.width > (float)width-20) {
-        tooltip_set_text(w,w->label);
+        tooltip_set_text(w,comboboxlist->list_names[v]);
         w->flags |= HAS_TOOLTIP;
     } else {
         w->flags &= ~HAS_TOOLTIP;
@@ -214,7 +219,7 @@ void _draw_combobox_entrys(void *w_, void* user_data) {
         double h = extents.height;
         cairo_text_extents(w->crb,comboboxlist->list_names[i] , &extents);
 
-        cairo_move_to (w->crb, 15, (25*(a+1)) - h );
+        cairo_move_to (w->crb, 15, (25*(a+1)) - h +2);
         cairo_show_text(w->crb, comboboxlist->list_names[i]);
         cairo_new_path (w->crb);
         if (i == comboboxlist->prelight_item && extents.width > (float)width-20) {
@@ -311,8 +316,10 @@ void _reconfigure_combobox_viewport(void *w_, void* user_data) {
     XGetWindowAttributes(combobox->app->dpy, (Window)combobox->widget, &attrs);
     int height = attrs.height;
     comboboxlist->show_items = height/25;
-    comboboxlist->slider->adj->step = max(0.0,1.0/(comboboxlist->list_size-(comboboxlist->show_items-1)));
-    adj_set_scale(comboboxlist->slider->adj, ((float)(comboboxlist->list_size)/(float)comboboxlist->show_items)/25.0);
+    set_adjustment(comboboxlist->slider->adj,0.0, 0.0, 0.0,
+        (float)(comboboxlist->list_size-(comboboxlist->show_items-1)),1.0, CL_VIEWPORTSLIDER);
+    adj_set_scale(comboboxlist->slider->adj,
+        ((float)(comboboxlist->list_size)/(float)comboboxlist->show_items)/25.0);
     adj_set_state(w->adj,st);
 }
 

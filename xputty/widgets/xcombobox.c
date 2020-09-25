@@ -42,6 +42,21 @@ void combobox_mem_free(void *w_, void* user_data) {
     free(comboboxlist);
 }
 
+void combobox_delete_entrys(Widget_t *combobox) {
+    Widget_t * menu = combobox->childlist->childs[1];
+    Widget_t* view_port =  menu->childlist->childs[0];
+    ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
+    unsigned int j = 0;
+    for(; j<comboboxlist->list_size;j++) {
+        free(comboboxlist->list_names[j]);
+        comboboxlist->list_names[j] = NULL;
+    }
+    comboboxlist->list_size = 0;
+    set_adjustment(combobox->adj,0.0, 0.0, 0.0, -1.0,1.0, CL_ENUM);
+    set_adjustment(view_port->adj,0.0, 0.0, 0.0, -6.0,1.0, CL_ENUM);
+    set_adjustment(comboboxlist->slider->adj,0.0, 0.0, 0.0, 1.0,0.0085, CL_VIEWPORTSLIDER);
+}
+
 void pop_combobox_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     if (!childlist_has_child(menu->childlist)) return;
     Widget_t* view_port =  menu->childlist->childs[0];

@@ -101,6 +101,14 @@ void combobox_set_active_entry(Widget_t *w, int active);
 
 void combobox_mem_free(void *w_, void* user_data);
 
+/**
+ * @brief combobox_delete_entrys   - free the list hold the combobox entrys
+ * @param *combobox                - void pointer to the Widget_t combobox
+ * @return void
+ */
+
+void combobox_delete_entrys(Widget_t *combobox);
+
 #ifdef __cplusplus
 }
 #endif

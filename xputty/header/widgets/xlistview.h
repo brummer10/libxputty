@@ -87,6 +87,14 @@ Widget_t* add_listview(Widget_t *parent, const char * label,
 void listview_mem_free(void *w_, void* user_data);
 
 /**
+ * @brief listview_remove_list - remove the list from a listview  Widget_t
+ * @param *listview            - pointer to the Widget_t listview which should show the list
+ * @return void
+ */
+
+void listview_remove_list(Widget_t *listview);
+
+/**
  * @brief listview_set_list   - set a list to a listview  Widget_t
  * @param *listview           - pointer to the Widget_t listview which should show the list
  * @param **list              - pointer to the list
