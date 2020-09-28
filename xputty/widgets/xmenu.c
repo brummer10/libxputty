@@ -158,7 +158,7 @@ Widget_t *menu_add_submenu(Widget_t *w, const char  * label) {
     XWindowAttributes attrs;
     XGetWindowAttributes(menu->app->dpy, (Window)menu->widget, &attrs);
     int width = attrs.width;
-    int height = attrs.height;
+    int height = menu->scale.init_height;
     int si = childlist_has_child(view_port->childlist);
     Widget_t *wid = create_widget(menu->app, view_port, 0, height*si, width, height);
     float max_value1 = view_port->adj->max_value+1.0;
@@ -226,7 +226,7 @@ Widget_t* menu_add_item(Widget_t *menu,const char * label) {
     XWindowAttributes attrs;
     XGetWindowAttributes(menu->app->dpy, (Window)menu->widget, &attrs);
     int width = attrs.width;
-    int height = attrs.height;
+    int height = menu->scale.init_height;
     int si = childlist_has_child(view_port->childlist);
     Widget_t *wid = create_widget(menu->app, view_port, 0, height*si, width, height);
     float max_value = view_port->adj->max_value+1.0;
@@ -238,6 +238,13 @@ Widget_t* menu_add_item(Widget_t *menu,const char * label) {
     wid->func.enter_callback = transparent_draw;
     wid->func.leave_callback = transparent_draw;
     return wid;
+}
+
+void menu_remove_item(Widget_t *menu, Widget_t *item) {
+    Widget_t* view_port =  menu->childlist->childs[0];
+    float max_value = view_port->adj->max_value-1.0;
+    destroy_widget(item,menu->app);
+    set_adjustment(view_port->adj,0.0, 0.0, 0.0, max_value,1.0, CL_VIEWPORT);
 }
 
 Widget_t* menu_add_accel_item(Widget_t *menu,const char * label) {
@@ -286,7 +293,7 @@ void menu_add_numeric_items(Widget_t *menu, int *imin, int *imax) {
     XWindowAttributes attrs;
     XGetWindowAttributes(menu->app->dpy, (Window)menu->widget, &attrs);
     int width = attrs.width;
-    int height = attrs.height;
+    int height = menu->scale.init_height;
     int si = childlist_has_child(view_port->childlist);
     float max_value = view_port->adj->max_value;
     Widget_t *wid;

@@ -144,6 +144,15 @@ Widget_t* create_menu(Widget_t *parent, int height);
 Widget_t* menu_add_item(Widget_t *menu, const char * label);
 
 /**
+ * @brief menu_remove_item    - remove a item from menu
+ * @param *menu               - pointer to the Widget_t menu
+ * @return Widget_t*          - pointer to the Widget_t menu_item to be removed
+ * @return void
+ */
+
+void menu_remove_item(Widget_t *menu, Widget_t *item);
+
+/**
  * @brief menu_add_accel_item - add a accel item to menu
  * @param *menu               - pointer to the Widget_t menu
  * @param *label              - Label to show on the menu
