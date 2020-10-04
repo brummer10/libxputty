@@ -147,9 +147,9 @@ int fp_get_files(FilePicker *filepicker, char *path, int get_dirs) {
 
     while ((dp = readdir(dirp)) != NULL) {
 
-        if(dp-> d_type != DT_DIR && strlen(dp->d_name)!=0 && dp->d_type != DT_UNKNOWN
-          && strcmp(dp->d_name,"..")!=0 && fp_show_hidden_files(filepicker, dp->d_name) &&
-          fp_show_filter_files(filepicker, dp->d_name)) {
+        if(dp-> d_type != DT_DIR && dp->d_type != DT_UNKNOWN && dp->d_type != DT_LNK
+          && strlen(dp->d_name)!=0 && strcmp(dp->d_name,"..")!=0 && fp_show_hidden_files(filepicker, dp->d_name)
+          && fp_show_filter_files(filepicker, dp->d_name)) {
 
             filepicker->file_names = (char **)realloc(filepicker->file_names,
               (filepicker->file_counter + 1) * sizeof(char *));
@@ -157,7 +157,7 @@ int fp_get_files(FilePicker *filepicker, char *path, int get_dirs) {
             asprintf(&filepicker->file_names[filepicker->file_counter++],"%s",dp->d_name);
             assert(&filepicker->file_names[filepicker->file_counter] != NULL);
 
-        } else if(get_dirs && dp -> d_type == DT_DIR && strlen(dp->d_name)!=0
+        } else if(get_dirs && (dp -> d_type == DT_DIR || dp -> d_type == DT_LNK) && strlen(dp->d_name)!=0
           && strcmp(dp->d_name,"..")!=0 && fp_show_hidden_files(filepicker, dp->d_name)) {
 
             filepicker->file_names = (char **)realloc(filepicker->file_names,
