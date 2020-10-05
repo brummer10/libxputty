@@ -128,6 +128,19 @@ static inline int fp_prefill_dirbuffer(FilePicker *filepicker, char *path) {
     return ret;   
 }
 
+int fp_check_link(char *path, struct dirent *dp) {
+    if(dp -> d_type == DT_LNK) {
+        char s[256];
+        snprintf(s, 256, (strcmp(path, PATH_SEPARATOR) != 0) ?
+              "%s" PATH_SEPARATOR "%s" : "%s%s" , path,dp->d_name);
+        struct stat sb;
+        if (stat(s, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int fp_get_files(FilePicker *filepicker, char *path, int get_dirs) {
     int ret = 0;
     fp_clear_filebuffer(filepicker);
@@ -147,9 +160,9 @@ int fp_get_files(FilePicker *filepicker, char *path, int get_dirs) {
 
     while ((dp = readdir(dirp)) != NULL) {
 
-        if(dp-> d_type != DT_DIR && dp->d_type != DT_UNKNOWN && dp->d_type != DT_LNK
-          && strlen(dp->d_name)!=0 && strcmp(dp->d_name,"..")!=0 && fp_show_hidden_files(filepicker, dp->d_name)
-          && fp_show_filter_files(filepicker, dp->d_name)) {
+        if(dp-> d_type != DT_DIR && dp->d_type != DT_UNKNOWN && strlen(dp->d_name)!=0
+          && strcmp(dp->d_name,"..")!=0 && fp_show_hidden_files(filepicker, dp->d_name)
+          && fp_show_filter_files(filepicker, dp->d_name) && !fp_check_link(path, dp)) {
 
             filepicker->file_names = (char **)realloc(filepicker->file_names,
               (filepicker->file_counter + 1) * sizeof(char *));
