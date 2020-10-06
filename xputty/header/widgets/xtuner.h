@@ -33,6 +33,7 @@ extern "C" {
 typedef struct {
     float ref_freq;
     float temperament;
+    int lang;
     int temp_adjust;
     int move;
     int smove;

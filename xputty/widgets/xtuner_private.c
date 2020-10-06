@@ -23,10 +23,15 @@
 
 
 static const char *note_sharp[] = {"A","A#","B","C","C#","D","D#","E","F","F#","G","G#"};
+static const char *note_fr[] = {"La","La#","Si","Do","Do#","Ré","Ré#","Mi","Fa","Fa#","Sol","Sol#"};
 static const char *note_flat[] = {"A","Bb","B","C","Db","D","Eb","E","F","Gb","G","Ab"};
+static const char *note_fr_flat[] = {"La","La♭","Si","Do","Do♭","Ré","Ré♭","Mi","Fa","Fa♭","Sol","Sol♭"};
 static const char* note_19[19] = {"A","A♯","B♭","B","B♯","C","C♯","D♭","D","D♯","E♭","E","E♯","F","F♯","G♭","G","G♯","A♭"};
+static const char* note_fr_19[19] = {"La","La♯","Si♭","Si","Si♯","Do","Do♯","Ré♭","Ré","Ré♯","Mi♭","Mi","Mi♯","Fa","Fa♯","Sol♭","Sol","Sol♯","La♭"};
 static const char* note_24[24] = {"A","A¼♯","A♯","A¾♯","B","B¼♯","C","C¼♯","C♯","C¾♯","D","D¼♯","D♯","D¾♯","E","E¼♯","F","F¼♯","F♯","F¾♯","G","G¼♯","G♯","G¾♯"};
+static const char* note_fr_24[24] = {"La","La¼♯","La♯","La¾♯","Si","Si¼♯","Do","Do¼♯","Do♯","Do¾♯","Ré","Ré¼♯","Ré♯","Ré¾♯","Mi","E¼♯","Fa","Fa¼♯","Fa♯","Fa¾♯","Sol","Sol¼♯","Sol♯","Sol¾♯"};
 static const char* note_31[31] = {"A","B♭♭","A♯","B♭","A♯♯","B","C♭","B♯","C ","D♭♭","C♯","D♭","C♯♯","D","E♭♭","D♯","E♭","D♯♯","E","F♭","E♯","F","G♭♭","F♯","G♭","F♯♯","G","A♭♭","G♯","A♭","G♯♯"};
+static const char* note_fr_31[31] = {"La","Si♭♭","La♯","Si♭","La♯♯","Si","Do♭","Si♯","Do ","Ré♭♭","Do♯","Ré♭","Do♯♯","Ré","Mi♭♭","Ré♯","Mi♭","Ré♯♯","Mi","Fa♭","Mi♯","Fa","Sol♭♭","Fa♯","Sol♭","Fa♯♯","Sol","La♭♭","Sol♯","La♭","Sol♯♯"};
 static const char* note_53[53] = {"la","laa","lo","law","ta","teh","te","tu","tuh","ti","tih","to","taw","da","do","di","daw","ro","rih","ra","ru","ruh","reh","re ","ri","raw","ma","meh","me","mu","muh","mi","maa","mo","maw","fe","fa","fih","fu","fuh","fi","se","suh","su","sih","sol","si","saw","lo","leh","le","lu","luh"};
 static const char *octave[] = {"0","1","2","3","4","5"," "};
 
@@ -57,11 +62,19 @@ static int _get_tuner_temperament(Widget_t *w) {
 
 static const char **_get_note_set(Widget_t *w) {
     XTuner *xt = (XTuner *)w->parent_struct;
-    if((int)xt->temperament == 0) return note_sharp;
-    else if((int)xt->temperament == 1) return note_19;
-    else if((int)xt->temperament == 2) return note_24;
-    else if((int)xt->temperament == 3) return note_31;
-    else if((int)xt->temperament == 4) return note_53;
+    if((int)xt->temperament == 0) {
+        if (xt->lang == 1) return note_fr;
+        return note_sharp;
+    } else if((int)xt->temperament == 1) {
+        if (xt->lang == 1) return note_fr_19;
+        return note_19;
+    } else if((int)xt->temperament == 2)  {
+        if (xt->lang == 1) return note_fr_24;
+        return note_24;
+    } else if((int)xt->temperament == 3)  {
+        if (xt->lang == 1) return note_fr_31;
+        return note_31;
+    } else if((int)xt->temperament == 4) return note_53;
     else return note_flat;
     
 }
@@ -138,6 +151,7 @@ void _draw_tuner(void *w_, void* user_data) {
         }
     }
     // display note
+    cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
     cairo_set_source_rgba(w->crb, fabsf(scale)*2, 1-(scale*scale*4), 0.2,max(0,1-(fabsf(scale)*6)));
     cairo_set_font_size(w->crb, (w->app->big_font*2)/w->scale.ascale);
     cairo_text_extents_t extents;
