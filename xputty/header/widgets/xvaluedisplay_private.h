@@ -38,6 +38,14 @@ extern "C" {
 
 void _draw_valuedisplay(void *w_, void* user_data);
 
+void _popup_spinbox(void *w_, void* button, void* user_data);
+
+void _draw_spinbox(void *w_, void* user_data);
+
+void _draw_buttons(void *w_, void* user_data);
+
+void _buttons_released(void *w_, void* button, void* user_data);
+
 #ifdef __cplusplus
 }
 #endif

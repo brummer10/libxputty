@@ -41,6 +41,9 @@ extern "C" {
 Widget_t* add_valuedisplay(Widget_t *parent, const char * label,
                 int x, int y, int width, int height);
 
+Widget_t* add_popup_spinbox(Widget_t *parent, const char * label,
+                int x, int y, int width, int height);
+
 #ifdef __cplusplus
 }
 #endif
