@@ -92,6 +92,7 @@ typedef struct {
 
     evfunc button_press_callback;
     evfunc button_release_callback;
+    evfunc double_click_callback;
     evfunc motion_callback;
     evfunc key_press_callback;
     evfunc key_release_callback;
@@ -341,6 +342,8 @@ struct Widget_t {
 /** Context to Locale and UTF 8 support */
     XIM xim;
 /** int to hold the widget state default = 0 */
+    Time double_click;
+/** time of the last button press */
     int state;
 /** mouse pointer x position on button press */
     int pos_x;

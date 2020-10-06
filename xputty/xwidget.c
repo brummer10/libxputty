@@ -218,6 +218,7 @@ Widget_t *create_window(Xputty *app, Window win,
     w->label = NULL;
     memset(w->input_label, 0, 32 * (sizeof w->input_label[0]));
     w->state = 0;
+    w->double_click = 0;
     w->data = 0;
     w->x = x;
     w->y = y;
@@ -246,6 +247,7 @@ Widget_t *create_window(Xputty *app, Window win,
     w->func.configure_callback = configure_event;
     w->func.button_press_callback = _dummy1_callback;
     w->func.button_release_callback = _dummy1_callback;
+    w->func.double_click_callback = _dummy1_callback;
     w->func.motion_callback = _dummy1_callback;
     w->func.adj_callback = transparent_draw;
     w->func.value_changed_callback = _dummy_callback;
@@ -330,6 +332,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     w->label = NULL;
     memset(w->input_label, 0, 32 * (sizeof w->input_label[0]));
     w->state = 0;
+    w->double_click = 0;
     w->data = 0;
     w->x = x;
     w->y = y;
@@ -359,6 +362,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     w->func.configure_callback = configure_event;
     w->func.button_press_callback = _dummy1_callback;
     w->func.button_release_callback = _dummy1_callback;
+    w->func.double_click_callback = _dummy1_callback;
     w->func.motion_callback = _dummy1_callback;
     w->func.adj_callback = transparent_draw;
     w->func.value_changed_callback = _dummy_callback;
@@ -538,15 +542,25 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
         break;
 
         case ButtonRelease:
-            _check_grab(wid, &xev->xbutton, main);
-            _check_submenu(wid, &xev->xbutton, main);
+        {
+            XButtonEvent *xbutton = &xev->xbutton;
+            _check_grab(wid, xbutton, main);
+            _check_submenu(wid, xbutton, main);
             if (wid->state == 4) break;
+            if (xbutton->button == Button1) {
+                if (xbutton->time < wid->double_click+300) {
+                    wid->func.double_click_callback(wid, xbutton, user_data);
+                    break;
+                }
+                wid->double_click = xbutton->time;
+            }
             _has_pointer(wid, &xev->xbutton);
             if(wid->flags & HAS_POINTER) wid->state = 1;
             else wid->state = 0;
-            _check_enum(wid, &xev->xbutton);
-            wid->func.button_release_callback(w_, &xev->xbutton, user_data);
+            _check_enum(wid, xbutton);
+            wid->func.button_release_callback(w_, xbutton, user_data);
             debug_print("Widget_t  ButtonRelease %i\n", xev->xbutton.button);
+        }
         break;
 
         case KeyPress:

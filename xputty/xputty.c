@@ -76,17 +76,17 @@ void main_run(Xputty *main) {
                         if (xev.xbutton.window == slider->widget) {
                             break;
                         }
-                    }
-                    Widget_t *view_port = main->hold_grab->childlist->childs[0];
-                    int i = view_port->childlist->elem-1;
-                    for(;i>-1;i--) {
-                        Widget_t *w = view_port->childlist->childs[i];
-                        if (xev.xbutton.window == w->widget) {
-                            is_item = True;
-                            break;
+                        Widget_t *view_port = main->hold_grab->childlist->childs[0];
+                        int i = view_port->childlist->elem-1;
+                        for(;i>-1;i--) {
+                            Widget_t *w = view_port->childlist->childs[i];
+                            if (xev.xbutton.window == w->widget) {
+                                is_item = True;
+                                break;
+                            }
                         }
-                    }
                     if (xev.xbutton.window == view_port->widget) is_item = True;
+                    }
                     if (!is_item) {
                         XUngrabPointer(main->dpy,CurrentTime);
                         widget_hide(main->hold_grab);
