@@ -75,7 +75,10 @@ static const char **_get_note_set(Widget_t *w) {
         if (xt->lang == 1) return note_fr_31;
         return note_31;
     } else if((int)xt->temperament == 4) return note_53;
-    else return note_flat;
+    else {
+        if (xt->lang == 1) return note_fr_flat;
+        return note_flat;
+    }
     
 }
 
