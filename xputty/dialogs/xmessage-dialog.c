@@ -273,7 +273,7 @@ static void check_for_message(MessageBox *mb, const char *message) {
     }
     free(ms);
     mb->width = len*12 ;
-    mb->height = mb->lin*12+150;
+    mb->height = mb->lin*16+150;
 }
 
 static void check_for_choices(MessageBox *mb, const char *choices) {

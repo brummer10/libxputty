@@ -77,10 +77,11 @@ typedef struct {
  * @param *filepicker              - pointer to the struct holding the list pointers
  * @param *path                    - the path to read from
  * @param get_dirs                 - 0 = only read files 1 = refill the directory buffer as well
+ * @param get_files                - 0 = only read directorys 1 = refill the file buffer as well
  * @return int                     - return the position of the given path in the directory list 
  */
 
-int fp_get_files(FilePicker *filepicker, char *path, int get_dirs);
+int fp_get_files(FilePicker *filepicker, char *path, int get_dirs, int get_files);
 
 /**
  * @brief fp_free                  - release all memory used by the filepicker

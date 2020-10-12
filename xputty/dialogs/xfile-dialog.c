@@ -117,7 +117,7 @@ static void reload_from_dir(FileDialog *file_dialog) {
     assert(file_dialog->fp->path != NULL);
     listview_remove_list(file_dialog->ft);
     combobox_delete_entrys(file_dialog->ct);
-    int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1);
+    int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1, 1);
     file_dialog->ft->func.button_release_callback = file_released_b_callback;
     int set_f = set_files(file_dialog);
     set_dirs(file_dialog);
@@ -161,7 +161,7 @@ static void file_released_callback(void *w_, void* user_data) {
 
 static void reload_file_entrys(FileDialog *file_dialog) {
     listview_remove_list(file_dialog->ft);
-    fp_get_files(file_dialog->fp,file_dialog->fp->path, 0);
+    fp_get_files(file_dialog->fp,file_dialog->fp->path, 0, 1);
     file_dialog->ft->func.value_changed_callback = file_released_callback;
     int set_f = set_files(file_dialog);
     listview_set_active_entry(file_dialog->ft, set_f);
@@ -213,7 +213,7 @@ static void reload_all(FileDialog *file_dialog) {
     assert(file_dialog->fp->path != NULL);
     listview_remove_list(file_dialog->ft);
     combobox_delete_entrys(file_dialog->ct);
-    int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1);
+    int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1, 1);
     file_dialog->ft->func.value_changed_callback = file_released_callback;
     int set_f = set_files(file_dialog);
     set_dirs(file_dialog);
@@ -316,7 +316,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->ft->parent_struct = file_dialog;
     file_dialog->ft->func.value_changed_callback = file_released_callback;
 
-    int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1);   
+    int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1, 1);   
     int set_f = set_files(file_dialog); 
     set_dirs(file_dialog);
     combobox_set_active_entry(file_dialog->ct, ds);

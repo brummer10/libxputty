@@ -56,6 +56,8 @@ typedef struct {
     bool is_active;
 } FileButton;
 
+Widget_t *open_directory_dialog(Widget_t *w, const char *path);
+
 /**
  * @brief open_file_dialog  - open a non blocking dialog window,
  * to select a file. The path to open the file-selector could be NULL

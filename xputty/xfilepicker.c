@@ -141,7 +141,7 @@ int fp_check_link(char *path, struct dirent *dp) {
     return 0;
 }
 
-int fp_get_files(FilePicker *filepicker, char *path, int get_dirs) {
+int fp_get_files(FilePicker *filepicker, char *path, int get_dirs, int get_files) {
     int ret = 0;
     fp_clear_filebuffer(filepicker);
 
@@ -160,7 +160,7 @@ int fp_get_files(FilePicker *filepicker, char *path, int get_dirs) {
 
     while ((dp = readdir(dirp)) != NULL) {
 
-        if(dp-> d_type != DT_DIR && dp->d_type != DT_UNKNOWN && strlen(dp->d_name)!=0
+        if(get_files && dp-> d_type != DT_DIR && dp->d_type != DT_UNKNOWN && strlen(dp->d_name)!=0
           && strcmp(dp->d_name,"..")!=0 && fp_show_hidden_files(filepicker, dp->d_name)
           && fp_show_filter_files(filepicker, dp->d_name) && !fp_check_link(path, dp)) {
 
