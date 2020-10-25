@@ -23,24 +23,29 @@
 
 
 void _rounded_rectangle(cairo_t *cr,float x, float y, float width, float height) {
-	cairo_new_path (cr);
-	cairo_move_to  (cr, x, (y + height)/2);
-	cairo_curve_to (cr, x ,y, x, y, (x + width)/2, y);
-	cairo_curve_to (cr, width, y, width, y, width, (y + height)/2);
-	cairo_curve_to (cr, width, height, width, height, (width + x)/2, height);
-	cairo_curve_to (cr, x, height, x, height, x, (y + height)/2);
-	cairo_close_path (cr);
+    cairo_new_path (cr);
+    cairo_move_to  (cr, x, (y + height)/2);
+    cairo_curve_to (cr, x ,y, x, y, (x + width)/2, y);
+    cairo_curve_to (cr, width, y, width, y, width, (y + height)/2);
+    cairo_curve_to (cr, width, height, width, height, (width + x)/2, height);
+    cairo_curve_to (cr, x, height, x, height, x, (y + height)/2);
+    cairo_close_path (cr);
 }
 
 void _pattern_out(Widget_t *w, Color_state st, int height) {
     Colors *c = get_color_scheme(w->app,st);
     if (!c) return;
-    cairo_pattern_t *pat = cairo_pattern_create_linear (2, 2, 2, height);
-    cairo_pattern_add_color_stop_rgba(pat, 0.0, c->light[0],  c->light[1], c->light[2],  c->light[3]);
-    cairo_pattern_add_color_stop_rgba(pat, 0.5, 0.0, 0.0, 0.0, 0.0);
-    cairo_pattern_add_color_stop_rgba(pat, 1.0, c->light[0],  c->light[1], c->light[2],  c->light[3]);
-    cairo_set_source(w->crb, pat);
-    cairo_pattern_destroy (pat);
+    XButton_t *xbutton = (XButton_t*) w->parent_struct;
+    if (xbutton->pat) {
+        cairo_set_source(w->crb, xbutton->pat);
+    } else {
+        cairo_pattern_t *pat = cairo_pattern_create_linear (2, 2, 2, height);
+        cairo_pattern_add_color_stop_rgba(pat, 0.0, c->light[0],  c->light[1], c->light[2],  c->light[3]);
+        cairo_pattern_add_color_stop_rgba(pat, 0.5, 0.0, 0.0, 0.0, 0.0);
+        cairo_pattern_add_color_stop_rgba(pat, 1.0, c->light[0],  c->light[1], c->light[2],  c->light[3]);
+        cairo_set_source(w->crb, pat);
+        cairo_pattern_destroy (pat);
+    }
 }
 
 void _pattern_in(Widget_t *w, Color_state st, int height) {
