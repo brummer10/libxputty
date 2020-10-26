@@ -20,6 +20,48 @@
 
 #include "xmessage-dialog.h"
 
+void hyperlink_pressed(void *w_, void* button_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    XButtonEvent *xbutton = (XButtonEvent*)button_;
+    if (xbutton->button == Button1) {
+        char *command;
+        asprintf(&command, "xdg-open '%s'",w->label);
+        if (system(NULL)) system(command);
+        free(command);
+    }
+}
+
+void draw_hyperlink(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    int width = attrs.width;
+    int height = attrs.height;
+
+    cairo_text_extents_t extents;
+    use_fg_color_scheme(w, get_color_state(w));
+    cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
+    cairo_text_extents(w->crb,w->label , &extents);
+
+    cairo_move_to (w->crb, (width*0.5)-(extents.width/2), height-(extents.height/4));
+    cairo_show_text(w->crb, w->label);
+    cairo_new_path (w->crb);
+}
+
+Widget_t *create_hyperlink(Widget_t *w, char*label, int x, int y,
+                                            int width, int height) {
+    Widget_t *wid = create_widget(w->app, w, x, y, width, height);
+    wid->label = label;
+    wid->scale.gravity = ASPECT;
+    Cursor c = XCreateFontCursor(wid->app->dpy, XC_hand2);
+    XDefineCursor (wid->app->dpy, wid->widget, c);
+    XFreeCursor(wid->app->dpy, c);
+    wid->func.enter_callback = transparent_draw;
+    wid->func.leave_callback = transparent_draw;
+    wid->func.expose_callback = draw_hyperlink;
+    wid->func.button_press_callback = hyperlink_pressed;
+    return wid;
+}
 
 static void draw_message_label(Widget_t *w, int width, int height) {
     MessageBox *mb = (MessageBox *)w->parent_struct;
@@ -29,9 +71,13 @@ static void draw_message_label(Widget_t *w, int width, int height) {
     int i = 0;
     for(;i<(int)mb->lin;i++) {
         cairo_text_extents(w->crb,mb->message[i] , &extents);
-        cairo_move_to (w->crb, 100, ((40)+(extents.height * (2*i))));
-        cairo_show_text(w->crb, mb->message[i]);
-        cairo_new_path (w->crb);
+        if (strstr(mb->message[i], "http") != NULL) {
+            continue;
+        } else {
+            cairo_move_to (w->crb, 100, ((40)+(extents.height * (2*i))));
+            cairo_show_text(w->crb, mb->message[i]);
+            cairo_new_path (w->crb);
+        }
     }    
 }
 
@@ -276,6 +322,21 @@ static void check_for_message(MessageBox *mb, const char *message) {
     mb->height = mb->lin*16+150;
 }
 
+static void check_for_hyperlinks(Widget_t *w) {
+    MessageBox *mb = (MessageBox *)w->parent_struct;
+    if(!mb->message) return;
+    cairo_text_extents_t extents;
+    cairo_set_font_size (w->crb, 12.0);
+    int i = 0;
+    for(;i<(int)mb->lin;i++) {
+        if (strstr(mb->message[i], "http") != NULL) {
+            cairo_text_extents(w->crb,mb->message[i] , &extents);
+            create_hyperlink(w, mb->message[i], 100,
+                ((25)+(extents.height * (2*i))), extents.width, 16);
+        }
+    }    
+}
+
 static void check_for_choices(MessageBox *mb, const char *choices) {
     if(!choices) return;
     if(!strlen(choices)) return;
@@ -343,6 +404,7 @@ Widget_t *open_message_dialog(Widget_t *w, int style, const char *title,
     wid->parent = w;
     wid->func.mem_free_callback = mg_mem_free;
     wid->func.expose_callback = draw_message_window;
+    check_for_hyperlinks(wid);
     char *alternate_title = NULL;
     char *button_title = (char*)_("OK");
     Widget_t *no;

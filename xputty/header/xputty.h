@@ -37,6 +37,7 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
+#include <X11/cursorfont.h> 
 
 #ifdef ENABLE_NLS
 #include <libintl.h>
