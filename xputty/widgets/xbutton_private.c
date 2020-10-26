@@ -35,17 +35,12 @@ void _rounded_rectangle(cairo_t *cr,float x, float y, float width, float height)
 void _pattern_out(Widget_t *w, Color_state st, int height) {
     Colors *c = get_color_scheme(w->app,st);
     if (!c) return;
-    XButton_t *xbutton = (XButton_t*) w->parent_struct;
-    if (xbutton->pat) {
-        cairo_set_source(w->crb, xbutton->pat);
-    } else {
-        cairo_pattern_t *pat = cairo_pattern_create_linear (2, 2, 2, height);
-        cairo_pattern_add_color_stop_rgba(pat, 0.0, c->light[0],  c->light[1], c->light[2],  c->light[3]);
-        cairo_pattern_add_color_stop_rgba(pat, 0.5, 0.0, 0.0, 0.0, 0.0);
-        cairo_pattern_add_color_stop_rgba(pat, 1.0, c->light[0],  c->light[1], c->light[2],  c->light[3]);
-        cairo_set_source(w->crb, pat);
-        cairo_pattern_destroy (pat);
-    }
+    cairo_pattern_t *pat = cairo_pattern_create_linear (2, 2, 2, height);
+    cairo_pattern_add_color_stop_rgba(pat, 0.0, c->light[0],  c->light[1], c->light[2],  c->light[3]);
+    cairo_pattern_add_color_stop_rgba(pat, 0.5, 0.0, 0.0, 0.0, 0.0);
+    cairo_pattern_add_color_stop_rgba(pat, 1.0, c->light[0],  c->light[1], c->light[2],  c->light[3]);
+    cairo_set_source(w->crb, pat);
+    cairo_pattern_destroy (pat);
 }
 
 void _pattern_in(Widget_t *w, Color_state st, int height) {

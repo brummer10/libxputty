@@ -30,18 +30,6 @@
 extern "C" {
 #endif
 
-typedef struct {
-    cairo_pattern_t *pat;
-} XButton_t;
-
-/**
- * @brief button_mem_free          - release additional used memory when destroy the Widget_t
- * @param *w_                      - void pointer to the Widget_t
- * @param *user_data               - void pointer to attached user_data
- * @return void
- */
-
-void button_mem_free(void *w_, void* user_data);
 
 /**
  * @brief add_button          - add a button to a Widget_t

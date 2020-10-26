@@ -23,31 +23,19 @@
 #include "xbutton_private.h"
 
 
-void button_mem_free(void *w_, void* user_data) {
-    Widget_t *w = (Widget_t*)w_;
-    XButton_t *xbutton = (XButton_t*) w->parent_struct;
-    if (xbutton->pat) cairo_pattern_destroy (xbutton->pat);
-    free(xbutton);
-}
-
 Widget_t* add_button(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 
     Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
-    XButton_t *xbutton = (XButton_t*) malloc(sizeof(XButton_t));
-    xbutton->pat = NULL;
     wid->label = label;
     wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, 1.0,1.0, CL_TOGGLE);
     wid->adj = wid->adj_y;
     wid->scale.gravity = CENTER;
-    wid->flags |= HAS_MEM;
-    wid->parent_struct = xbutton;
     wid->func.expose_callback = _draw_button;
     wid->func.enter_callback = transparent_draw;
     wid->func.leave_callback = transparent_draw;
     wid->func.button_press_callback = _button_pressed;
     wid->func.button_release_callback = _button_released;
-    wid->func.mem_free_callback = button_mem_free;
     return wid;
 }
 
@@ -55,19 +43,14 @@ Widget_t* add_on_off_button(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 
     Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
-    XButton_t *xbutton = (XButton_t*) malloc(sizeof(XButton_t));
-    xbutton->pat = NULL;
     wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, 1.0,1.0, CL_TOGGLE);
     wid->adj = wid->adj_y;
     wid->scale.gravity = CENTER;
-    wid->flags |= HAS_MEM;
-    wid->parent_struct = xbutton;
     wid->func.expose_callback = _draw_on_off_button;
     wid->func.enter_callback = transparent_draw;
     wid->func.leave_callback = transparent_draw;
     wid->func.button_press_callback = _toggle_button_pressed;
     wid->func.button_release_callback = _toggle_button_released;
-    wid->func.mem_free_callback = button_mem_free;
     return wid;
 }
 
@@ -75,20 +58,15 @@ Widget_t* add_toggle_button(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 
     Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
-    XButton_t *xbutton = (XButton_t*) malloc(sizeof(XButton_t));
-    xbutton->pat = NULL;
     wid->label = label;
     wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, 1.0,1.0, CL_TOGGLE);
     wid->adj = wid->adj_y;
     wid->scale.gravity = CENTER;
-    wid->flags |= HAS_MEM;
-    wid->parent_struct = xbutton;
     wid->func.expose_callback = _draw_button;
     wid->func.enter_callback = transparent_draw;
     wid->func.leave_callback = transparent_draw;
     wid->func.button_press_callback = _toggle_button_pressed;
     wid->func.button_release_callback = _toggle_button_released;
-    wid->func.mem_free_callback = button_mem_free;
     return wid;
 }
 
@@ -128,20 +106,15 @@ Widget_t* add_check_button(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 
     Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
-    XButton_t *xbutton = (XButton_t*) malloc(sizeof(XButton_t));
-    xbutton->pat = NULL;
     wid->label = label;
     wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, 1.0,1.0, CL_TOGGLE);
     wid->adj = wid->adj_y;
     wid->scale.gravity = CENTER;
-    wid->flags |= HAS_MEM;
-    wid->parent_struct = xbutton;
     wid->func.expose_callback = _draw_check_button;
     wid->func.enter_callback = transparent_draw;
     wid->func.leave_callback = transparent_draw;
     wid->func.button_press_callback = _toggle_button_pressed;
     wid->func.button_release_callback = _toggle_button_released;
-    wid->func.mem_free_callback = button_mem_free;
     return wid;
 }
 
@@ -153,17 +126,13 @@ Widget_t* add_check_box(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 
     Widget_t *wid = create_widget(parent->app, parent, x, y, get_width(label), height);
-    XButton_t *xbutton = (XButton_t*) malloc(sizeof(XButton_t));
-    xbutton->pat = NULL;
     wid->label = label;
     wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, 1.0,1.0, CL_TOGGLE);
     wid->adj = wid->adj_y;
     wid->scale.gravity = CENTER;
-    wid->flags |= HAS_MEM;
     wid->func.expose_callback = _draw_check_box;
     wid->func.enter_callback = transparent_draw;
     wid->func.leave_callback = transparent_draw;
     wid->func.button_press_callback = _toggle_button_pressed;
-    wid->func.button_release_callback = _toggle_button_released;
     return wid;
 }
