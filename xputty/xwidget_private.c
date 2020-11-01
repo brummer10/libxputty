@@ -135,11 +135,11 @@ void _check_grab(Widget_t * wid, XButtonEvent *xbutton, Xputty *main) {
             widget_hide(main->hold_grab);
             main->hold_grab = NULL;
 
-        } else if(xbutton->button == Button4) {
+        } /*else if(xbutton->button == Button4) {
             _scroll_event(view_port, 1);
         } else if(xbutton->button == Button5) {
             _scroll_event(view_port, -1);
-        }
+        }*/ // done in  _button_press() anyway
     }
 }
 
