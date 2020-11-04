@@ -89,6 +89,7 @@ typedef struct {
     xevfunc map_notify_callback;
     xevfunc unmap_notify_callback;
     xevfunc dialog_callback;
+    xevfunc dnd_notify_callback;
 
     evfunc button_press_callback;
     evfunc button_release_callback;
@@ -600,6 +601,42 @@ void expose_widget(Widget_t *w);
  */
 
 int key_mapping(Display *dpy, XKeyEvent *xkey);
+
+/**
+ * @brief handle_drag_data  - handle recived drag data
+ * @param w                 - the Widget_t recive the event
+ * @param event             - the drag event contain the drop data
+ * @return void 
+ */
+
+void handle_drag_data(Widget_t *w, XEvent* event);
+
+/**
+ * @brief handle_drag_enter - handle  drag event enter the Widget_t
+ * @param main              - pointer to the Xputty *main struct running
+ * @param event             - the drag event contain the drop data
+ * @return void 
+ */
+
+void handle_dnd_enter(Xputty *main, XEvent* event);
+
+/**
+ * @brief send_dnd_finished_event - notify the drag sender that the event is handled
+ * @param w                       - the Widget_t handled the event 
+ * @param event                   - the drag event contain the drop data
+ * @return void 
+ */
+
+void send_dnd_finished_event(Widget_t *w, XEvent* event);
+
+/**
+ * @brief send_dnd_status_event   - notify the drag sender that prepared to recive the event
+ * @param w                       - the Widget_t to recive the event 
+ * @param event                   - the drag event contain the drop data
+ * @return void 
+ */
+
+void send_dnd_status_event(Widget_t *w, XEvent* event);
 
 #ifdef __cplusplus
 }

@@ -36,13 +36,28 @@ void main_init(Xputty *main) {
     main->small_font = 10;
     main->normal_font = 12;
     main->big_font = 16;
+    main->XdndAware = XInternAtom (main->dpy, "XdndAware", False);
+    main->XdndTypeList = XInternAtom (main->dpy, "XdndTypeList", False);
+    main->XdndSelection = XInternAtom (main->dpy, "XdndSelection", False);
+    main->XdndStatus = XInternAtom (main->dpy, "XdndStatus", False);
+    main->XdndEnter = XInternAtom (main->dpy, "XdndEnter", False);
+    main->XdndPosition = XInternAtom (main->dpy, "XdndPosition", False);
+    main->XdndLeave = XInternAtom (main->dpy, "XdndLeave", False);
+    main->XdndDrop = XInternAtom (main->dpy, "XdndDrop", False);
+    main->XdndActionCopy = XInternAtom (main->dpy, "XdndActionCopy", False);
+    main->XdndFinished = XInternAtom (main->dpy, "XdndFinished", False);
+    main->dnd_type_uri = XInternAtom (main->dpy, "text/uri-list", False);
+    main->dnd_type_text = XInternAtom (main->dpy, "text/plain", False);
+    main->dnd_type_utf8 = XInternAtom (main->dpy, "UTF8_STRING", False);
+    main->dnd_type = None;
+    main->dnd_source_window = 0;
 }
 
 void main_run(Xputty *main) {
     Widget_t * wid = main->childlist->childs[0]; 
     Atom WM_DELETE_WINDOW;
-    WM_DELETE_WINDOW = XInternAtom(wid->app->dpy, "WM_DELETE_WINDOW", True);
-    XSetWMProtocols(wid->app->dpy, wid->widget, &WM_DELETE_WINDOW, 1);
+    WM_DELETE_WINDOW = XInternAtom(main->dpy, "WM_DELETE_WINDOW", True);
+    XSetWMProtocols(main->dpy, wid->widget, &WM_DELETE_WINDOW, 1);
 
     XEvent xev;
     int ew;
@@ -96,18 +111,19 @@ void main_run(Xputty *main) {
             }
             break;
             case ClientMessage:
-                /* delete window event */
+            {
                 if (xev.xclient.data.l[0] == (long int)WM_DELETE_WINDOW &&
                         xev.xclient.window == wid->widget) {
                     main->run = false;
-                } else {
+                } else if (xev.xclient.data.l[0] == (long int)WM_DELETE_WINDOW) {
                     int i = childlist_find_widget(main->childlist, xev.xclient.window);
                     if(i<1) return;
                     Widget_t *w = main->childlist->childs[i];
                     if(w->flags & HIDE_ON_DELETE) widget_hide(w);
                     else destroy_widget(main->childlist->childs[i],main);
                 }
-            break;
+                break;
+            }
         }
     }
 }
@@ -146,7 +162,6 @@ void run_embedded(Xputty *main) {
             }
         break;
         case ClientMessage:
-            /* delete window event */
             if (xev.xclient.data.l[0] == (long int)XInternAtom(main->dpy, "WM_DELETE_WINDOW", True) ) {
                 int i = childlist_find_widget(main->childlist, xev.xclient.window);
                 if(i<1) return;

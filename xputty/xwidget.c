@@ -261,9 +261,14 @@ Widget_t *create_window(Xputty *app, Window win,
     w->func.map_notify_callback = _dummy_callback;
     w->func.unmap_notify_callback = _dummy_callback;
     w->func.dialog_callback = _dummy_callback;
+    w->func.dnd_notify_callback = _dummy_callback;
 
     childlist_add_child(app->childlist,w);
     //XMapWindow(app->dpy, w->widget);
+
+    Atom dnd_version = 3;
+    XChangeProperty (app->dpy, w->widget, app->XdndAware, XA_ATOM, 32, PropModeReplace, (unsigned char*)&dnd_version, 1);
+
     debug_print("size of Func_t = %lu\n", sizeof(w->func)/sizeof(void*));
     return w;
 }
@@ -376,6 +381,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     w->func.map_notify_callback = _dummy_callback;
     w->func.unmap_notify_callback = _dummy_callback;
     w->func.dialog_callback = _dummy_callback;
+    w->func.dnd_notify_callback = _dummy_callback;
 
     childlist_add_child(app->childlist,w);
     //XMapWindow(app->dpy, w->widget);
@@ -623,8 +629,30 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
             debug_print("Widget_t MotionNotify x = %i Y = %i \n",xev->xmotion.x,xev->xmotion.y );
         break;
 
+        case SelectionRequest:
+            break;
+        case SelectionNotify:
+            handle_drag_data(wid, xev);
+            break;
+
         case ClientMessage:
-            if (xev->xclient.message_type == XInternAtom(wid->app->dpy, "WIDGET_DESTROY", 1)) {
+            if (xev->xclient.message_type == main->XdndPosition) {
+                send_dnd_status_event(wid, xev);
+            } else if (xev->xclient.message_type == main->XdndEnter) {
+                handle_dnd_enter(main, xev);
+            } else if (xev->xclient.message_type == main->XdndLeave) {
+                main->dnd_type   = None;
+                main->dnd_source_window = 0;
+            } else if (xev->xclient.message_type == main->XdndDrop) {
+                if ((DND_SOURCE_WIN(xev) != main->dnd_source_window) ||
+                    main->dnd_type == None || main->dnd_source_window == 0) {
+                    break;
+                }
+                XConvertSelection(main->dpy, main->XdndSelection,
+                                   main->dnd_type, main->XdndSelection, wid->widget, CurrentTime);
+
+                send_dnd_finished_event(wid, xev);
+            } else if (xev->xclient.message_type == XInternAtom(wid->app->dpy, "WIDGET_DESTROY", 1)) {
                 int ch = childlist_has_child(wid->childlist);
                 if (ch) {
                     int i = ch;
@@ -636,10 +664,121 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
                     destroy_widget(wid,main);
                 }
             }
-
+            break;
         default:
         break;
     }
+}
+
+void strremove(char *str, const char *sub) {
+    char *p, *q, *r;
+    if ((q = r = strstr(str, sub)) != NULL) {
+        size_t len = strlen(sub);
+        while ((r = strstr(p = r + len, sub)) != NULL) {
+            while (p < r)
+                *q++ = *p++;
+        }
+        while ((*q++ = *p++) != '\0')
+            continue;
+    }
+}
+
+void handle_drag_data(Widget_t *w, XEvent* event) {
+    if (event->xselection.property != w->app->XdndSelection) return;
+
+    Atom type;
+    int format;
+    unsigned long  count = 0, remaining;
+    unsigned char* data = 0;
+
+    XGetWindowProperty(w->app->dpy,w->widget, event->xselection.property,
+                        0, 65536, True, w->app->dnd_type, &type, &format,
+                        &count, &remaining, &data);
+
+    send_dnd_finished_event (w, event);
+
+    if (!data || count == 0) {
+        return;
+    }
+    strremove((char*)data, "file://");
+    w->func.dnd_notify_callback(w, (void*)&data);
+    w->app->dnd_type = None;
+    w->app->dnd_source_window = 0;
+    free(data);
+}
+
+void handle_dnd_enter(Xputty *main, XEvent* event) {
+    main->dnd_source_window = DND_SOURCE_WIN(event);
+    if (DND_STATUS_ACCEPT(event)) {
+        if (DND_VERSION(event) > 3) return;
+        Atom type = 0;
+        int format;
+        unsigned long count, remaining;
+        unsigned char *data = 0;
+
+        XGetWindowProperty (main->dpy, main->dnd_source_window, main->XdndTypeList,
+            0, 0x8000000L, False, XA_ATOM, &type, &format, &count, &remaining, &data);
+        if (!data || type != XA_ATOM || format != 32) {
+            if (data) {
+                XFree (data);
+            }
+            return;
+        }
+        Atom* types = (Atom*)data;
+        for (unsigned long l = 1; l < count; l++) {
+            if ((types[l] == main->dnd_type_uri) || 
+                (types[l] == main->dnd_type_text) ||
+                (types[l] == main->dnd_type_utf8)) {
+                main->dnd_type = types[l];
+                break;
+            }
+        }
+        if (data) {
+            XFree (data);
+        }
+    } else {
+        for (int i = 2; i < 5; ++i) {
+            if ((event->xclient.data.l[i] == main->dnd_type_uri) || 
+                (event->xclient.data.l[i] == main->dnd_type_text) || 
+                (event->xclient.data.l[i] == main->dnd_type_utf8)) {
+                main->dnd_type = event->xclient.data.l[i];
+                break;
+            }
+        }
+    }
+}
+
+void send_dnd_status_event(Widget_t *w, XEvent* event) {
+    XEvent xev;
+    memset (&xev, 0, sizeof (XEvent));
+    xev.xany.type            = ClientMessage;
+    xev.xany.display         = w->app->dpy;
+    xev.xclient.window       = w->app->dnd_source_window;
+    xev.xclient.message_type = w->app->XdndStatus;
+    xev.xclient.format       = 32;
+    xev.xclient.data.l[0]    = w->widget;
+    xev.xclient.data.l[1]    = (w->app->dnd_type != None) ? 1 : 0;
+    xev.xclient.data.l[2]    = DND_DROP_TIME(event);
+    xev.xclient.data.l[3]    = 0;
+    xev.xclient.data.l[4]    = w->app->XdndActionCopy;
+    XSendEvent (w->app->dpy, w->app->dnd_source_window, False, NoEventMask, &xev);
+}
+
+void send_dnd_finished_event(Widget_t *w, XEvent* event) {
+    if (DND_VERSION(event) < 2) {
+        return;
+    }
+    XEvent xev;
+    memset (&xev, 0, sizeof (XEvent));
+    xev.xany.type            = ClientMessage;
+    xev.xany.display         = w->app->dpy;
+    xev.xclient.window       = w->app->dnd_source_window;
+    xev.xclient.message_type = w->app->XdndFinished;
+    xev.xclient.format       = 32;
+    xev.xclient.data.l[0]    = w->widget;
+    xev.xclient.data.l[1]    = 1;
+    xev.xclient.data.l[2]    = w->app->XdndActionCopy;
+    XSendEvent (w->app->dpy, w->app->dnd_source_window, False, NoEventMask, &xev);
 }
 
 void send_configure_event(Widget_t *w,int x, int y, int width, int height) {
