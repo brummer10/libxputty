@@ -265,10 +265,6 @@ Widget_t *create_window(Xputty *app, Window win,
 
     childlist_add_child(app->childlist,w);
     //XMapWindow(app->dpy, w->widget);
-
-    Atom dnd_version = 3;
-    XChangeProperty (app->dpy, w->widget, app->XdndAware, XA_ATOM, 32, PropModeReplace, (unsigned char*)&dnd_version, 1);
-
     debug_print("size of Func_t = %lu\n", sizeof(w->func)/sizeof(void*));
     return w;
 }
@@ -668,6 +664,16 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
         default:
         break;
     }
+}
+
+void widget_set_dnd_aware(Widget_t *w) {
+    Atom dnd_version = 3;
+    XChangeProperty (w->app->dpy, w->widget, w->app->XdndAware, XA_ATOM,
+                    32, PropModeReplace, (unsigned char*)&dnd_version, 1);
+}
+
+void widget_set_dnd_unaware(Widget_t *w) {
+    XDeleteProperty(w->app->dpy, w->widget, w->app->XdndAware);
 }
 
 void strremove(char *str, const char *sub) {

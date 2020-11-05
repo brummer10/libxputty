@@ -603,6 +603,22 @@ void expose_widget(Widget_t *w);
 int key_mapping(Display *dpy, XKeyEvent *xkey);
 
 /**
+ * @brief widget_set_dnd_aware    - allow drag and drop for on Widget_t
+ * @param w                       - the Widget_t to send the event to
+ * @return void 
+ */
+
+void widget_set_dnd_aware(Widget_t *w);
+
+/**
+ * @brief widget_set_dnd_unaware  - disable drag and drop for on Widget_t
+ * @param w                       - the Widget_t to send the event to
+ * @return void 
+ */
+
+void widget_set_dnd_unaware(Widget_t *w);
+
+/**
  * @brief handle_drag_data  - handle recived drag data
  * @param w                 - the Widget_t recive the event
  * @param event             - the drag event contain the drop data
