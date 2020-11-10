@@ -226,7 +226,7 @@ static void open_dir_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     if (w->flags & HAS_POINTER && !*(int*)user_data){
-        reload_all(file_dialog);
+        reload_from_dir(file_dialog);
     }
 }
 

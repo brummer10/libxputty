@@ -172,7 +172,9 @@ int fp_get_files(FilePicker *filepicker, char *path, int get_dirs, int get_files
 
         } else if(get_dirs && (dp -> d_type == DT_DIR || dp -> d_type == DT_LNK) && strlen(dp->d_name)!=0
           && strcmp(dp->d_name,"..")!=0 && fp_show_hidden_files(filepicker, dp->d_name)) {
-
+            if (dp -> d_type == DT_LNK) {
+                if (!fp_check_link(path, dp)) continue;
+            }
             filepicker->file_names = (char **)realloc(filepicker->file_names,
               (filepicker->file_counter + 1) * sizeof(char *));
             assert(filepicker->file_names != NULL);
