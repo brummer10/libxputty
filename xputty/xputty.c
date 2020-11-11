@@ -135,6 +135,10 @@ void run_embedded(Xputty *main) {
 
     while (XPending(main->dpy) > 0) {
         XNextEvent(main->dpy, &xev);
+        if (xev.type == ClientMessage || xev.type == SelectionNotify) {
+            Widget_t * w = main->childlist->childs[0];
+            w->event_callback(w, &xev, main, NULL);
+        }
         ew = childlist_find_widget(main->childlist, xev.xany.window);
         if(ew  >= 0) {
             Widget_t * w = main->childlist->childs[ew];

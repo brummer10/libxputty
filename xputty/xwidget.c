@@ -628,15 +628,19 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
         case SelectionRequest:
             break;
         case SelectionNotify:
+            debug_print("Widget_t SelectionNotify\n");
             handle_drag_data(wid, xev);
             break;
 
         case ClientMessage:
             if (xev->xclient.message_type == main->XdndPosition) {
+                debug_print( "XdndPosition\n");
                 send_dnd_status_event(wid, xev);
             } else if (xev->xclient.message_type == main->XdndEnter) {
+                debug_print( "XdndEnter\n");
                 handle_dnd_enter(main, xev);
             } else if (xev->xclient.message_type == main->XdndLeave) {
+                debug_print( "XdndLeave\n");
                 main->dnd_type   = None;
                 main->dnd_source_window = 0;
             } else if (xev->xclient.message_type == main->XdndDrop) {
@@ -667,7 +671,7 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
 }
 
 void widget_set_dnd_aware(Widget_t *w) {
-    Atom dnd_version = 3;
+    Atom dnd_version = 5;
     XChangeProperty (w->app->dpy, w->widget, w->app->XdndAware, XA_ATOM,
                     32, PropModeReplace, (unsigned char*)&dnd_version, 1);
 }
@@ -716,7 +720,7 @@ void handle_drag_data(Widget_t *w, XEvent* event) {
 void handle_dnd_enter(Xputty *main, XEvent* event) {
     main->dnd_source_window = DND_SOURCE_WIN(event);
     if (DND_STATUS_ACCEPT(event)) {
-        if (DND_VERSION(event) > 3) return;
+        if (DND_VERSION(event) > 5) return;
         Atom type = 0;
         int format;
         unsigned long count, remaining;
@@ -762,7 +766,7 @@ void send_dnd_status_event(Widget_t *w, XEvent* event) {
     xev.xclient.window       = w->app->dnd_source_window;
     xev.xclient.message_type = w->app->XdndStatus;
     xev.xclient.format       = 32;
-    xev.xclient.data.l[0]    = w->widget;
+    xev.xclient.data.l[0]    = event->xany.window;
     xev.xclient.data.l[1]    = (w->app->dnd_type != None) ? 1 : 0;
     xev.xclient.data.l[2]    = DND_DROP_TIME(event);
     xev.xclient.data.l[3]    = 0;
@@ -781,7 +785,7 @@ void send_dnd_finished_event(Widget_t *w, XEvent* event) {
     xev.xclient.window       = w->app->dnd_source_window;
     xev.xclient.message_type = w->app->XdndFinished;
     xev.xclient.format       = 32;
-    xev.xclient.data.l[0]    = w->widget;
+    xev.xclient.data.l[0]    = event->xany.window;
     xev.xclient.data.l[1]    = 1;
     xev.xclient.data.l[2]    = w->app->XdndActionCopy;
     XSendEvent (w->app->dpy, w->app->dnd_source_window, False, NoEventMask, &xev);
