@@ -643,6 +643,7 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
                 debug_print( "XdndLeave\n");
                 main->dnd_type   = None;
                 main->dnd_source_window = 0;
+                main->dnd_version = 0;
             } else if (xev->xclient.message_type == main->XdndDrop) {
                 if ((DND_SOURCE_WIN(xev) != main->dnd_source_window) ||
                     main->dnd_type == None || main->dnd_source_window == 0) {
@@ -693,6 +694,29 @@ void strremove(char *str, const char *sub) {
     }
 }
 
+void strdecode(char *target, const char *needle, const char *replacement) {
+    char buffer[1024] = { 0 };
+    char *insert_point = &buffer[0];
+    const char *tmp = target;
+    size_t needle_len = strlen(needle);
+    size_t repl_len = strlen(replacement);
+
+    while (1) {
+        const char *p = strstr(tmp, needle);
+        if (p == NULL) {
+            strcpy(insert_point, tmp);
+            break;
+        }
+        memcpy(insert_point, tmp, p - tmp);
+        insert_point += p - tmp;
+        memcpy(insert_point, replacement, repl_len);
+        insert_point += repl_len;
+        tmp = p + needle_len;
+    }
+    strcpy(target, buffer);
+}
+
+
 void handle_drag_data(Widget_t *w, XEvent* event) {
     if (event->xselection.property != w->app->XdndSelection) return;
 
@@ -710,8 +734,10 @@ void handle_drag_data(Widget_t *w, XEvent* event) {
     if (!data || count == 0) {
         return;
     }
-    strremove((char*)data, "file://");
-    w->func.dnd_notify_callback(w, (void*)&data);
+    char* dndfile = (char*)data;
+    strdecode(dndfile, "%20", " ");
+    strremove(dndfile, "file://");
+    w->func.dnd_notify_callback(w, (void*)&dndfile);
     w->app->dnd_type = None;
     w->app->dnd_source_window = 0;
     free(data);
@@ -719,8 +745,10 @@ void handle_drag_data(Widget_t *w, XEvent* event) {
 
 void handle_dnd_enter(Xputty *main, XEvent* event) {
     main->dnd_source_window = DND_SOURCE_WIN(event);
+    main->dnd_version = 0;
     if (DND_STATUS_ACCEPT(event)) {
-        if (DND_VERSION(event) > 5) return;
+        main->dnd_version = DND_VERSION(event);
+        if (main->dnd_version > 5) return;
         Atom type = 0;
         int format;
         unsigned long count, remaining;
@@ -775,7 +803,7 @@ void send_dnd_status_event(Widget_t *w, XEvent* event) {
 }
 
 void send_dnd_finished_event(Widget_t *w, XEvent* event) {
-    if (DND_VERSION(event) < 2) {
+    if (w->app->dnd_version < 2) {
         return;
     }
     XEvent xev;

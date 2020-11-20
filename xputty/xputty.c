@@ -51,6 +51,7 @@ void main_init(Xputty *main) {
     main->dnd_type_utf8 = XInternAtom (main->dpy, "UTF8_STRING", False);
     main->dnd_type = None;
     main->dnd_source_window = 0;
+    main->dnd_version = 5;
 }
 
 void main_run(Xputty *main) {

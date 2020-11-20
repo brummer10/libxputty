@@ -225,6 +225,7 @@ struct Xputty{
     Atom dnd_type_utf8;
     Atom dnd_type;
     Window dnd_source_window;
+    int dnd_version;
 };
 
 /**
