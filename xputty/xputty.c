@@ -147,24 +147,32 @@ void run_embedded(Xputty *main) {
         }
         switch (xev.type) {
         case ButtonPress:
+        {
+            bool is_item = False;
             if(main->hold_grab != NULL) {
-                Widget_t *view_port = main->hold_grab->childlist->childs[0];
-                bool is_item = False;
-                int i = view_port->childlist->elem-1;
-                for(;i>-1;i--) {
-                    Widget_t *w = view_port->childlist->childs[i];
-                    if (xev.xbutton.window == w->widget) {
-                        is_item = True;
+                if (childlist_has_child(main->hold_grab->childlist)) {
+                    Widget_t *slider = main->hold_grab->childlist->childs[1];
+                    if (xev.xbutton.window == slider->widget) {
                         break;
                     }
+                    Widget_t *view_port = main->hold_grab->childlist->childs[0];
+                    int i = view_port->childlist->elem-1;
+                    for(;i>-1;i--) {
+                        Widget_t *w = view_port->childlist->childs[i];
+                        if (xev.xbutton.window == w->widget) {
+                            is_item = True;
+                            break;
+                        }
+                    }
+                    if (xev.xbutton.window == view_port->widget) is_item = True;
                 }
-                if (xev.xbutton.window == view_port->widget) is_item = True;
                 if (!is_item) {
                     XUngrabPointer(main->dpy,CurrentTime);
                     widget_hide(main->hold_grab);
                     main->hold_grab = NULL;
                 }
             }
+        }
         break;
         case ClientMessage:
             if (xev.xclient.data.l[0] == (long int)XInternAtom(main->dpy, "WM_DELETE_WINDOW", True) ) {
