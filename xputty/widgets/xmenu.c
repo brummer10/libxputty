@@ -283,7 +283,7 @@ Widget_t* menu_add_radio_item(Widget_t *menu, const char * label) {
     wid->flags |= IS_RADIO;
     wid->func.expose_callback = _draw_check_item;
     wid->func.button_press_callback = _radio_item_button_pressed;
-    radio_item_set_active(wid);
+    //radio_item_set_active(wid);
     return wid;
 }
 
