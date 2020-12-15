@@ -100,7 +100,7 @@ Widget_t *add_menu(Widget_t *parent, const char * label,
 Widget_t *add_menubar(Widget_t *parent, const char * label,
                         int x, int y, int width, int height) {
     Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
-    wid->scale.gravity = NORTHWEST;
+    wid->scale.gravity = NORTHEAST;
     wid->flags |= NO_AUTOREPEAT | NO_PROPAGATE;
     return wid;
 }
@@ -245,6 +245,7 @@ void menu_remove_item(Widget_t *menu, Widget_t *item) {
     float max_value = view_port->adj->max_value-1.0;
     destroy_widget(item,menu->app);
     set_adjustment(view_port->adj,0.0, 0.0, 0.0, max_value,1.0, CL_VIEWPORT);
+    XMoveWindow(menu->app->dpy,view_port->widget,0.0, 0.0);
 }
 
 Widget_t* menu_add_accel_item(Widget_t *menu,const char * label) {
