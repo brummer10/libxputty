@@ -141,6 +141,21 @@ int fp_check_link(char *path, struct dirent *dp) {
     return 0;
 }
 
+int fp_check_dir(char *path, struct dirent *dp) {
+    if (dp->d_type == DT_UNKNOWN) {
+        char s[256];
+        snprintf(s, 256, (strcmp(path, PATH_SEPARATOR) != 0) ?
+              "%s" PATH_SEPARATOR "%s" : "%s%s" , path,dp->d_name);
+        struct stat sb;
+        if (stat(s, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }
+    return 0;
+}
+
 int fp_get_files(FilePicker *filepicker, char *path, int get_dirs, int get_files) {
     int ret = 0;
     fp_clear_filebuffer(filepicker);
@@ -160,9 +175,9 @@ int fp_get_files(FilePicker *filepicker, char *path, int get_dirs, int get_files
 
     while ((dp = readdir(dirp)) != NULL) {
 
-        if(get_files && dp-> d_type != DT_DIR && dp->d_type != DT_UNKNOWN && strlen(dp->d_name)!=0
+        if((get_files && (dp->d_type != DT_DIR || (fp_check_dir(path, dp) == 2)) && strlen(dp->d_name)!=0
           && strcmp(dp->d_name,"..")!=0 && fp_show_hidden_files(filepicker, dp->d_name)
-          && fp_show_filter_files(filepicker, dp->d_name) && !fp_check_link(path, dp)) {
+          && fp_show_filter_files(filepicker, dp->d_name) && !fp_check_link(path, dp)) ) {
 
             filepicker->file_names = (char **)realloc(filepicker->file_names,
               (filepicker->file_counter + 1) * sizeof(char *));
@@ -170,8 +185,9 @@ int fp_get_files(FilePicker *filepicker, char *path, int get_dirs, int get_files
             asprintf(&filepicker->file_names[filepicker->file_counter++],"%s",dp->d_name);
             assert(&filepicker->file_names[filepicker->file_counter] != NULL);
 
-        } else if(get_dirs && (dp -> d_type == DT_DIR || dp -> d_type == DT_LNK) && strlen(dp->d_name)!=0
-          && strcmp(dp->d_name,"..")!=0 && fp_show_hidden_files(filepicker, dp->d_name)) {
+        } else if(get_dirs && (dp -> d_type == DT_DIR || dp -> d_type == DT_LNK || (fp_check_dir(path, dp) == 1)) 
+          && strlen(dp->d_name)!=0 && strcmp(dp->d_name,"..")!=0 && fp_show_hidden_files(filepicker, dp->d_name)) {
+
             if (dp -> d_type == DT_LNK) {
                 if (!fp_check_link(path, dp)) continue;
             }
