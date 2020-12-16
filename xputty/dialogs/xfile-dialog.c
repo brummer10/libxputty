@@ -193,8 +193,8 @@ static void button_ok_callback(void *w_, void* user_data) {
             file_dialog->parent->func.dialog_callback(file_dialog->parent,&file_dialog->fp->selected_file);
             file_dialog->send_clear_func = false;
         } else {
-            open_message_dialog(w, INFO_BOX, _("INFO"),
-                    _("Please select a file"),NULL);
+            Widget_t *dia = open_message_dialog(w, INFO_BOX, _("INFO"), _("Please select a file"),NULL);
+            XSetTransientForHint(file_dialog->w->app->dpy, dia->widget, file_dialog->w->widget);
             return;
         }
         destroy_widget(file_dialog->w,file_dialog->w->app);
@@ -389,6 +389,10 @@ static void fbutton_callback(void *w_, void* user_data) {
     FileButton *filebutton = (FileButton *)w->parent_struct;
     if (w->flags & HAS_POINTER && adj_get_value(w->adj)){
         filebutton->w = open_file_dialog(w,filebutton->path,filebutton->filter);
+        Atom wmStateAbove = XInternAtom(w->app->dpy, "_NET_WM_STATE_ABOVE", 1 );
+        Atom wmNetWmState = XInternAtom(w->app->dpy, "_NET_WM_STATE", 1 );
+        XChangeProperty(w->app->dpy, filebutton->w->widget, wmNetWmState, XA_ATOM, 32, 
+            PropModeReplace, (unsigned char *) &wmStateAbove, 1); 
         filebutton->is_active = true;
     } else if (w->flags & HAS_POINTER && !adj_get_value(w->adj)){
         if(filebutton->is_active)
