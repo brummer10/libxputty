@@ -31,6 +31,7 @@
 #include <stdarg.h> 
 #include <string.h>
 #include <unistd.h>
+#include <pwd.h>
 
 #include <libgen.h>
 
@@ -299,6 +300,10 @@ static void parse_xdg_dirs(FileDialog *file_dialog) {
     
     char xdg_dir[204];
     file_dialog->home_dir = getenv("HOME");
+    if (file_dialog->home_dir == NULL) {
+        file_dialog->home_dir = getpwuid(getuid())->pw_dir;
+    }
+    if (file_dialog->home_dir == NULL) return;
     sprintf(xdg_dir,"%s/.config/user-dirs.dirs", file_dialog->home_dir);
     FILE * fp = NULL;
     char * line = NULL;
@@ -360,7 +365,16 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->xdg_dir_counter = 0;
     parse_xdg_dirs(file_dialog);
     file_dialog->fp = (FilePicker*)malloc(sizeof(FilePicker));
-    fp_init(file_dialog->fp, (path) ? path : "/");
+
+    struct stat sb;
+    if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+        fp_init(file_dialog->fp, path);
+    } else if (stat(file_dialog->home_dir, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+        fp_init(file_dialog->fp, file_dialog->home_dir);
+    } else {
+        fp_init(file_dialog->fp, "/");
+    }
+
     file_dialog->parent = w;
     file_dialog->send_clear_func = true;
     file_dialog->icon = NULL;
