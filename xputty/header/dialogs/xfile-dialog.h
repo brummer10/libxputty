@@ -46,6 +46,9 @@ typedef struct {
     Pixmap *icon;
     FilePicker *fp;
     bool send_clear_func;
+    unsigned int xdg_dir_counter;
+    char **xdg_user_dirs;
+    const char *home_dir;
 } FileDialog;
 
 typedef struct {

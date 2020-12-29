@@ -59,6 +59,8 @@ static void draw_window(void *w_, void* user_data) {
     cairo_move_to (w->crb, 20, 35);
     cairo_show_text(w->crb, _("Directory"));
     cairo_move_to (w->crb, 20, 85);
+    cairo_show_text(w->crb, _("XDG"));
+    cairo_move_to (w->crb, 130, 85);
     cairo_show_text(w->crb, _("File"));
     cairo_move_to (w->crb, 20, 340);
     cairo_show_text(w->crb, _("Load: "));
@@ -271,9 +273,92 @@ static void fd_mem_free(void *w_, void* user_data) {
     free(file_dialog);
 }
 
+static int starts_with(const char *restrict string, const char *restrict prefix) {
+    while(*prefix)
+    {
+        if(*prefix++ != *string++)
+            return 0;
+    }
+
+    return 1;
+}
+
+static int strremove(char *string, const char *restrict find){
+    if(strstr(string, find) == NULL) return 0;
+    char *temporaryString = malloc(strlen(strstr(string, find) + strlen(find)) + 1);
+    strcpy(temporaryString, strstr(string, find) + strlen(find));
+    char* rep = strstr(string, find);
+    *rep = '\0';
+    //strcat(string, replaceWith);
+    strcat(string, temporaryString);
+    free(temporaryString);
+    return 1;
+}
+
+static void parse_xdg_dirs(FileDialog *file_dialog) {
+    
+    char xdg_dir[204];
+    file_dialog->home_dir = getenv("HOME");
+    sprintf(xdg_dir,"%s/.config/user-dirs.dirs", file_dialog->home_dir);
+    FILE * fp = NULL;
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    fp = fopen(xdg_dir, "r");
+    if (fp == NULL) {
+        fprintf(stderr, "fail to open %s\n", xdg_dir);
+        return;
+    }
+    file_dialog->xdg_user_dirs = (char **)realloc(file_dialog->xdg_user_dirs,
+      (file_dialog->xdg_dir_counter + 1) * sizeof(char *));
+    assert(file_dialog->xdg_user_dirs != NULL);
+    asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", _("Home"));
+    assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter] != NULL);
+    while ((read = getline(&line, &len, fp)) != -1) {
+        if(starts_with(line,"XDG_")) {
+            char* xdg = strstr(line, "$HOME/");
+            if (!strremove(xdg, "$HOME/")) continue;
+            char* rep = strstr(xdg, "\"");
+            *rep = '\0';
+            file_dialog->xdg_user_dirs = (char **)realloc(file_dialog->xdg_user_dirs,
+              (file_dialog->xdg_dir_counter + 1) * sizeof(char *));
+            assert(file_dialog->xdg_user_dirs != NULL);
+            asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", xdg);
+            assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter] != NULL);
+        }
+    }
+
+    fclose(fp);
+    if (line)
+        free(line);    
+}
+
+static void xdg_dir_select_callback(void *w_, void *button, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+    int v = (int)adj_get_value(w->adj);
+    if (v == 0) {
+        asprintf(&file_dialog->fp->path, "%s",file_dialog->home_dir);
+    } else {
+        asprintf(&file_dialog->fp->path, "%s/%s",file_dialog->home_dir,file_dialog->xdg_user_dirs[v]);
+    }
+    reload_from_dir(file_dialog);
+}
+
+static void add_xdg_dirs(FileDialog *file_dialog) {
+    Widget_t *wid = add_listview(file_dialog->w, "", 20, 90, 100, 225);
+    wid->parent_struct = file_dialog;
+    listview_set_list(wid, file_dialog->xdg_user_dirs, (int)file_dialog->xdg_dir_counter);
+    wid->func.button_release_callback = xdg_dir_select_callback;
+}
+
 Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     FileDialog *file_dialog = (FileDialog*)malloc(sizeof(FileDialog));
-    
+
+    file_dialog->xdg_user_dirs = NULL;
+    file_dialog->xdg_dir_counter = 0;
+    parse_xdg_dirs(file_dialog);
     file_dialog->fp = (FilePicker*)malloc(sizeof(FilePicker));
     fp_init(file_dialog->fp, (path) ? path : "/");
     file_dialog->parent = w;
@@ -312,7 +397,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     add_tooltip(file_dialog->sel_dir,_("Open sub-directory's"));
     file_dialog->sel_dir->func.value_changed_callback = open_dir_callback;
 
-    file_dialog->ft = add_listview(file_dialog->w, "", 20, 90, 620, 225);
+    file_dialog->ft = add_listview(file_dialog->w, "", 130, 90, 510, 225);
     file_dialog->ft->parent_struct = file_dialog;
     file_dialog->ft->func.value_changed_callback = file_released_callback;
 
@@ -321,6 +406,8 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     set_dirs(file_dialog);
     combobox_set_active_entry(file_dialog->ct, ds);
     listview_set_active_entry(file_dialog->ft, set_f);
+
+    add_xdg_dirs(file_dialog);
 
     file_dialog->w_quit = add_button(file_dialog->w, _("Cancel"), 580, 350, 60, 60);
     file_dialog->w_quit->parent_struct = file_dialog;
