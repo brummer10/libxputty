@@ -145,6 +145,7 @@ void _list_entry_released(void *w_, void* button_, void* user_data) {
         int height = attrs.height;
         int _items = height/(height/25);
         int prelight_item = xbutton->y/_items  + (int)max(0,adj_get_value(w->adj));
+        if (prelight_item > filelist->list_size-1) return;
         if(xbutton->button == Button4) {
             if(prelight_item != filelist->prelight_item) {
                 filelist->prelight_item = prelight_item;
@@ -165,6 +166,14 @@ void _list_entry_released(void *w_, void* button_, void* user_data) {
 void _list_entry_double_clicked(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t* listview = (Widget_t*) w->parent;
+    ViewList_t *filelist = (ViewList_t*)w->parent_struct;
+    XButtonEvent *xbutton = (XButtonEvent*)button_;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    int height = attrs.height;
+    int _items = height/(height/25);
+    int prelight_item = xbutton->y/_items  + (int)max(0,adj_get_value(w->adj));
+    if (prelight_item > filelist->list_size-1) return;
     listview->func.double_click_callback(listview,button_,NULL);
 }
 
