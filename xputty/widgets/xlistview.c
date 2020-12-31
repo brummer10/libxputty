@@ -36,6 +36,13 @@ void listview_set_active_entry(Widget_t *w, int active) {
     adj_set_value(w->adj,filelist->active_item);
 }
 
+void listview_unset_active_entry(Widget_t *w) {
+    Widget_t* view_port =  w->childlist->childs[0];
+    ViewList_t *filelist = (ViewList_t*)view_port->parent_struct;
+    filelist->active_item = -1;
+    filelist->prelight_item = -1;
+}
+
 Widget_t* create_listview_viewport(Widget_t *parent, int elem, int width, int height) {
     Widget_t *wid = create_widget(parent->app, parent, 0, 0, width, height);
     XSelectInput(wid->app->dpy, wid->widget,StructureNotifyMask|ExposureMask|KeyPressMask 
@@ -54,6 +61,7 @@ Widget_t* create_listview_viewport(Widget_t *parent, int elem, int width, int he
     wid->func.motion_callback = _list_motion;
     wid->func.leave_callback = _leave_list;
     wid->func.button_release_callback = _list_entry_released;
+    wid->func.double_click_callback = _list_entry_double_clicked;
     wid->func.key_press_callback = _list_key_pressed;
     wid->func.expose_callback = _draw_list;
     wid->func.configure_notify_callback = _reconfigure_listview_viewport;

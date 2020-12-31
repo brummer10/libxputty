@@ -79,6 +79,16 @@ void _list_key_pressed(void *w_, void* xkey_, void* user_data);
 void _list_entry_released(void *w_, void* button_, void* user_data);
 
 /**
+ * @brief _list_entry_double_clicke - forward double click from list entry to list view 
+ * @param *w_                       - void pointer to the Widget_t listview
+ * @param *button_                  - void pointer to the XButtonEvent
+ * @param *user_data                - void pointer to attached user_data
+ * @return void
+ */
+
+void _list_entry_double_clicked(void *w_, void* button_, void* user_data);
+
+/**
  * @brief _leave_list          - draw list on pointer leave
  * @param *w_                  - the Widget_t to draw
  * @param *user_data           - attached user_data

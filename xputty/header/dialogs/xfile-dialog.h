@@ -43,6 +43,7 @@ typedef struct {
     Widget_t *sel_dir;
     Widget_t *set_filter;
     Widget_t *text_entry;
+    Widget_t *xdg_dirs;
     Pixmap *icon;
     FilePicker *fp;
     bool send_clear_func;

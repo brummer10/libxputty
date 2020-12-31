@@ -162,6 +162,12 @@ void _list_entry_released(void *w_, void* button_, void* user_data) {
     }
 }
 
+void _list_entry_double_clicked(void *w_, void* button_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Widget_t* listview = (Widget_t*) w->parent;
+    listview->func.double_click_callback(listview,button_,NULL);
+}
+
 void _leave_list(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;

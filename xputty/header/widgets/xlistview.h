@@ -57,6 +57,14 @@ typedef struct {
 void listview_set_active_entry(Widget_t *w, int active);
 
 /**
+ * @brief listview_unset_active_entry - unset the active listview entry
+ * @param *w_                         - void pointer to the Widget_t listview
+ * @return void
+ */
+
+void listview_unset_active_entry(Widget_t *w);
+
+/**
  * @brief create_listview_viewport     - create a viewport on a listview to a Widget_t
  * @param *parent             - pointer to the Widget_t the listview should pop over
  * @param width               - define the width of the viewport
