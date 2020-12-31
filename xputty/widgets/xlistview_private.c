@@ -114,6 +114,7 @@ void _list_motion(void *w_, void* xmotion_, void* user_data) {
 
 void _list_key_pressed(void *w_, void* xkey_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
+    Widget_t* listview = (Widget_t*) w->parent;
     XKeyEvent *xkey = (XKeyEvent*)xkey_;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
     XWindowAttributes attrs;
@@ -133,6 +134,7 @@ void _list_key_pressed(void *w_, void* xkey_, void* user_data) {
             break;
         }
     }
+    listview->func.key_press_callback(listview, xkey_, user_data);
 }
 
 void _list_entry_released(void *w_, void* button_, void* user_data) {
