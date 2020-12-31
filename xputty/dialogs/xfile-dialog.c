@@ -357,11 +357,20 @@ static void xdg_dir_select_callback(void *w_, void *button, void* user_data) {
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     int v = (int)adj_get_value(w->adj);
     if (v == 0) {
+        free(file_dialog->fp->path);
+        file_dialog->fp->path = NULL;
         asprintf(&file_dialog->fp->path, "%s",file_dialog->home_dir);
+        assert(file_dialog->fp->path != NULL);
     } else if (v == file_dialog->xdg_dir_counter) {
+        free(file_dialog->fp->path);
+        file_dialog->fp->path = NULL;
         asprintf(&file_dialog->fp->path, "%s",PATH_SEPARATOR);
+        assert(file_dialog->fp->path != NULL);
     } else {
+        free(file_dialog->fp->path);
+        file_dialog->fp->path = NULL;
         asprintf(&file_dialog->fp->path, "%s/%s",file_dialog->home_dir,file_dialog->xdg_user_dirs[v]);
+        assert(file_dialog->fp->path != NULL);
     }
     reload_from_dir(file_dialog);
 }
