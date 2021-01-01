@@ -154,6 +154,8 @@ static void set_selected_file(FileDialog *file_dialog) {
 static void reload_file_entrys(FileDialog *file_dialog) {
     listview_remove_list(file_dialog->ft);
     fp_get_files(file_dialog->fp,file_dialog->fp->path, 0, 1);
+    if (!file_dialog->fp->file_counter)
+        fp_get_files(file_dialog->fp,file_dialog->fp->path, 1, 1);
     int set_f = set_files(file_dialog);
     if (set_f != -1) {
         listview_set_active_entry(file_dialog->ft, set_f);
