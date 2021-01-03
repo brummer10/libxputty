@@ -43,7 +43,7 @@ void _draw_list(void *w_, void* user_data) {
     use_base_color_scheme(w, NORMAL_);
     cairo_rectangle(w->crb, 0, 0, width, height);
     cairo_fill (w->crb);
-    cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
+    cairo_set_font_size (w->crb, min(w->app->big_font ,w->app->normal_font/w->scale.ascale));
     cairo_text_extents_t extents;
     cairo_text_extents(w->crb,"Ay", &extents);
     double h = extents.height;
@@ -76,20 +76,22 @@ void _draw_list(void *w_, void* user_data) {
         else
             use_text_color_scheme(w,NORMAL_ );
 
-        struct stat sb;
-        if (stat(filelist->list_names[i], &sb) == 0 && S_ISDIR(sb.st_mode)) {
-            use_text_color_scheme(w, INSENSITIVE_);
+        if (filelist->check_dir) {
+            struct stat sb;
+            if (stat(filelist->list_names[i], &sb) == 0 && S_ISDIR(sb.st_mode)) {
+                use_text_color_scheme(w, INSENSITIVE_);
+            }
         }
         cairo_text_extents(w->crb,filelist->list_names[i] , &extents);
 
-        cairo_move_to (w->crb, 20, (25*(a+1)) - h +2 );
+        cairo_move_to (w->crb, 20, (25*(a+1))+2 - (h*max(0.71,w->scale.ascale)));
         cairo_show_text(w->crb, filelist->list_names[i]);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {
             tooltip_set_text(w,filelist->list_names[i]);
             w->flags |= HAS_TOOLTIP;
             show_tooltip(w);
-        } else {
+        } else if (i == filelist->prelight_item && extents.width < (float)width-20){
             w->flags &= ~HAS_TOOLTIP;
             hide_tooltip(w);
         }

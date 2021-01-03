@@ -35,6 +35,7 @@ extern "C" {
  * @param active_item        - the list item which is selected(active)
  * @param show_items         - the viewable amount of list items
  * @param list_size          - total amount of list items in list
+ * @param check_dir          - check if list items is a directory
  * @param **list_names       - the list entrys
  */
 
@@ -44,6 +45,7 @@ typedef struct {
     int active_item;
     int show_items;
     int list_size;
+    int check_dir;
     char **list_names;
 } ViewList_t;
 
@@ -111,6 +113,15 @@ void listview_remove_list(Widget_t *listview);
  */
 
 void listview_set_list(Widget_t *listview, char **list, int list_size);
+
+/**
+ * @brief listview_set_check_dir - set optional check if list item is a directory
+ * @param *listview              - pointer to the Widget_t listview which should show the list
+ * @param set                    - 0 = no check (default); 1 = check
+ * @return void
+ */
+
+void listview_set_check_dir(Widget_t *listview, int set);
 
 #ifdef __cplusplus
 }

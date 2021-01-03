@@ -48,10 +48,11 @@ Widget_t* create_listview_viewport(Widget_t *parent, int elem, int width, int he
     XSelectInput(wid->app->dpy, wid->widget,StructureNotifyMask|ExposureMask|KeyPressMask 
                     |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask
                     |ButtonPressMask|Button1MotionMask|PointerMotionMask);
-    wid->scale.gravity = CENTER;
+    wid->scale.gravity = NORTHWEST;
     ViewList_t *filelist;
     filelist = (ViewList_t*)malloc(sizeof(ViewList_t));
     filelist->show_items = elem;
+    filelist->check_dir = 0;
     wid->flags |= HAS_MEM;
     wid->parent_struct = filelist;
     float max_value = -elem;
@@ -89,7 +90,7 @@ Widget_t* add_listview(Widget_t *parent, const char * label,
     filelist->slider->adj_y = add_adjustment(filelist->slider,0.0, 0.0, 0.0, 1.0,0.0085, CL_VIEWPORTSLIDER);
     filelist->slider->adj = filelist->slider->adj_y;
     filelist->slider->func.value_changed_callback = _set_listviewport;
-    filelist->slider->scale.gravity = NORTHWEST;
+    filelist->slider->scale.gravity = WESTSOUTH;
     filelist->slider->flags &= ~USE_TRANSPARENCY;
     filelist->slider->flags |= NO_AUTOREPEAT | NO_PROPAGATE;
     filelist->slider->parent_struct = viewport;
@@ -128,3 +129,8 @@ void listview_set_list(Widget_t *listview, char **list, int list_size) {
     _configure_listview(view_port, NULL);
 }
 
+void listview_set_check_dir(Widget_t *listview, int set) {
+    Widget_t* view_port =  listview->childlist->childs[0];
+    ViewList_t *filelist = (ViewList_t*)view_port->parent_struct;
+    filelist->check_dir = set;
+}
