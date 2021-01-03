@@ -534,7 +534,7 @@ static void xdg_dir_select_callback(void *w_, void *button, void* user_data) {
 static void add_xdg_dirs(FileDialog *file_dialog) {
     file_dialog->xdg_dirs = add_listview(file_dialog->w, "", 20, 90, 100, 225);
     file_dialog->xdg_dirs->parent_struct = file_dialog;
-    file_dialog->xdg_dirs->scale.gravity = NORTHWEST;
+    file_dialog->xdg_dirs->scale.gravity = EASTNORTH;
     file_dialog->xdg_dirs->func.key_press_callback = forward_key_press;
     listview_set_list(file_dialog->xdg_dirs, file_dialog->xdg_user_dirs, (int)file_dialog->xdg_dir_counter);
     file_dialog->xdg_dirs->func.button_release_callback = xdg_dir_select_callback;
@@ -592,7 +592,7 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
 
     file_dialog->sel_dir = add_button(file_dialog->w, _("Open"), 580, 40, 60, 30);
     file_dialog->sel_dir->parent_struct = file_dialog;
-    file_dialog->sel_dir->scale.gravity = NORTHEAST;
+    file_dialog->sel_dir->scale.gravity = WESTNORTH;
     add_tooltip(file_dialog->sel_dir,_("Open sub-directory's"));
     file_dialog->sel_dir->func.value_changed_callback = open_dir_callback;
     file_dialog->sel_dir->func.key_press_callback = forward_key_press;
@@ -600,6 +600,7 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->ft = add_listview(file_dialog->w, "", 130, 90, 510, 225);
     file_dialog->ft->parent_struct = file_dialog;
     file_dialog->ft->scale.gravity = NORTHWEST;
+    listview_set_check_dir(file_dialog->ft, 1);
     file_dialog->ft->func.key_press_callback = forward_key_press;
 
     int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1, 1);   
@@ -620,7 +621,7 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->text_entry->func.expose_callback = entry_add_text;
     file_dialog->text_entry->func.key_press_callback = entry_get_text;
     file_dialog->text_entry->flags &= ~USE_TRANSPARENCY;
-    file_dialog->text_entry->scale.gravity = SOUTHWEST;
+    file_dialog->text_entry->scale.gravity = EASTWEST;
     file_dialog->text_entry->parent_struct = file_dialog;
 
     file_dialog->w_quit = add_button(file_dialog->w, _("Cancel"), 580, 350, 60, 60);
@@ -659,7 +660,7 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
 
     file_dialog->w_hidden = add_check_button(file_dialog->w, "", 20, 365, 20, 20);
     file_dialog->w_hidden->parent_struct = file_dialog;
-    file_dialog->w_hidden->scale.gravity = SOUTHWEST;
+    file_dialog->w_hidden->scale.gravity = EASTWEST;
     add_tooltip(file_dialog->w_hidden,_("Show hidden files and folders"));
     file_dialog->w_hidden->func.key_press_callback = forward_key_press;
     file_dialog->w_hidden->func.value_changed_callback = button_hidden_callback;
