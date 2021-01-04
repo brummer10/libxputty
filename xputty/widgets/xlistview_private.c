@@ -224,6 +224,8 @@ void _set_listview_viewpoint(void *w_, void* user_data) {
 
 void _draw_listviewslider(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
+    Widget_t* view_port = (Widget_t*)w->parent_struct;
+    ViewList_t *filelist = (ViewList_t*)view_port->parent_struct;
     int v = (int)w->adj->max_value;
     if (!v) return;
     XWindowAttributes attrs;
@@ -231,6 +233,10 @@ void _draw_listviewslider(void *w_, void* user_data) {
     if (attrs.map_state != IsViewable) return;
     int width = attrs.width;
     int height = attrs.height;
+    int show_items = height/25;
+    float slidersize = 1.0;
+    if (filelist->list_size > show_items)
+        slidersize = (float)((float)show_items/(float)filelist->list_size);
     float sliderstate = adj_get_state(w->adj);
     use_bg_color_scheme(w, get_color_state(w));
     cairo_rectangle(w->crb, 0,0,width,height);
@@ -238,7 +244,8 @@ void _draw_listviewslider(void *w_, void* user_data) {
     use_shadow_color_scheme(w, NORMAL_);
     cairo_fill(w->crb);
     use_bg_color_scheme(w, NORMAL_);
-    cairo_rectangle(w->crb, 0,(height-10)*sliderstate,width,10);
+    cairo_rectangle(w->crb, 0,((float)height-
+        ((float)height*slidersize))*sliderstate,width,((float)height*slidersize));
     cairo_fill(w->crb);
 }
 
