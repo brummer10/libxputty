@@ -226,7 +226,7 @@ void _draw_combobox_entrys(void *w_, void* user_data) {
             tooltip_set_text(w,comboboxlist->list_names[i]);
             w->flags |= HAS_TOOLTIP;
             show_tooltip(w);
-        } else {
+        } else if (i == comboboxlist->prelight_item && extents.width < (float)width-20) {
             w->flags &= ~HAS_TOOLTIP;
             hide_tooltip(w);
         }
@@ -332,6 +332,8 @@ void _set_combobox_viewpoint(void *w_, void* user_data) {
 
 void _draw_combobox_menu_slider(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
+    Widget_t* view_port = (Widget_t*)w->parent_struct;
+    ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
     int v = (int)w->adj->max_value;
     if (!v) return;
     XWindowAttributes attrs;
@@ -339,6 +341,10 @@ void _draw_combobox_menu_slider(void *w_, void* user_data) {
     if (attrs.map_state != IsViewable) return;
     int width = attrs.width;
     int height = attrs.height;
+    int show_items = height/25;
+    float slidersize = 1.0;
+    if (comboboxlist->list_size > show_items)
+        slidersize = (float)((float)show_items/(float)comboboxlist->list_size);
     float sliderstate = adj_get_state(w->adj);
     use_bg_color_scheme(w, get_color_state(w));
     cairo_rectangle(w->crb, 0,0,width,height);
@@ -346,7 +352,8 @@ void _draw_combobox_menu_slider(void *w_, void* user_data) {
     use_shadow_color_scheme(w, NORMAL_);
     cairo_fill(w->crb);
     use_bg_color_scheme(w, NORMAL_);
-    cairo_rectangle(w->crb, 0,(height-10)*sliderstate,width,10);
+    cairo_rectangle(w->crb, 0,((float)height-
+        ((float)height*slidersize))*sliderstate,width,((float)height*slidersize));
     cairo_fill(w->crb);
 }
 
@@ -427,6 +434,9 @@ void _configure_combobox_menu(Widget_t *parent, Widget_t *menu, int elem, bool a
     if(above) {
         if(item_width<parent->width)item_width = parent->width;
     }
+    int snum = DefaultScreen(parent->app->dpy);
+    int screen_height = DisplayHeight(parent->app->dpy, snum);
+    if (y1+(height*elem) > screen_height) y1 = y1-((height*elem)+parent->height);
     XResizeWindow (menu->app->dpy, menu->widget, item_width, height*elem);
     XResizeWindow (view_port->app->dpy, view_port->widget, item_width, height*elem);
     XMoveWindow(menu->app->dpy,slider->widget,item_width-15, 0);

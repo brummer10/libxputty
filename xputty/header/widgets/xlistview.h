@@ -35,7 +35,7 @@ extern "C" {
  * @param active_item        - the list item which is selected(active)
  * @param show_items         - the viewable amount of list items
  * @param list_size          - total amount of list items in list
- * @param check_dir          - check if list items is a directory
+ * @param check_dir          - check if list item is a directory
  * @param **list_names       - the list entrys
  */
 

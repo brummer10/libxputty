@@ -598,7 +598,9 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
         case LeaveNotify:
             wid->flags &= ~HAS_FOCUS;
             if (wid->state == 4) break;
-            if(!(xev->xcrossing.state & Button1Mask)) {
+            if(!(xev->xcrossing.state & Button1Mask) &&
+               !(xev->xcrossing.state & Button2Mask) &&
+               !(xev->xcrossing.state & Button3Mask)) {
                 wid->state = 0;
                 wid->func.leave_callback(w_, user_data);
             }
@@ -609,7 +611,9 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
         case EnterNotify:
             wid->flags |= HAS_FOCUS;
             if (wid->state == 4) break;
-            if(!(xev->xcrossing.state & Button1Mask)) {
+            if(!(xev->xcrossing.state & Button1Mask) &&
+               !(xev->xcrossing.state & Button2Mask) &&
+               !(xev->xcrossing.state & Button3Mask)) {
                 wid->state = 1;
                 wid->func.enter_callback(w_, user_data);
                 if (wid->flags & HAS_TOOLTIP) show_tooltip(wid);

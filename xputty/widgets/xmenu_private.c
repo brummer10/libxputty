@@ -433,6 +433,9 @@ void _configure_menu(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     }
     slider->adj->step = max(0.0,1.0/(view_port->childlist->elem-elem));
     adj_set_scale(slider->adj, ((float)view_port->childlist->elem/(float)elem)/25.0);
+    int snum = DefaultScreen(parent->app->dpy);
+    int screen_height = DisplayHeight(parent->app->dpy, snum);
+    if (y1+(height*elem) > screen_height) y1 = y1-((height*elem)+parent->height);
     XResizeWindow (menu->app->dpy, menu->widget, item_width, height*elem);
     XResizeWindow (view_port->app->dpy, view_port->widget, item_width, height*view_port->childlist->elem);
     XMoveWindow(menu->app->dpy,slider->widget,item_width-10, 0);

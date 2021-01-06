@@ -94,10 +94,12 @@ void _button_press(Widget_t * wid, XButtonEvent *xbutton, void* user_data) {
         break;
         case Button2:
             debug_print("Button2 \n");
+            _has_pointer(wid, xbutton);
             wid->func.button_press_callback(wid, xbutton, user_data);
         break;
         case Button3:
             debug_print("Button3 \n");
+            _has_pointer(wid, xbutton);
             wid->func.button_press_callback(wid, xbutton, user_data);
         break;
         case  Button4:
