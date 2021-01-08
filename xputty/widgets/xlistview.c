@@ -85,6 +85,8 @@ Widget_t* add_listview(Widget_t *parent, const char * label,
     Widget_t *viewport = create_listview_viewport(wid, elem, width-10, height);
 
     ViewList_t *filelist = (ViewList_t*)viewport->parent_struct;
+    filelist->folder = surface_get_png(wid, filelist->folder, LDVAR(directory_png));
+    filelist->file = surface_get_png(wid, filelist->folder, LDVAR(file_png));
     filelist->slider = add_vslider(wid, "", width-10, 0, 10, height);
     filelist->slider->func.expose_callback = _draw_listviewslider;
     filelist->slider->adj_y = add_adjustment(filelist->slider,0.0, 0.0, 0.0, 1.0,0.0085, CL_VIEWPORTSLIDER);
@@ -101,6 +103,8 @@ Widget_t* add_listview(Widget_t *parent, const char * label,
 void listview_mem_free(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
+    cairo_surface_destroy(filelist->folder);
+    cairo_surface_destroy(filelist->file);
     free(filelist);
 }
 

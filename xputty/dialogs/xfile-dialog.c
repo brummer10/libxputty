@@ -416,7 +416,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     win_size_hints->min_height = 420;
     win_size_hints->base_width = 660;
     win_size_hints->base_height = 420;
-    win_size_hints->max_width = 660;
+    win_size_hints->max_width = 860;
     win_size_hints->max_height = 840;
     win_size_hints->win_gravity = CenterGravity;
     XSetWMNormalHints(file_dialog->w->app->dpy, file_dialog->w->widget, win_size_hints);

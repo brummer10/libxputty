@@ -65,7 +65,8 @@ void _draw_list(void *w_, void* user_data) {
         cairo_fill_preserve(w->crb);
         cairo_set_line_width(w->crb, 1.0);
         use_frame_color_scheme(w, PRELIGHT_);
-        cairo_stroke(w->crb); 
+        cairo_stroke(w->crb);
+
         /** show label **/
         if(i == filelist->prelight_item && i == filelist->active_item)
             use_text_color_scheme(w, ACTIVE_);
@@ -79,12 +80,22 @@ void _draw_list(void *w_, void* user_data) {
         if (filelist->check_dir) {
             struct stat sb;
             if (stat(filelist->list_names[i], &sb) == 0 && S_ISDIR(sb.st_mode)) {
+                cairo_scale(w->crb,0.08, 0.08);
+                cairo_set_source_surface (w->crb, filelist->folder,1.0*12.5,((double)a+0.1)*25.0*12.5);
+                cairo_paint (w->crb);
+                cairo_scale(w->crb,12.5, 12.5);
                 use_text_color_scheme(w, INSENSITIVE_);
+            } else {
+                cairo_scale(w->crb,0.08, 0.08);
+                cairo_set_source_surface (w->crb, filelist->file,1.0*12.5,((double)a+0.1)*25.0*12.5);
+                cairo_paint (w->crb);
+                cairo_scale(w->crb,12.5, 12.5);
+                use_text_color_scheme(w,NORMAL_ );
             }
         }
         cairo_text_extents(w->crb,filelist->list_names[i] , &extents);
 
-        cairo_move_to (w->crb, 20, (25*(a+1))+2 - (h*max(0.71,w->scale.ascale)));
+        cairo_move_to (w->crb, 20, (25.0*((double)a+1.0))+3.0 - (h*max(0.71,w->scale.ascale)));
         cairo_show_text(w->crb, filelist->list_names[i]);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {

@@ -41,6 +41,8 @@ extern "C" {
 
 typedef struct {
     Widget_t *slider;
+    cairo_surface_t *folder;
+    cairo_surface_t *file;
     int prelight_item;
     int active_item;
     int show_items;
