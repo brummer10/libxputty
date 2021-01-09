@@ -324,7 +324,8 @@ static void parse_xdg_dirs(FileDialog *file_dialog) {
       (file_dialog->xdg_dir_counter + 1) * sizeof(char *));
     assert(file_dialog->xdg_user_dirs != NULL);
     asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", _("Home"));
-    assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter] != NULL);
+    assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter-1] != NULL);
+    
 
     fp = fopen(xdg_dir, "r");
     if (fp != NULL) {
@@ -338,7 +339,7 @@ static void parse_xdg_dirs(FileDialog *file_dialog) {
                   (file_dialog->xdg_dir_counter + 1) * sizeof(char *));
                 assert(file_dialog->xdg_user_dirs != NULL);
                 asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", xdg);
-                assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter] != NULL);
+                assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter-1] != NULL);
             }
         }
     }
@@ -347,7 +348,7 @@ static void parse_xdg_dirs(FileDialog *file_dialog) {
       (file_dialog->xdg_dir_counter + 1) * sizeof(char *));
     assert(file_dialog->xdg_user_dirs != NULL);
     asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", _("Computer"));
-    assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter] != NULL);
+    assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter-1] != NULL);
 
     fclose(fp);
     if (line)

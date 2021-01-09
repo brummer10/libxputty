@@ -478,7 +478,7 @@ static void parse_xdg_dirs(FileDialog *file_dialog) {
       (file_dialog->xdg_dir_counter + 1) * sizeof(char *));
     assert(file_dialog->xdg_user_dirs != NULL);
     asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", _("Home"));
-    assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter] != NULL);
+    assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter-1] != NULL);
 
     fp = fopen(xdg_dir, "r");
     if (fp != NULL) {
@@ -492,7 +492,7 @@ static void parse_xdg_dirs(FileDialog *file_dialog) {
                   (file_dialog->xdg_dir_counter + 1) * sizeof(char *));
                 assert(file_dialog->xdg_user_dirs != NULL);
                 asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", xdg);
-                assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter] != NULL);
+                assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter-1] != NULL);
             }
         }
     }
@@ -501,7 +501,7 @@ static void parse_xdg_dirs(FileDialog *file_dialog) {
       (file_dialog->xdg_dir_counter + 1) * sizeof(char *));
     assert(file_dialog->xdg_user_dirs != NULL);
     asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", _("Computer"));
-    assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter] != NULL);
+    assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter-1] != NULL);
 
     fclose(fp);
     if (line)
@@ -623,6 +623,9 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->text_entry->flags &= ~USE_TRANSPARENCY;
     file_dialog->text_entry->scale.gravity = EASTWEST;
     file_dialog->text_entry->parent_struct = file_dialog;
+    Cursor c = XCreateFontCursor(file_dialog->w->app->dpy, XC_xterm);
+    XDefineCursor (file_dialog->w->app->dpy, file_dialog->text_entry->widget, c);
+    XFreeCursor(file_dialog->w->app->dpy, c);
 
     file_dialog->w_quit = add_button(file_dialog->w, _("Cancel"), 580, 350, 60, 60);
     file_dialog->w_quit->parent_struct = file_dialog;

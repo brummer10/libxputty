@@ -103,7 +103,7 @@ static inline int fp_prefill_dirbuffer(FilePicker *filepicker, char *path) {
           (filepicker->dir_counter + 1) * sizeof(char *));
         assert(filepicker->dir_names != NULL);
         asprintf(&filepicker->dir_names[filepicker->dir_counter++], "%s",path);
-        assert(&filepicker->dir_names[filepicker->dir_counter] != NULL);
+        assert(&filepicker->dir_names[filepicker->dir_counter-1] != NULL);
     } else {
         char *ho;
         asprintf(&ho, "%s",path);
@@ -113,7 +113,7 @@ static inline int fp_prefill_dirbuffer(FilePicker *filepicker, char *path) {
               (filepicker->dir_counter + 1) * sizeof(char *));
             assert(filepicker->dir_names != NULL);
             asprintf(&filepicker->dir_names[filepicker->dir_counter++], "%s",dirname(ho));
-            assert(&filepicker->dir_names[filepicker->dir_counter] != NULL);
+            assert(&filepicker->dir_names[filepicker->dir_counter-1] != NULL);
             ret++;
         }
         if (strcmp (path, PATH_SEPARATOR) != 0) {
@@ -121,7 +121,7 @@ static inline int fp_prefill_dirbuffer(FilePicker *filepicker, char *path) {
               (filepicker->dir_counter + 1) * sizeof(char *));
             assert(filepicker->dir_names != NULL);
             asprintf(&filepicker->dir_names[filepicker->dir_counter++], "%s",path);
-            assert(&filepicker->dir_names[filepicker->dir_counter] != NULL);
+            assert(&filepicker->dir_names[filepicker->dir_counter-1] != NULL);
         }
         free(ho);
     }
@@ -183,7 +183,7 @@ int fp_get_files(FilePicker *filepicker, char *path, int get_dirs, int get_files
               (filepicker->file_counter + 1) * sizeof(char *));
             assert(filepicker->file_names != NULL);
             asprintf(&filepicker->file_names[filepicker->file_counter++],"%s",dp->d_name);
-            assert(&filepicker->file_names[filepicker->file_counter] != NULL);
+            assert(&filepicker->file_names[filepicker->file_counter-1] != NULL);
 
         } else if(get_dirs && (dp -> d_type == DT_DIR || dp -> d_type == DT_LNK || (fp_check_dir(path, dp) == 1)) 
           && strlen(dp->d_name)!=0 && strcmp(dp->d_name,"..")!=0 && fp_show_hidden_files(filepicker, dp->d_name)) {
@@ -196,7 +196,7 @@ int fp_get_files(FilePicker *filepicker, char *path, int get_dirs, int get_files
             assert(filepicker->file_names != NULL);
             asprintf(&filepicker->file_names[filepicker->file_counter++], (strcmp(path, PATH_SEPARATOR) != 0) ?
               "%s" PATH_SEPARATOR "%s" : "%s%s" , path,dp->d_name);
-            assert(&filepicker->dir_names[filepicker->file_counter] != NULL);
+            assert(&filepicker->dir_names[filepicker->file_counter-1] != NULL);
         }
     }
     closedir(dirp);
