@@ -40,6 +40,7 @@
 #include "xlabel.h"
 #include "xlistbox.h"
 #include "xlistview.h"
+#include "xmultilistview.h"
 #include "xplayhead.h"
 #include "xtuner.h"
 #include "xvaluedisplay.h"

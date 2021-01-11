@@ -44,8 +44,10 @@ typedef struct {
     Widget_t *set_filter;
     Widget_t *text_entry;
     Widget_t *xdg_dirs;
+    Widget_t *view;
     Pixmap *icon;
     FilePicker *fp;
+    bool list_view;
     bool send_clear_func;
     unsigned int xdg_dir_counter;
     char **xdg_user_dirs;

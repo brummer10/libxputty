@@ -64,8 +64,10 @@ static void draw_window(void *w_, void* user_data) {
     cairo_show_text(w->crb, _("Entries"));
     cairo_move_to (w->crb, 20, 340-w->scale.scale_y);
     cairo_show_text(w->crb, _("Load: "));
-    cairo_move_to (w->crb, 45, 380-w->scale.scale_y);
+    cairo_move_to (w->crb, 45, 370-w->scale.scale_y);
     cairo_show_text(w->crb, _("Show hidden files")); 
+    cairo_move_to (w->crb, 45, 400-w->scale.scale_y);
+    cairo_show_text(w->crb, _("List view")); 
     cairo_move_to (w->crb, 60, 340-w->scale.scale_y);
     cairo_show_text(w->crb, w->label);
     //widget_reset_scale(w);
@@ -83,7 +85,11 @@ static void button_quit_callback(void *w_, void* user_data) {
 }
 
 static inline int set_files(FileDialog *file_dialog) {
-    listview_set_list(file_dialog->ft,file_dialog->fp->file_names , (int)file_dialog->fp->file_counter);
+    if (file_dialog->list_view) {
+        listview_set_list(file_dialog->ft,file_dialog->fp->file_names , (int)file_dialog->fp->file_counter);
+    } else {
+        multi_listview_set_list(file_dialog->ft,file_dialog->fp->file_names , (int)file_dialog->fp->file_counter);
+    }
     int ret = -1;
     int i = 0;
     for (; i<(int)file_dialog->fp->file_counter; i++) {
@@ -100,28 +106,43 @@ static void set_dirs(FileDialog *file_dialog) {
     }
 }
 
-static void file_released_b_callback(void *w_, void *button, void* user_data) {
+static void file_released_b_callback(void *w_, void *button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
-    set_selected_file(file_dialog);
-    if(file_dialog->fp->selected_file) {
-        file_dialog->w->label = file_dialog->fp->selected_file;
-        expose_widget(file_dialog->w);
+    XButtonEvent *xbutton = (XButtonEvent*)button_;
+    if(xbutton->button == Button1) {
+        set_selected_file(file_dialog);
+        if(file_dialog->fp->selected_file) {
+            file_dialog->w->label = file_dialog->fp->selected_file;
+            expose_widget(file_dialog->w);
+        }
     }
 }
 
 static void reload_from_dir(FileDialog *file_dialog) {
     assert(file_dialog->fp->path != NULL);
-    listview_remove_list(file_dialog->ft);
+    if (file_dialog->list_view) {
+        listview_remove_list(file_dialog->ft);
+    } else {
+        multi_listview_remove_list(file_dialog->ft);
+    }
     combobox_delete_entrys(file_dialog->ct);
     int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1, 1);
     int set_f = set_files(file_dialog);
     set_dirs(file_dialog);
     combobox_set_active_entry(file_dialog->ct, ds);
     if (set_f != -1) {
-        listview_set_active_entry(file_dialog->ft, set_f);
+        if (file_dialog->list_view) {
+            listview_set_active_entry(file_dialog->ft, set_f);
+        } else {
+            multi_listview_set_active_entry(file_dialog->ft, set_f);
+        }
     } else {
-        listview_unset_active_entry(file_dialog->ft);
+        if (file_dialog->list_view) {
+            listview_unset_active_entry(file_dialog->ft);
+        } else {
+            multi_listview_unset_active_entry(file_dialog->ft);
+        }
     }
     listview_unset_active_entry(file_dialog->xdg_dirs);
     expose_widget(file_dialog->ft);
@@ -152,15 +173,27 @@ static void set_selected_file(FileDialog *file_dialog) {
 }
 
 static void reload_file_entrys(FileDialog *file_dialog) {
-    listview_remove_list(file_dialog->ft);
+    if (file_dialog->list_view) {
+        listview_remove_list(file_dialog->ft);
+    } else {
+        multi_listview_remove_list(file_dialog->ft);
+    }
     fp_get_files(file_dialog->fp,file_dialog->fp->path, 0, 1);
     if (!file_dialog->fp->file_counter)
         fp_get_files(file_dialog->fp,file_dialog->fp->path, 1, 1);
     int set_f = set_files(file_dialog);
     if (set_f != -1) {
-        listview_set_active_entry(file_dialog->ft, set_f);
+        if (file_dialog->list_view) {
+            listview_set_active_entry(file_dialog->ft, set_f);
+        } else {
+            multi_listview_set_active_entry(file_dialog->ft, set_f);
+        }
     } else {
-        listview_unset_active_entry(file_dialog->ft);
+        if (file_dialog->list_view) {
+            listview_unset_active_entry(file_dialog->ft);
+        } else {
+            multi_listview_unset_active_entry(file_dialog->ft);
+        }
     }
     expose_widget(file_dialog->ft);
 }
@@ -221,16 +254,28 @@ static void reload_all(FileDialog *file_dialog) {
     file_dialog->fp->path = NULL;
     asprintf(&file_dialog->fp->path, "%s",comboboxlist->list_names[(int)adj_get_value(file_dialog->ct->adj)]);
     assert(file_dialog->fp->path != NULL);
-    listview_remove_list(file_dialog->ft);
+    if (file_dialog->list_view) {
+        listview_remove_list(file_dialog->ft);
+    } else {
+        multi_listview_remove_list(file_dialog->ft);
+    }
     combobox_delete_entrys(file_dialog->ct);
     int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1, 1);
     int set_f = set_files(file_dialog);
     set_dirs(file_dialog);
     combobox_set_active_entry(file_dialog->ct, ds);
     if (set_f != -1) {
-        listview_set_active_entry(file_dialog->ft, set_f);
+        if (file_dialog->list_view) {
+            listview_set_active_entry(file_dialog->ft, set_f);
+        } else {
+            multi_listview_set_active_entry(file_dialog->ft, set_f);
+        }
     } else {
-        listview_unset_active_entry(file_dialog->ft);
+        if (file_dialog->list_view) {
+            listview_unset_active_entry(file_dialog->ft);
+        } else {
+            multi_listview_unset_active_entry(file_dialog->ft);
+        }
     }
     expose_widget(file_dialog->ft);
 }
@@ -250,6 +295,46 @@ static void button_hidden_callback(void *w_, void* user_data) {
         file_dialog->fp->show_hidden = adj_get_value(w->adj) ? true : false;
         reload_all(file_dialog);
     }
+}
+
+static void button_view_callback(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+    if (w->flags & HAS_POINTER) {
+        file_dialog->list_view = adj_get_value(w->adj) ? true : false;
+    }
+    if (file_dialog->list_view) {
+        destroy_widget(file_dialog->ft, w->app);
+        file_dialog->ft = add_listview(file_dialog->w, "", 130, 90, 510, 225);
+        file_dialog->ft->parent_struct = file_dialog;
+        file_dialog->ft->scale.gravity = NORTHWEST;
+        listview_set_check_dir(file_dialog->ft, 1);
+        file_dialog->ft->func.button_release_callback = file_released_b_callback;
+        file_dialog->ft->func.double_click_callback = file_double_click_callback;
+        int set_f = set_files(file_dialog); 
+        if (set_f != -1) {
+            listview_set_active_entry(file_dialog->ft, set_f);
+        } else {
+            listview_unset_active_entry(file_dialog->ft);
+        }
+        widget_show_all(file_dialog->ft);
+    } else {
+        destroy_widget(file_dialog->ft, w->app);
+        file_dialog->ft = add_multi_listview(file_dialog->w, "", 130, 90, 510, 225);
+        file_dialog->ft->parent_struct = file_dialog;
+        file_dialog->ft->scale.gravity = NORTHWEST;
+        multi_listview_set_check_dir(file_dialog->ft, 1);
+        file_dialog->ft->func.button_release_callback = file_released_b_callback;
+        file_dialog->ft->func.double_click_callback = file_double_click_callback;
+        int set_f = set_files(file_dialog); 
+        if (set_f != -1) {
+            multi_listview_set_active_entry(file_dialog->ft, set_f);
+        } else {
+            multi_listview_unset_active_entry(file_dialog->ft);
+        }
+        widget_show_all(file_dialog->ft);
+    }
+    resize_childs(file_dialog->w);
 }
 
 static void set_filter_callback(void *w_, void* user_data) {
@@ -407,6 +492,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->parent = w;
     file_dialog->send_clear_func = true;
     file_dialog->icon = NULL;
+    file_dialog->list_view = false;
 
     file_dialog->w = create_window(w->app, DefaultRootWindow(w->app->dpy), 0, 0, 660, 420);
 
@@ -441,10 +527,10 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     add_tooltip(file_dialog->sel_dir,_("Open sub-directory's"));
     file_dialog->sel_dir->func.value_changed_callback = open_dir_callback;
 
-    file_dialog->ft = add_listview(file_dialog->w, "", 130, 90, 510, 225);
+    file_dialog->ft = add_multi_listview(file_dialog->w, "", 130, 90, 510, 225);
     file_dialog->ft->parent_struct = file_dialog;
     file_dialog->ft->scale.gravity = NORTHWEST;
-    listview_set_check_dir(file_dialog->ft, 1);
+    multi_listview_set_check_dir(file_dialog->ft, 1);
     file_dialog->ft->func.button_release_callback = file_released_b_callback;
     file_dialog->ft->func.double_click_callback = file_double_click_callback;
 
@@ -453,9 +539,9 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     set_dirs(file_dialog);
     combobox_set_active_entry(file_dialog->ct, ds);
     if (set_f != -1) {
-        listview_set_active_entry(file_dialog->ft, set_f);
+        multi_listview_set_active_entry(file_dialog->ft, set_f);
     } else {
-        listview_unset_active_entry(file_dialog->ft);
+        multi_listview_unset_active_entry(file_dialog->ft);
     }
 
     add_xdg_dirs(file_dialog);
@@ -491,11 +577,17 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
         combobox_set_active_entry(file_dialog->set_filter, 8);
     add_tooltip(file_dialog->set_filter->childlist->childs[0], _("File filter type"));
 
-    file_dialog->w_hidden = add_check_button(file_dialog->w, "", 20, 365, 20, 20);
+    file_dialog->w_hidden = add_check_button(file_dialog->w, "", 20, 355, 20, 20);
     file_dialog->w_hidden->parent_struct = file_dialog;
     file_dialog->w_hidden->scale.gravity = EASTWEST;
     add_tooltip(file_dialog->w_hidden,_("Show hidden files and folders"));
     file_dialog->w_hidden->func.value_changed_callback = button_hidden_callback;
+
+    file_dialog->view = add_check_button(file_dialog->w, "", 20, 385, 20, 20);
+    file_dialog->view->parent_struct = file_dialog;
+    file_dialog->view->scale.gravity = EASTWEST;
+    add_tooltip(file_dialog->view,_("Show entrys in list view"));
+    file_dialog->view->func.value_changed_callback = button_view_callback;
 
     widget_show_all(file_dialog->w);
     return file_dialog->w;

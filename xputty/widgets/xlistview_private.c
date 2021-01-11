@@ -110,6 +110,97 @@ void _draw_list(void *w_, void* user_data) {
     }
 }
 
+void _update_list_view(void *w_) {
+    Widget_t *w = (Widget_t*)w_;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    if (attrs.map_state != IsViewable) return;
+    int width = attrs.width;
+    ViewList_t *filelist = (ViewList_t*)w->parent_struct;
+
+    cairo_push_group (w->crb);
+    use_base_color_scheme(w, NORMAL_);
+    cairo_set_font_size (w->crb, min(w->app->big_font ,w->app->normal_font/w->scale.ascale));
+    cairo_text_extents_t extents;
+    cairo_text_extents(w->crb,"Ay", &extents);
+    double h = extents.height;
+
+    int i = (int)max(0,adj_get_value(w->adj));
+    int a = 0;
+    int j = filelist->list_size<filelist->show_items+i+1 ? 
+      filelist->list_size : filelist->show_items+i+1;
+    for(;i<j;i++) {
+        if (i != filelist->prelight_item && i != filelist->prev_prelight_item) {
+            if (i<j-1) {
+                a++;
+            }
+            continue;
+        }
+        if(i == filelist->prelight_item && i == filelist->active_item)
+            use_base_color_scheme(w, ACTIVE_);
+        else if(i == filelist->prelight_item)
+            use_base_color_scheme(w, PRELIGHT_);
+        else if (i == filelist->active_item)
+            use_base_color_scheme(w, SELECTED_);
+        else
+            use_base_color_scheme(w,NORMAL_ );
+        cairo_rectangle(w->crb, 0, a*25, width, 25);
+        cairo_fill_preserve(w->crb);
+        cairo_set_line_width(w->crb, 1.0);
+        use_frame_color_scheme(w, PRELIGHT_);
+        cairo_stroke(w->crb);
+
+        /** show label **/
+        if(i == filelist->prelight_item && i == filelist->active_item)
+            use_text_color_scheme(w, ACTIVE_);
+        else if(i == filelist->prelight_item)
+            use_text_color_scheme(w, PRELIGHT_);
+        else if (i == filelist->active_item)
+            use_text_color_scheme(w, SELECTED_);
+        else
+            use_text_color_scheme(w,NORMAL_ );
+
+        if (filelist->check_dir) {
+            struct stat sb;
+            if (stat(filelist->list_names[i], &sb) == 0 && S_ISDIR(sb.st_mode)) {
+                cairo_scale(w->crb,0.08, 0.08);
+                cairo_set_source_surface (w->crb, filelist->folder,1.0*12.5,((double)a+0.1)*25.0*12.5);
+                cairo_paint (w->crb);
+                cairo_scale(w->crb,12.5, 12.5);
+                use_text_color_scheme(w, INSENSITIVE_);
+            } else {
+                cairo_scale(w->crb,0.08, 0.08);
+                cairo_set_source_surface (w->crb, filelist->file,1.0*12.5,((double)a+0.1)*25.0*12.5);
+                cairo_paint (w->crb);
+                cairo_scale(w->crb,12.5, 12.5);
+                use_text_color_scheme(w,NORMAL_ );
+            }
+        }
+        cairo_text_extents(w->crb,filelist->list_names[i] , &extents);
+
+        cairo_move_to (w->crb, 20, (25.0*((double)a+1.0))+3.0 - (h*max(0.71,w->scale.ascale)));
+        cairo_show_text(w->crb, filelist->list_names[i]);
+        cairo_new_path (w->crb);
+        if (i == filelist->prelight_item && extents.width > (float)width-20) {
+            tooltip_set_text(w,filelist->list_names[i]);
+            w->flags |= HAS_TOOLTIP;
+            show_tooltip(w);
+        } else if (i == filelist->prelight_item && extents.width < (float)width-20){
+            w->flags &= ~HAS_TOOLTIP;
+            hide_tooltip(w);
+        }
+        a++;
+    }
+    cairo_pop_group_to_source (w->crb);
+    cairo_paint (w->crb);
+    cairo_push_group (w->cr);
+    cairo_set_source_surface (w->cr, w->buffer,0,0);
+    cairo_paint (w->cr);
+
+    cairo_pop_group_to_source (w->cr);
+    cairo_paint (w->cr);
+}
+
 void _list_motion(void *w_, void* xmotion_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
@@ -120,9 +211,11 @@ void _list_motion(void *w_, void* xmotion_, void* user_data) {
     int _items = height/(height/25);
     int prelight_item = (xmotion->y/_items)  + (int)max(0,adj_get_value(w->adj));
     if(prelight_item != filelist->prelight_item) {
+        filelist->prev_prelight_item = filelist->prelight_item;
         filelist->prelight_item = prelight_item;
+        hide_tooltip(w);
+        _update_list_view(w);
     }
-    expose_widget(w);
 }
 
 void _list_key_pressed(void *w_, void* xkey_, void* user_data) {
@@ -173,7 +266,7 @@ void _list_entry_released(void *w_, void* button_, void* user_data) {
             Widget_t* listview = (Widget_t*) w->parent;
             filelist->active_item = filelist->prelight_item;
             adj_set_value(listview->adj,filelist->active_item);
-            listview->func.button_release_callback(listview,NULL,NULL);
+            listview->func.button_release_callback(listview,xbutton,user_data);
         }
     }
 }

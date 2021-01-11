@@ -134,6 +134,10 @@ void configure_event(void *w_, void* user_data) {
     wid->func.configure_notify_callback(wid,NULL);
 }
 
+void resize_childs(Widget_t *w) {
+    _resize_childs(w);
+}
+
 void widget_reset_scale(Widget_t *w) {
     cairo_scale(w->crb, w->scale.cscale_x,w->scale.cscale_y);
 }

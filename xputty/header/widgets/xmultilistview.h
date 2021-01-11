@@ -20,8 +20,8 @@
 
 #pragma once
 
-#ifndef XLISTVIEW_H_
-#define XLISTVIEW_H_
+#ifndef XMULTILISTVIEW_H_
+#define XMULTILISTVIEW_H_
 
 #include "xputty.h"
 
@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 /**
- * @brief ViewList_t         - struct to hold information for the listview
+ * @brief ViewMultiList_t         - struct to hold information for the listview
  * @param prelight_item      - the list item which has the focus
  * @param active_item        - the list item which is selected(active)
  * @param show_items         - the viewable amount of list items
@@ -42,43 +42,47 @@ extern "C" {
 typedef struct {
     Widget_t *slider;
     cairo_surface_t *folder;
+    cairo_surface_t *folder_select;
     cairo_surface_t *file;
+    int icon_pos;
     int prelight_item;
     int active_item;
     int prev_prelight_item;
     int prev_active_item;
     int show_items;
+    int item_height;
+    int item_width;
     int list_size;
     int check_dir;
     char **list_names;
-} ViewList_t;
+} ViewMultiList_t;
 
 /**
- * @brief listview_set_active_entry   - set the active listview entry
+ * @brief multi_listview_set_active_entry   - set the active listview entry
  * @param *w_                        - void pointer to the Widget_t listview
  * @param active                     - the active entry (int)
  * @return void
  */
 
-void listview_set_active_entry(Widget_t *w, int active);
+void multi_listview_set_active_entry(Widget_t *w, int active);
 
 /**
- * @brief listview_unset_active_entry - unset the active listview entry
+ * @brief multi_listview_unset_active_entry - unset the active listview entry
  * @param *w_                         - void pointer to the Widget_t listview
  * @return void
  */
 
-void listview_unset_active_entry(Widget_t *w);
+void multi_listview_unset_active_entry(Widget_t *w);
 
 /**
- * @brief create_listview_viewport     - create a viewport on a listview to a Widget_t
+ * @brief create_multi_listview_viewport     - create a viewport on a listview to a Widget_t
  * @param *parent             - pointer to the Widget_t the listview should pop over
  * @param width               - define the width of the viewport
  * @param height              - define the height of the viewport
  * @return Widget_t*          - pointer to the Widget_t viewport
  */
 
-Widget_t* create_listview_viewport(Widget_t *parent, int elem, int width, int height);
+Widget_t* create_multi_listview_viewport(Widget_t *parent, int elem, int width, int height);
 
 /**
  * @brief add_label           - add a listview to a Widget_t
@@ -88,47 +92,47 @@ Widget_t* create_listview_viewport(Widget_t *parent, int elem, int width, int he
  * @return Widget_t*          - pointer to the Widget_t label struct
  */
 
-Widget_t* add_listview(Widget_t *parent, const char * label,
+Widget_t* add_multi_listview(Widget_t *parent, const char * label,
                 int x, int y, int width, int height);
 
 /**
- * @brief listview_mem_free        - release additional used memory when destroy the Widget_t
+ * @brief multi_listview_mem_free        - release additional used memory when destroy the Widget_t
  * @param *w_                      - void pointer to the Widget_t
  * @param *user_data               - void pointer to attached user_data
  * @return void
  */
 
-void listview_mem_free(void *w_, void* user_data);
+void multi_listview_mem_free(void *w_, void* user_data);
 
 /**
- * @brief listview_remove_list - remove the list from a listview  Widget_t
+ * @brief multi_listview_remove_list - remove the list from a listview  Widget_t
  * @param *listview            - pointer to the Widget_t listview which should show the list
  * @return void
  */
 
-void listview_remove_list(Widget_t *listview);
+void multi_listview_remove_list(Widget_t *listview);
 
 /**
- * @brief listview_set_list   - set a list to a listview  Widget_t
+ * @brief multi_listview_set_multi_list   - set a list to a listview  Widget_t
  * @param *listview           - pointer to the Widget_t listview which should show the list
  * @param **list              - pointer to the list
  * @param list_size           - how many items contain the list
  * @return void
  */
 
-void listview_set_list(Widget_t *listview, char **list, int list_size);
+void multi_listview_set_list(Widget_t *listview, char **list, int list_size);
 
 /**
- * @brief listview_set_check_dir - set optional check if list item is a directory
+ * @brief multi_listview_set_check_dir - set optional check if list item is a directory
  * @param *listview              - pointer to the Widget_t listview which should show the list
  * @param set                    - 0 = no check (default); 1 = check
  * @return void
  */
 
-void listview_set_check_dir(Widget_t *listview, int set);
+void multi_listview_set_check_dir(Widget_t *listview, int set);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //XLISTVIEW_H_
+#endif //XMULTILISTVIEW_H_

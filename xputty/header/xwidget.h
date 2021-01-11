@@ -515,6 +515,15 @@ void quit_widget(Widget_t *w);
 
 void transparent_draw(void * wid, void* user_data);
 
+
+/**
+ * @brief resize_childs      - intern check if child widgets needs resizing
+ * @param *wid               - pointer to the Widget_t receive the event
+ * @return void 
+ */
+
+void resize_childs(Widget_t *wid);
+
 /**
  * @brief widget_reset_scale - used to reset scaling mode after a image surface
  * is drawn to the Widget_t surface with widget_set_scale()
