@@ -329,8 +329,8 @@ void _reconfigure_multi_listview_viewport(void *w_, void* user_data) {
     int ax = max(1,width/filelist->item_width);
     filelist->show_items = (height/filelist->item_height) * ax;
     filelist->icon_pos = (filelist->item_width/2) - 120/5;
-    w->adj->max_value = (filelist->list_size-filelist->show_items)/ax;
-    filelist->slider->adj->max_value = (filelist->list_size-filelist->show_items)/ax;
+    w->adj->max_value = ((filelist->list_size-filelist->show_items)/ax)+1.0;
+    filelist->slider->adj->max_value = ((filelist->list_size-filelist->show_items)/ax)+1.0;
     adj_set_scale(filelist->slider->adj, ((float)filelist->list_size/(float)filelist->show_items)/filelist->item_height);
     adj_set_state(w->adj,st);
 }
