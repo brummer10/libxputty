@@ -167,8 +167,14 @@ static void set_selected_file(FileDialog *file_dialog) {
     if ((int)adj_get_value(file_dialog->ct->adj) < 0) return;
     free(file_dialog->fp->selected_file);
     file_dialog->fp->selected_file = NULL;
-    asprintf(&file_dialog->fp->selected_file, "%s/%s",comboboxlist->list_names[(int)adj_get_value(file_dialog->ct->adj)],
-        file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)]);
+    if (strlen(comboboxlist->list_names[(int)adj_get_value(file_dialog->ct->adj)]) > 1) {
+        asprintf(&file_dialog->fp->selected_file, "%s/%s",
+            comboboxlist->list_names[(int)adj_get_value(file_dialog->ct->adj)],
+            file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)]);
+    } else {
+        asprintf(&file_dialog->fp->selected_file, "/%s",
+            file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)]);
+    }
     assert(file_dialog->fp->selected_file != NULL);
 }
 
