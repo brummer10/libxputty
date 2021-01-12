@@ -44,6 +44,8 @@ typedef struct {
     cairo_surface_t *folder;
     cairo_surface_t *folder_select;
     cairo_surface_t *file;
+    float scale_down;
+    float scale_up;
     int icon_pos;
     int prelight_item;
     int active_item;
@@ -53,6 +55,7 @@ typedef struct {
     int item_height;
     int item_width;
     int list_size;
+    int column;
     int check_dir;
     char **list_names;
 } ViewMultiList_t;
@@ -130,6 +133,15 @@ void multi_listview_set_list(Widget_t *listview, char **list, int list_size);
  */
 
 void multi_listview_set_check_dir(Widget_t *listview, int set);
+
+/**
+ * @brief multi_listview_set_item_size - set size for the icons in the viewport
+ * @param *listview              - pointer to the Widget_t listview which should show the list
+ * @param set                    - scale factor range from 0.2 <-> 0.4
+ * @return void
+ */
+
+void multi_listview_set_item_size(Widget_t *listview, float set);
 
 #ifdef __cplusplus
 }

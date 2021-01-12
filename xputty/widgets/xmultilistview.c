@@ -88,9 +88,12 @@ Widget_t* add_multi_listview(Widget_t *parent, const char * label,
     filelist->folder = surface_get_png(wid, filelist->folder, LDVAR(directory_png));
     filelist->folder_select = surface_get_png(wid, filelist->folder_select, LDVAR(directory_select_png));
     filelist->file = surface_get_png(wid, filelist->folder, LDVAR(file_png));
-    filelist->item_height = 75;
-    filelist->item_width = 100;
-    filelist->icon_pos = (filelist->item_width/2) - 120/5;
+    filelist->scale_down = 0.2;
+    filelist->scale_up = 1.0/0.2;
+    filelist->item_height = 375*filelist->scale_down;
+    filelist->item_width = 500*filelist->scale_down;
+    filelist->column = max(1,width/filelist->item_width);
+    filelist->icon_pos = (filelist->item_width/2) - 120/filelist->scale_up;
     filelist->slider = add_vslider(wid, "", width-10, 0, 10, height);
     filelist->slider->func.expose_callback = _draw_multi_listviewslider;
     filelist->slider->adj_y = add_adjustment(filelist->slider,0.0, 0.0, 0.0, 1.0,1.0, CL_VIEWPORTSLIDER);
@@ -142,4 +145,16 @@ void multi_listview_set_check_dir(Widget_t *listview, int set) {
     Widget_t* view_port =  listview->childlist->childs[0];
     ViewMultiList_t *filelist = (ViewMultiList_t*)view_port->parent_struct;
     filelist->check_dir = set;
+}
+
+void multi_listview_set_item_size(Widget_t *listview, float set) {
+    Widget_t* view_port =  listview->childlist->childs[0];
+    ViewMultiList_t *filelist = (ViewMultiList_t*)view_port->parent_struct;
+    float v = max(0.2,min(0.4,set));
+    filelist->scale_down = v;
+    filelist->scale_up = 1.0/v;
+    filelist->item_height = 375*filelist->scale_down;
+    filelist->item_width = 500*filelist->scale_down;    
+    _reconfigure_multi_listview_viewport(view_port, NULL);
+    expose_widget(view_port);
 }

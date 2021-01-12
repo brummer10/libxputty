@@ -73,6 +73,34 @@ static void draw_window(void *w_, void* user_data) {
     //widget_reset_scale(w);
 }
 
+static void draw_fd_hslider(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+
+    int width = w->width-2;
+    int height = w->height-2;
+    float center = (float)height/2;
+
+    float sliderstate = adj_get_state(w->adj_x);
+
+    use_text_color_scheme(w, get_color_state(w));
+    cairo_move_to (w->crb, 0.0, center);
+    cairo_line_to(w->crb,width,center);
+    cairo_set_line_width(w->crb,center/10);
+    cairo_stroke(w->crb);
+
+    use_bg_color_scheme(w, get_color_state(w));
+    cairo_rectangle(w->crb, (width-height)*sliderstate,0,height, height);
+    cairo_fill(w->crb);
+    cairo_new_path (w->crb);
+
+    use_text_color_scheme(w, get_color_state(w));
+    cairo_set_line_width(w->crb,3);
+    cairo_move_to (w->crb,((width-height)*sliderstate)+center, 0.0);
+    cairo_line_to(w->crb,((width-height)*sliderstate)+center,height);
+    cairo_stroke(w->crb);
+    cairo_new_path (w->crb);
+}
+
 static void button_quit_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
@@ -286,6 +314,15 @@ static void reload_all(FileDialog *file_dialog) {
     expose_widget(file_dialog->ft);
 }
 
+static void set_scale_factor_callback(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+    float v = adj_get_value(w->adj);
+    if (!file_dialog->list_view) {
+        multi_listview_set_item_size(file_dialog->ft, v);
+    }
+}
+
 static void open_dir_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
@@ -338,6 +375,7 @@ static void button_view_callback(void *w_, void* user_data) {
         } else {
             multi_listview_unset_active_entry(file_dialog->ft);
         }
+        multi_listview_set_item_size(file_dialog->ft,adj_get_value(file_dialog->scale_size->adj));
         widget_show_all(file_dialog->ft);
     }
     resize_childs(file_dialog->w);
@@ -533,6 +571,14 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     add_tooltip(file_dialog->sel_dir,_("Open sub-directory's"));
     file_dialog->sel_dir->func.value_changed_callback = open_dir_callback;
 
+    file_dialog->scale_size = add_hslider(file_dialog->w, "", 580, 10, 60, 15);
+    set_adjustment(file_dialog->scale_size->adj, 0.2, 0.2, 0.2, 0.4, 0.01, CL_CONTINUOS);
+    file_dialog->scale_size->parent_struct = file_dialog;
+    file_dialog->scale_size->scale.gravity = WESTNORTH;
+    file_dialog->scale_size->func.expose_callback = draw_fd_hslider;
+    add_tooltip(file_dialog->scale_size,_("Set Icon scale factor"));
+    file_dialog->scale_size->func.value_changed_callback = set_scale_factor_callback;
+
     file_dialog->ft = add_multi_listview(file_dialog->w, "", 130, 90, 510, 225);
     file_dialog->ft->parent_struct = file_dialog;
     file_dialog->ft->scale.gravity = NORTHWEST;
@@ -592,7 +638,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->view = add_check_button(file_dialog->w, "", 20, 385, 20, 20);
     file_dialog->view->parent_struct = file_dialog;
     file_dialog->view->scale.gravity = EASTWEST;
-    add_tooltip(file_dialog->view,_("Show entrys in list view"));
+    add_tooltip(file_dialog->view,_("Show entries in list view"));
     file_dialog->view->func.value_changed_callback = button_view_callback;
 
     widget_show_all(file_dialog->w);

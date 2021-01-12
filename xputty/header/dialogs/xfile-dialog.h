@@ -45,6 +45,7 @@ typedef struct {
     Widget_t *text_entry;
     Widget_t *xdg_dirs;
     Widget_t *view;
+    Widget_t *scale_size;
     Pixmap *icon;
     FilePicker *fp;
     bool list_view;
