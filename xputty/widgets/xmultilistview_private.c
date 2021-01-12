@@ -85,7 +85,6 @@ void _draw_multi_list(void *w_, void* user_data) {
 
             char label[124];
             memset(label, '\0', sizeof(char)*124);
-            //strcpy(label,basename(filelist->list_names[i]));
             cairo_text_extents(w->crb, basename(filelist->list_names[i]), &extents);
             if (extents.width > filelist->item_width-10) {
                 int slen = strlen(basename(filelist->list_names[i]));
@@ -176,11 +175,11 @@ void _update_view(void *w_) {
 
             char label[124];
             memset(label, '\0', sizeof(char)*124);
-            //strcpy(label,basename(filelist->list_names[i]));
             cairo_text_extents(w->crb, basename(filelist->list_names[i]), &extents);
             if (extents.width > filelist->item_width-10) {
-                int len = ((filelist->item_width-5)/(extents.width/strlen(basename(filelist->list_names[i]))));
-                strncpy(label,basename(filelist->list_names[i]), len-3);
+                int slen = strlen(basename(filelist->list_names[i]));
+                int len = ((filelist->item_width-5)/(extents.width/slen));
+                strncpy(label,basename(filelist->list_names[i]), min(slen-4,len-3));
                 strcat(label,"...");
             } else {
                 strcpy(label,basename(filelist->list_names[i]));
