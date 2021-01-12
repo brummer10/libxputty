@@ -24,6 +24,21 @@
 #include <sys/stat.h>
 #include <libgen.h>
 
+char* _utf8cpy(char* dst, const char* src, size_t sizeDest ) {
+    if( sizeDest ){
+        size_t sizeSrc = strlen(src);
+        while( sizeSrc >= sizeDest ){
+            const char* lastByte = src + sizeSrc;
+            while( lastByte-- > src )
+                if((*lastByte & 0xC0) != 0x80)
+                    break;
+            sizeSrc = lastByte - src;
+        }
+        memcpy(dst, src, sizeSrc);
+        dst[sizeSrc] = '\0';
+    }
+    return dst;
+}
 
 void _draw_multi_listview(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
@@ -44,7 +59,7 @@ void _draw_multi_list(void *w_, void* user_data) {
     use_base_color_scheme(w, NORMAL_);
     cairo_rectangle(w->crb, 0, 0, width, height);
     cairo_fill (w->crb);
-    cairo_set_font_size (w->crb, w->app->normal_font);
+    cairo_set_font_size (w->crb, w->app->normal_font * (0.5 +((filelist->scale_down/0.2)/2.0)));
     cairo_text_extents_t extents;
     cairo_text_extents_t fextents;
     cairo_text_extents(w->crb,"Ay", &extents);
@@ -64,13 +79,11 @@ void _draw_multi_list(void *w_, void* user_data) {
                     cairo_set_source_surface (w->crb, filelist->folder,(filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,((double)a+0.1)*filelist->item_height*filelist->scale_up);
                     cairo_paint (w->crb);
                     cairo_scale(w->crb,filelist->scale_up, filelist->scale_up);
-                    //use_text_color_scheme(w, INSENSITIVE_);
                 } else {
                     cairo_scale(w->crb,filelist->scale_down, filelist->scale_down);
                     cairo_set_source_surface (w->crb, filelist->file,(filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,((double)a+0.1)*filelist->item_height*filelist->scale_up);
                     cairo_paint (w->crb);
                     cairo_scale(w->crb,filelist->scale_up, filelist->scale_up);
-                    //use_text_color_scheme(w,NORMAL_ );
                 }
             }
             /** show label **/
@@ -89,7 +102,7 @@ void _draw_multi_list(void *w_, void* user_data) {
             if (extents.width > filelist->item_width-10) {
                 int slen = strlen(basename(filelist->list_names[i]));
                 int len = ((filelist->item_width-5)/(extents.width/slen));
-                strncpy(label,basename(filelist->list_names[i]), min(slen-4,len-3));
+                _utf8cpy(label,basename(filelist->list_names[i]), min(slen-4,len-3));
                 strcat(label,"...");
             } else {
                 strcpy(label,basename(filelist->list_names[i]));
@@ -122,7 +135,7 @@ void _update_view(void *w_) {
     //int height = attrs.height;
     ViewMultiList_t *filelist = (ViewMultiList_t*)w->parent_struct;
     cairo_push_group (w->crb);
-    cairo_set_font_size (w->crb, w->app->normal_font);
+    cairo_set_font_size (w->crb, w->app->normal_font * (0.5 +((filelist->scale_down/0.2)/2.0)));
     cairo_text_extents_t extents;
     cairo_text_extents_t fextents;
     cairo_text_extents(w->crb,"Ay", &extents);
@@ -179,7 +192,7 @@ void _update_view(void *w_) {
             if (extents.width > filelist->item_width-10) {
                 int slen = strlen(basename(filelist->list_names[i]));
                 int len = ((filelist->item_width-5)/(extents.width/slen));
-                strncpy(label,basename(filelist->list_names[i]), min(slen-4,len-3));
+                _utf8cpy(label,basename(filelist->list_names[i]), min(slen-4,len-3));
                 strcat(label,"...");
             } else {
                 strcpy(label,basename(filelist->list_names[i]));
