@@ -63,12 +63,12 @@ void _draw_multi_list(void *w_, void* user_data) {
     cairo_text_extents_t extents;
     cairo_text_extents_t fextents;
     cairo_text_extents(w->crb,"Ay", &extents);
-    double h = extents.height;
+    double h = extents.height/2.0;
 
     int i = (int)max(0,adj_get_value(w->adj)*filelist->column);
     int a = 0;
-    int j = filelist->list_size<filelist->show_items+i ? 
-      filelist->list_size : filelist->show_items+i;
+    int j = filelist->list_size<filelist->show_items+i+filelist->column ? 
+      filelist->list_size : filelist->show_items+i+filelist->column;
     for(;i<j;i++) {
         int k = 0;
         for(;k<filelist->column;k++) {
@@ -76,48 +76,56 @@ void _draw_multi_list(void *w_, void* user_data) {
                 struct stat sb;
                 if (stat(filelist->list_names[i], &sb) == 0 && S_ISDIR(sb.st_mode)) {
                     cairo_scale(w->crb,filelist->scale_down, filelist->scale_down);
-                    cairo_set_source_surface (w->crb, filelist->folder,(filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,((double)a+0.1)*filelist->item_height*filelist->scale_up);
+                    cairo_set_source_surface (w->crb, filelist->folder,
+                        (filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,
+                        ((double)a+0.1)*filelist->item_height*filelist->scale_up);
                     cairo_paint (w->crb);
                     cairo_scale(w->crb,filelist->scale_up, filelist->scale_up);
                 } else {
                     cairo_scale(w->crb,filelist->scale_down, filelist->scale_down);
-                    cairo_set_source_surface (w->crb, filelist->file,(filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,((double)a+0.1)*filelist->item_height*filelist->scale_up);
+                    cairo_set_source_surface (w->crb, filelist->file,
+                        (filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,
+                        ((double)a+0.1)*filelist->item_height*filelist->scale_up);
                     cairo_paint (w->crb);
                     cairo_scale(w->crb,filelist->scale_up, filelist->scale_up);
                 }
             }
-            /** show label **/
-            if(i == filelist->prelight_item && i == filelist->active_item)
-                use_text_color_scheme(w, ACTIVE_);
-            else if(i == filelist->prelight_item)
-                use_text_color_scheme(w, PRELIGHT_);
-            else if (i == filelist->active_item)
-                use_text_color_scheme(w, SELECTED_);
-            else
-                use_text_color_scheme(w,INSENSITIVE_ );
+            int pos_y = (filelist->item_height*((double)a+1.0))+3.0 - h;
+            if (pos_y-h < height) {
+                /** show label **/
+                if(i == filelist->prelight_item && i == filelist->active_item)
+                    use_text_color_scheme(w, ACTIVE_);
+                else if(i == filelist->prelight_item)
+                    use_text_color_scheme(w, PRELIGHT_);
+                else if (i == filelist->active_item)
+                    use_text_color_scheme(w, SELECTED_);
+                else
+                    use_text_color_scheme(w,INSENSITIVE_ );
 
-            char label[124];
-            memset(label, '\0', sizeof(char)*124);
-            cairo_text_extents(w->crb, basename(filelist->list_names[i]), &extents);
-            if (extents.width > filelist->item_width-10) {
-                int slen = strlen(basename(filelist->list_names[i]));
-                int len = ((filelist->item_width-5)/(extents.width/slen));
-                _utf8cpy(label,basename(filelist->list_names[i]), min(slen-4,len-3));
-                strcat(label,"...");
-            } else {
-                strcpy(label,basename(filelist->list_names[i]));
-            }
-            cairo_text_extents(w->crb, label, &fextents);
-            cairo_move_to (w->crb, (k*filelist->item_width) + (filelist->item_width/2) - (fextents.width/2), (filelist->item_height*((double)a+1.0))+3.0 - (h*max(0.71,w->scale.ascale)));
-            cairo_show_text(w->crb, label);
-            cairo_new_path (w->crb);
-            if (i == filelist->prelight_item && extents.width > (float)filelist->item_width-10) {
-                tooltip_set_text(w,filelist->list_names[i]);
-                w->flags |= HAS_TOOLTIP;
-                show_tooltip(w);
-            } else if (i == filelist->prelight_item && extents.width < (float)filelist->item_width-10){
-                w->flags &= ~HAS_TOOLTIP;
-                hide_tooltip(w);
+                char label[124];
+                memset(label, '\0', sizeof(char)*124);
+                cairo_text_extents(w->crb, basename(filelist->list_names[i]), &extents);
+                if (extents.width > filelist->item_width-10) {
+                    int slen = strlen(basename(filelist->list_names[i]));
+                    int len = ((filelist->item_width-5)/(extents.width/slen));
+                    _utf8cpy(label,basename(filelist->list_names[i]), min(slen-4,len-3));
+                    strcat(label,"...");
+                } else {
+                    strcpy(label,basename(filelist->list_names[i]));
+                }
+                cairo_text_extents(w->crb, label, &fextents);
+                int pos_x = (k*filelist->item_width) + (filelist->item_width/2) - (fextents.width/2.0);
+                cairo_move_to (w->crb, pos_x, pos_y);
+                cairo_show_text(w->crb, label);
+                cairo_new_path (w->crb);
+                if (i == filelist->prelight_item && extents.width > (float)filelist->item_width-10) {
+                    tooltip_set_text(w,filelist->list_names[i]);
+                    w->flags |= HAS_TOOLTIP;
+                    show_tooltip(w);
+                } else if (i == filelist->prelight_item && extents.width < (float)filelist->item_width-10){
+                    w->flags &= ~HAS_TOOLTIP;
+                    hide_tooltip(w);
+                }
             }
             if (k<filelist->column-1 && i<j-1) i++;
             else break;
@@ -131,20 +139,19 @@ void _update_view(void *w_) {
     XWindowAttributes attrs;
     XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
     if (attrs.map_state != IsViewable) return;
-    //int width = attrs.width;
-    //int height = attrs.height;
+    int height = attrs.height;
     ViewMultiList_t *filelist = (ViewMultiList_t*)w->parent_struct;
     cairo_push_group (w->crb);
     cairo_set_font_size (w->crb, w->app->normal_font * (0.5 +((filelist->scale_down/0.2)/2.0)));
     cairo_text_extents_t extents;
     cairo_text_extents_t fextents;
     cairo_text_extents(w->crb,"Ay", &extents);
-    double h = extents.height;
+    double h = extents.height/2.0;
 
     int i = (int)max(0,adj_get_value(w->adj)*filelist->column);
     int a = 0;
-    int j = filelist->list_size<filelist->show_items+i ? 
-      filelist->list_size : filelist->show_items+i;
+    int j = filelist->list_size<filelist->show_items+i+filelist->column ? 
+      filelist->list_size : filelist->show_items+i+filelist->column;
     for(;i<j;i++) {
         int k = 0;
         for(;k<filelist->column;k++) {
@@ -153,22 +160,29 @@ void _update_view(void *w_) {
                 continue;
             }
             use_base_color_scheme(w, NORMAL_);
-            cairo_rectangle(w->crb, k*filelist->item_width, a*filelist->item_height, filelist->item_width, filelist->item_height);
+            cairo_rectangle(w->crb, k*filelist->item_width, a*filelist->item_height,
+                                        filelist->item_width, filelist->item_height);
             cairo_fill(w->crb);
             if (filelist->check_dir) {
                 struct stat sb;
                 if (stat(filelist->list_names[i], &sb) == 0 && S_ISDIR(sb.st_mode)) {
                     cairo_scale(w->crb,filelist->scale_down, filelist->scale_down);
                     if (i == filelist->prelight_item) {
-                        cairo_set_source_surface (w->crb, filelist->folder_select,(filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,((double)a+0.1)*filelist->item_height*filelist->scale_up);
+                        cairo_set_source_surface (w->crb, filelist->folder_select,
+                            (filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,
+                            ((double)a+0.1)*filelist->item_height*filelist->scale_up);
                     } else {
-                        cairo_set_source_surface (w->crb, filelist->folder,(filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,((double)a+0.1)*filelist->item_height*filelist->scale_up);
+                        cairo_set_source_surface (w->crb, filelist->folder,
+                            (filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,
+                            ((double)a+0.1)*filelist->item_height*filelist->scale_up);
                     }
                     cairo_paint (w->crb);
                     cairo_scale(w->crb,filelist->scale_up, filelist->scale_up);
                 } else {
                     cairo_scale(w->crb,filelist->scale_down, filelist->scale_down);
-                    cairo_set_source_surface (w->crb, filelist->file,(filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,((double)a+0.1)*filelist->item_height*filelist->scale_up);
+                    cairo_set_source_surface (w->crb, filelist->file,
+                        (filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,
+                        ((double)a+0.1)*filelist->item_height*filelist->scale_up);
                     if (i == filelist->prelight_item)
                         cairo_set_operator (w->crb, CAIRO_OPERATOR_HARD_LIGHT);
                     cairo_paint (w->crb);
@@ -176,39 +190,43 @@ void _update_view(void *w_) {
                     cairo_set_operator (w->crb, CAIRO_OPERATOR_OVER);
                 }
             }
-            /** show label **/
-            if(i == filelist->prelight_item && i == filelist->active_item)
-                use_text_color_scheme(w, ACTIVE_);
-            else if(i == filelist->prelight_item)
-                use_text_color_scheme(w, PRELIGHT_);
-            else if (i == filelist->active_item)
-                use_text_color_scheme(w, SELECTED_);
-            else
-                use_text_color_scheme(w,INSENSITIVE_ );
+            int pos_y = (filelist->item_height*((double)a+1.0))+3.0 - h;
+            if (pos_y-h < height) {
+                /** show label **/
+                if(i == filelist->prelight_item && i == filelist->active_item)
+                    use_text_color_scheme(w, ACTIVE_);
+                else if(i == filelist->prelight_item)
+                    use_text_color_scheme(w, PRELIGHT_);
+                else if (i == filelist->active_item)
+                    use_text_color_scheme(w, SELECTED_);
+                else
+                    use_text_color_scheme(w,INSENSITIVE_ );
 
-            char label[124];
-            memset(label, '\0', sizeof(char)*124);
-            cairo_text_extents(w->crb, basename(filelist->list_names[i]), &extents);
-            if (extents.width > filelist->item_width-10) {
-                int slen = strlen(basename(filelist->list_names[i]));
-                int len = ((filelist->item_width-5)/(extents.width/slen));
-                _utf8cpy(label,basename(filelist->list_names[i]), min(slen-4,len-3));
-                strcat(label,"...");
-            } else {
-                strcpy(label,basename(filelist->list_names[i]));
-            }
+                char label[124];
+                memset(label, '\0', sizeof(char)*124);
+                cairo_text_extents(w->crb, basename(filelist->list_names[i]), &extents);
+                if (extents.width > filelist->item_width-10) {
+                    int slen = strlen(basename(filelist->list_names[i]));
+                    int len = ((filelist->item_width-5)/(extents.width/slen));
+                    _utf8cpy(label,basename(filelist->list_names[i]), min(slen-4,len-3));
+                    strcat(label,"...");
+                } else {
+                    strcpy(label,basename(filelist->list_names[i]));
+                }
 
-            cairo_text_extents(w->crb, label, &fextents);
-            cairo_move_to (w->crb, (k*filelist->item_width) + (filelist->item_width/2) - (fextents.width/2), (filelist->item_height*((double)a+1.0))+3.0 - (h*max(0.71,w->scale.ascale)));
-            cairo_show_text(w->crb, label);
-            cairo_new_path (w->crb);
-            if (i == filelist->prelight_item && extents.width > (float)filelist->item_width-10) {
-                tooltip_set_text(w,filelist->list_names[i]);
-                w->flags |= HAS_TOOLTIP;
-                show_tooltip(w);
-            } else if (i == filelist->prelight_item && extents.width < (float)filelist->item_width-10){
-                w->flags &= ~HAS_TOOLTIP;
-                hide_tooltip(w);
+                cairo_text_extents(w->crb, label, &fextents);
+                int pos_x = (k*filelist->item_width) + (filelist->item_width/2) - (fextents.width/2.0);
+                cairo_move_to (w->crb, pos_x, pos_y);
+                cairo_show_text(w->crb, label);
+                cairo_new_path (w->crb);
+                if (i == filelist->prelight_item && extents.width > (float)filelist->item_width-10) {
+                    tooltip_set_text(w,filelist->list_names[i]);
+                    w->flags |= HAS_TOOLTIP;
+                    show_tooltip(w);
+                } else if (i == filelist->prelight_item && extents.width < (float)filelist->item_width-10){
+                    w->flags &= ~HAS_TOOLTIP;
+                    hide_tooltip(w);
+                }
             }
             if (k<filelist->column-1 && i<j-1) i++;
             else break;
@@ -243,7 +261,6 @@ void _multi_list_motion(void *w_, void* xmotion_, void* user_data) {
         hide_tooltip(w);
         _update_view(w);
     }
-    //expose_widget(w);
 }
 
 void _multi_list_key_pressed(void *w_, void* xkey_, void* user_data) {
@@ -328,20 +345,20 @@ void _leave_multi_list(void *w_, void* user_data) {
 
 void _reconfigure_multi_listview_viewport(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    float st = adj_get_state(w->adj);
     Widget_t* listview = (Widget_t*) w->parent;
     ViewMultiList_t *filelist = (ViewMultiList_t*)w->parent_struct;
     XWindowAttributes attrs;
     XGetWindowAttributes(listview->app->dpy, (Window)listview->widget, &attrs);
     int width = attrs.width;
     int height = attrs.height;
+    float st = adj_get_value(filelist->slider->adj);
     filelist->column = max(1,width/filelist->item_width);
     filelist->show_items = (height/filelist->item_height) * filelist->column;
     filelist->icon_pos = (filelist->item_width/2) - 120/filelist->scale_up;
     w->adj->max_value = ((filelist->list_size-filelist->show_items)/filelist->column)+1.0;
     filelist->slider->adj->max_value = ((filelist->list_size-filelist->show_items)/filelist->column)+1.0;
     adj_set_scale(filelist->slider->adj, ((float)filelist->list_size/(float)filelist->show_items)/filelist->item_height);
-    adj_set_state(w->adj,st);
+    adj_set_value(filelist->slider->adj,st);
 }
 
 void _set_multi_listview_viewpoint(void *w_, void* user_data) {
@@ -353,7 +370,6 @@ void _set_multi_listview_viewpoint(void *w_, void* user_data) {
 
 void _draw_multi_listviewslider(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    Widget_t* listview = (Widget_t*) w->parent;
     Widget_t* view_port = (Widget_t*)w->parent_struct;
     ViewMultiList_t *filelist = (ViewMultiList_t*)view_port->parent_struct;
     int v = (int)w->adj->max_value;
@@ -363,12 +379,9 @@ void _draw_multi_listviewslider(void *w_, void* user_data) {
     if (attrs.map_state != IsViewable) return;
     int width = attrs.width;
     int height = attrs.height;
-    XWindowAttributes vattrs;
-    XGetWindowAttributes(w->app->dpy, (Window)listview->widget, &vattrs);
-    int show_items = (height/filelist->item_height) * filelist->column;
     float slidersize = 1.0;
-    if (filelist->list_size > show_items)
-        slidersize = (float)((float)show_items/(float)filelist->list_size);
+    if (filelist->list_size > filelist->show_items)
+        slidersize = (float)((float)filelist->show_items/(float)filelist->list_size);
     float sliderstate = adj_get_state(w->adj);
     use_bg_color_scheme(w, get_color_state(w));
     cairo_rectangle(w->crb, 0,0,width,height);

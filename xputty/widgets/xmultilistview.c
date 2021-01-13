@@ -150,9 +150,8 @@ void multi_listview_set_check_dir(Widget_t *listview, int set) {
 void multi_listview_set_item_size(Widget_t *listview, float set) {
     Widget_t* view_port =  listview->childlist->childs[0];
     ViewMultiList_t *filelist = (ViewMultiList_t*)view_port->parent_struct;
-    float v = max(0.2,min(0.4,set));
-    filelist->scale_down = v;
-    filelist->scale_up = 1.0/v;
+    filelist->scale_down = set;
+    filelist->scale_up = 1.0/set;
     filelist->item_height = 375*filelist->scale_down;
     filelist->item_width = 500*filelist->scale_down;    
     _reconfigure_multi_listview_viewport(view_port, NULL);

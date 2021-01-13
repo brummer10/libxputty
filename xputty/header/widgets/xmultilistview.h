@@ -137,7 +137,7 @@ void multi_listview_set_check_dir(Widget_t *listview, int set);
 /**
  * @brief multi_listview_set_item_size - set size for the icons in the viewport
  * @param *listview              - pointer to the Widget_t listview which should show the list
- * @param set                    - scale factor range from 0.2 <-> 0.4
+ * @param set                    - scale factor range from 0.1 <-> 0.4
  * @return void
  */
 

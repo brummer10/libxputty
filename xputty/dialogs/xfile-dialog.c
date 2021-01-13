@@ -572,7 +572,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->sel_dir->func.value_changed_callback = open_dir_callback;
 
     file_dialog->scale_size = add_hslider(file_dialog->w, "", 580, 10, 60, 15);
-    set_adjustment(file_dialog->scale_size->adj, 0.2, 0.2, 0.2, 0.4, 0.01, CL_CONTINUOS);
+    set_adjustment(file_dialog->scale_size->adj, 0.2, 0.2, 0.1, 0.4, 0.01, CL_CONTINUOS);
     file_dialog->scale_size->parent_struct = file_dialog;
     file_dialog->scale_size->scale.gravity = WESTNORTH;
     file_dialog->scale_size->func.expose_callback = draw_fd_hslider;
