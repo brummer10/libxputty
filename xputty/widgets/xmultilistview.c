@@ -116,6 +116,9 @@ void multi_listview_mem_free(void *w_, void* user_data) {
     cairo_surface_destroy(filelist->folder);
     cairo_surface_destroy(filelist->folder_select);
     cairo_surface_destroy(filelist->file);
+    cairo_surface_destroy(filelist->folder_scaled);
+    cairo_surface_destroy(filelist->folder_select_scaled);
+    cairo_surface_destroy(filelist->file_scaled);
     free(filelist);
 }
 
