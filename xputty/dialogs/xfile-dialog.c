@@ -62,13 +62,13 @@ static void draw_window(void *w_, void* user_data) {
     cairo_show_text(w->crb, _("Places"));
     cairo_move_to (w->crb, 130, 85);
     cairo_show_text(w->crb, _("Entries"));
-    cairo_move_to (w->crb, 20, 340-w->scale.scale_y);
+    cairo_move_to (w->crb, 20, 330-w->scale.scale_y);
     cairo_show_text(w->crb, _("Load: "));
-    cairo_move_to (w->crb, 45, 370-w->scale.scale_y);
+    cairo_move_to (w->crb, 45, 360-w->scale.scale_y);
     cairo_show_text(w->crb, _("Show hidden files")); 
-    cairo_move_to (w->crb, 45, 400-w->scale.scale_y);
+    cairo_move_to (w->crb, 45, 390-w->scale.scale_y);
     cairo_show_text(w->crb, _("List view")); 
-    cairo_move_to (w->crb, 60, 340-w->scale.scale_y);
+    cairo_move_to (w->crb, 60, 330-w->scale.scale_y);
     cairo_show_text(w->crb, w->label);
     //widget_reset_scale(w);
 }
@@ -351,6 +351,7 @@ static void button_view_callback(void *w_, void* user_data) {
         file_dialog->ft = add_listview(file_dialog->w, "", 130, 90, 510, 225);
         file_dialog->ft->parent_struct = file_dialog;
         file_dialog->ft->scale.gravity = NORTHWEST;
+        file_dialog->ft->flags |= NO_PROPAGATE;
         listview_set_check_dir(file_dialog->ft, 1);
         file_dialog->ft->func.button_release_callback = file_released_b_callback;
         file_dialog->ft->func.double_click_callback = file_double_click_callback;
@@ -366,6 +367,7 @@ static void button_view_callback(void *w_, void* user_data) {
         file_dialog->ft = add_multi_listview(file_dialog->w, "", 130, 90, 510, 225);
         file_dialog->ft->parent_struct = file_dialog;
         file_dialog->ft->scale.gravity = NORTHWEST;
+        file_dialog->ft->flags |= NO_PROPAGATE;
         multi_listview_set_check_dir(file_dialog->ft, 1);
         file_dialog->ft->func.button_release_callback = file_released_b_callback;
         file_dialog->ft->func.double_click_callback = file_double_click_callback;
@@ -511,6 +513,7 @@ static void add_xdg_dirs(FileDialog *file_dialog) {
     file_dialog->xdg_dirs = add_listview(file_dialog->w, "", 20, 90, 100, 225);
     file_dialog->xdg_dirs->parent_struct = file_dialog;
     file_dialog->xdg_dirs->scale.gravity = EASTNORTH;
+    file_dialog->xdg_dirs->flags |= NO_PROPAGATE;
     listview_set_list(file_dialog->xdg_dirs, file_dialog->xdg_user_dirs, (int)file_dialog->xdg_dir_counter);
     file_dialog->xdg_dirs->func.button_release_callback = xdg_dir_select_callback;
     listview_unset_active_entry(file_dialog->xdg_dirs);
@@ -538,23 +541,24 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->icon = NULL;
     file_dialog->list_view = false;
 
-    file_dialog->w = create_window(w->app, DefaultRootWindow(w->app->dpy), 0, 0, 660, 420);
+    file_dialog->w = create_window(w->app, DefaultRootWindow(w->app->dpy), 0, 0, 660, 415);
 
     XSizeHints* win_size_hints;
     win_size_hints = XAllocSizeHints();
     win_size_hints->flags =  PMinSize|PBaseSize|PMaxSize|PWinGravity;
     win_size_hints->min_width = 660;
-    win_size_hints->min_height = 420;
+    win_size_hints->min_height = 415;
     win_size_hints->base_width = 660;
-    win_size_hints->base_height = 420;
-    win_size_hints->max_width = 860;
-    win_size_hints->max_height = 840;
+    win_size_hints->base_height = 415;
+    win_size_hints->max_width = 960;
+    win_size_hints->max_height = 865;
     win_size_hints->win_gravity = CenterGravity;
     XSetWMNormalHints(file_dialog->w->app->dpy, file_dialog->w->widget, win_size_hints);
     XFree(win_size_hints);
 
     file_dialog->w->flags |= HAS_MEM;
     file_dialog->w->parent_struct = file_dialog;
+    file_dialog->w->flags |= NO_PROPAGATE;
     widget_set_title(file_dialog->w, _("File Selector"));
     file_dialog->w->func.expose_callback = draw_window;
     file_dialog->w->func.mem_free_callback = fd_mem_free;
@@ -563,11 +567,13 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->ct = add_combobox(file_dialog->w, "", 20, 40, 550, 30);
     file_dialog->ct->parent_struct = file_dialog;
     file_dialog->ct->scale.gravity = NORTHEAST;
+    file_dialog->ct->flags |= NO_PROPAGATE;
     file_dialog->ct->func.value_changed_callback = combo_response;
 
     file_dialog->sel_dir = add_button(file_dialog->w, _("Open"), 580, 40, 60, 30);
     file_dialog->sel_dir->parent_struct = file_dialog;
     file_dialog->sel_dir->scale.gravity = WESTNORTH;
+    file_dialog->sel_dir->flags |= NO_PROPAGATE;
     add_tooltip(file_dialog->sel_dir,_("Open sub-directory's"));
     file_dialog->sel_dir->func.value_changed_callback = open_dir_callback;
 
@@ -575,6 +581,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     set_adjustment(file_dialog->scale_size->adj, 0.2, 0.2, 0.1, 0.4, 0.01, CL_CONTINUOS);
     file_dialog->scale_size->parent_struct = file_dialog;
     file_dialog->scale_size->scale.gravity = WESTNORTH;
+    file_dialog->scale_size->flags |= NO_PROPAGATE;
     file_dialog->scale_size->func.expose_callback = draw_fd_hslider;
     add_tooltip(file_dialog->scale_size,_("Set Icon scale factor"));
     file_dialog->scale_size->func.value_changed_callback = set_scale_factor_callback;
@@ -582,6 +589,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->ft = add_multi_listview(file_dialog->w, "", 130, 90, 510, 225);
     file_dialog->ft->parent_struct = file_dialog;
     file_dialog->ft->scale.gravity = NORTHWEST;
+    file_dialog->ft->flags |= NO_PROPAGATE;
     multi_listview_set_check_dir(file_dialog->ft, 1);
     file_dialog->ft->func.button_release_callback = file_released_b_callback;
     file_dialog->ft->func.double_click_callback = file_double_click_callback;
@@ -598,21 +606,24 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
 
     add_xdg_dirs(file_dialog);
 
-    file_dialog->w_quit = add_button(file_dialog->w, _("Cancel"), 580, 350, 60, 60);
+    file_dialog->w_quit = add_button(file_dialog->w, _("Cancel"), 580, 340, 60, 60);
     file_dialog->w_quit->parent_struct = file_dialog;
     file_dialog->w_quit->scale.gravity = SOUTHWEST;
+    file_dialog->w_quit->flags |= NO_PROPAGATE;
     add_tooltip(file_dialog->w_quit,_("Exit file selector"));
     file_dialog->w_quit->func.value_changed_callback = button_quit_callback;
 
-    file_dialog->w_okay = add_button(file_dialog->w, _("Load"), 510, 350, 60, 60);
+    file_dialog->w_okay = add_button(file_dialog->w, _("Load"), 510, 340, 60, 60);
     file_dialog->w_okay->parent_struct = file_dialog;
     file_dialog->w_okay->scale.gravity = SOUTHWEST;
+    file_dialog->w_okay->flags |= NO_PROPAGATE;
     add_tooltip(file_dialog->w_okay,_("Load selected file"));
     file_dialog->w_okay->func.value_changed_callback = button_ok_callback;
 
-    file_dialog->set_filter = add_combobox(file_dialog->w, "", 360, 355, 120, 30);
+    file_dialog->set_filter = add_combobox(file_dialog->w, "", 360, 345, 120, 30);
     file_dialog->set_filter->parent_struct = file_dialog;
     file_dialog->set_filter->scale.gravity = SOUTHWEST;
+    file_dialog->set_filter->flags |= NO_PROPAGATE;
     combobox_add_entry(file_dialog->set_filter,_("all"));
     combobox_add_entry(file_dialog->set_filter,_("application"));
     combobox_add_entry(file_dialog->set_filter,_("audio"));
@@ -629,15 +640,17 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
         combobox_set_active_entry(file_dialog->set_filter, 8);
     add_tooltip(file_dialog->set_filter->childlist->childs[0], _("File filter type"));
 
-    file_dialog->w_hidden = add_check_button(file_dialog->w, "", 20, 355, 20, 20);
+    file_dialog->w_hidden = add_check_button(file_dialog->w, "", 20, 345, 20, 20);
     file_dialog->w_hidden->parent_struct = file_dialog;
     file_dialog->w_hidden->scale.gravity = EASTWEST;
+    file_dialog->w_hidden->flags |= NO_PROPAGATE;
     add_tooltip(file_dialog->w_hidden,_("Show hidden files and folders"));
     file_dialog->w_hidden->func.value_changed_callback = button_hidden_callback;
 
-    file_dialog->view = add_check_button(file_dialog->w, "", 20, 385, 20, 20);
+    file_dialog->view = add_check_button(file_dialog->w, "", 20, 375, 20, 20);
     file_dialog->view->parent_struct = file_dialog;
     file_dialog->view->scale.gravity = EASTWEST;
+    file_dialog->view->flags |= NO_PROPAGATE;
     add_tooltip(file_dialog->view,_("Show entries in list view"));
     file_dialog->view->func.value_changed_callback = button_view_callback;
 

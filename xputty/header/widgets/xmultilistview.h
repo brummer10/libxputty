@@ -44,6 +44,9 @@ typedef struct {
     cairo_surface_t *folder;
     cairo_surface_t *folder_select;
     cairo_surface_t *file;
+    cairo_surface_t *folder_scaled;
+    cairo_surface_t *folder_select_scaled;
+    cairo_surface_t *file_scaled;
     float scale_down;
     float scale_up;
     int icon_pos;

@@ -55,6 +55,7 @@ void _draw_multi_list(void *w_, void* user_data) {
     int width = attrs.width;
     int height = attrs.height;
     ViewMultiList_t *filelist = (ViewMultiList_t*)w->parent_struct;
+    if (!filelist->folder_scaled) return;
 
     use_base_color_scheme(w, NORMAL_);
     cairo_rectangle(w->crb, 0, 0, width, height);
@@ -64,6 +65,7 @@ void _draw_multi_list(void *w_, void* user_data) {
     cairo_text_extents_t fextents;
     cairo_text_extents(w->crb,"Ay", &extents);
     double h = extents.height/2.0;
+    struct stat sb;
 
     int i = (int)max(0,adj_get_value(w->adj)*filelist->column);
     int a = 0;
@@ -73,21 +75,16 @@ void _draw_multi_list(void *w_, void* user_data) {
         int k = 0;
         for(;k<filelist->column;k++) {
             if (filelist->check_dir) {
-                struct stat sb;
                 if (stat(filelist->list_names[i], &sb) == 0 && S_ISDIR(sb.st_mode)) {
-                    cairo_scale(w->crb,filelist->scale_down, filelist->scale_down);
-                    cairo_set_source_surface (w->crb, filelist->folder,
-                        (filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,
-                        ((double)a+0.1)*filelist->item_height*filelist->scale_up);
+                    cairo_set_source_surface (w->crb, filelist->folder_scaled,
+                        (filelist->icon_pos+(k*filelist->item_width)),
+                        ((double)a+0.1)*filelist->item_height);
                     cairo_paint (w->crb);
-                    cairo_scale(w->crb,filelist->scale_up, filelist->scale_up);
                 } else {
-                    cairo_scale(w->crb,filelist->scale_down, filelist->scale_down);
-                    cairo_set_source_surface (w->crb, filelist->file,
-                        (filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,
-                        ((double)a+0.1)*filelist->item_height*filelist->scale_up);
+                    cairo_set_source_surface (w->crb, filelist->file_scaled,
+                        (filelist->icon_pos+(k*filelist->item_width)),
+                        ((double)a+0.1)*filelist->item_height);
                     cairo_paint (w->crb);
-                    cairo_scale(w->crb,filelist->scale_up, filelist->scale_up);
                 }
             }
             int pos_y = (filelist->item_height*((double)a+1.0))+3.0 - h;
@@ -114,7 +111,7 @@ void _draw_multi_list(void *w_, void* user_data) {
                     strcpy(label,basename(filelist->list_names[i]));
                 }
                 cairo_text_extents(w->crb, label, &fextents);
-                int pos_x = (k*filelist->item_width) + (filelist->item_width/2) - (fextents.width/2.0);
+                int pos_x = (k*filelist->item_width) + (filelist->item_width/2) - (fextents.width*0.5);
                 cairo_move_to (w->crb, pos_x, pos_y);
                 cairo_show_text(w->crb, label);
                 cairo_new_path (w->crb);
@@ -166,27 +163,23 @@ void _update_view(void *w_) {
             if (filelist->check_dir) {
                 struct stat sb;
                 if (stat(filelist->list_names[i], &sb) == 0 && S_ISDIR(sb.st_mode)) {
-                    cairo_scale(w->crb,filelist->scale_down, filelist->scale_down);
                     if (i == filelist->prelight_item) {
-                        cairo_set_source_surface (w->crb, filelist->folder_select,
-                            (filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,
-                            ((double)a+0.1)*filelist->item_height*filelist->scale_up);
+                        cairo_set_source_surface (w->crb, filelist->folder_select_scaled,
+                            (filelist->icon_pos+(k*filelist->item_width)),
+                            ((double)a+0.1)*filelist->item_height);
                     } else {
-                        cairo_set_source_surface (w->crb, filelist->folder,
-                            (filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,
-                            ((double)a+0.1)*filelist->item_height*filelist->scale_up);
+                        cairo_set_source_surface (w->crb, filelist->folder_scaled,
+                            (filelist->icon_pos+(k*filelist->item_width)),
+                            ((double)a+0.1)*filelist->item_height);
                     }
                     cairo_paint (w->crb);
-                    cairo_scale(w->crb,filelist->scale_up, filelist->scale_up);
                 } else {
-                    cairo_scale(w->crb,filelist->scale_down, filelist->scale_down);
-                    cairo_set_source_surface (w->crb, filelist->file,
-                        (filelist->icon_pos+(k*filelist->item_width))*filelist->scale_up,
-                        ((double)a+0.1)*filelist->item_height*filelist->scale_up);
+                    cairo_set_source_surface (w->crb, filelist->file_scaled,
+                        filelist->icon_pos+(k*filelist->item_width),
+                        ((double)a+0.1)*filelist->item_height);
                     if (i == filelist->prelight_item)
                         cairo_set_operator (w->crb, CAIRO_OPERATOR_HARD_LIGHT);
                     cairo_paint (w->crb);
-                    cairo_scale(w->crb,filelist->scale_up, filelist->scale_up);
                     cairo_set_operator (w->crb, CAIRO_OPERATOR_OVER);
                 }
             }
@@ -247,14 +240,11 @@ void _multi_list_motion(void *w_, void* xmotion_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     ViewMultiList_t *filelist = (ViewMultiList_t*)w->parent_struct;
     XMotionEvent *xmotion = (XMotionEvent*)xmotion_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width;
-    int height = attrs.height;
-    int h = floor(max(1,(height/filelist->item_height))) * filelist->item_height;
-    int x_items = max(1,width/filelist->column);
-    int _items = h/max(1,(height/filelist->item_height));
-    int prelight_item = ((xmotion->y/_items)*filelist->column) + (xmotion->x/x_items) + (int)max(0,adj_get_value(w->adj)*filelist->column);
+    int prelight_item = ((xmotion->y/filelist->item_height)*filelist->column) +
+        (xmotion->x/filelist->item_width) + (int)max(0,adj_get_value(w->adj)*filelist->column);
+    if (xmotion->x > (filelist->column*filelist->item_width)-1) {
+        prelight_item = -1;
+    }
     if(prelight_item != filelist->prelight_item) {
         filelist->prev_prelight_item = filelist->prelight_item;
         filelist->prelight_item = prelight_item;

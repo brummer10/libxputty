@@ -88,6 +88,9 @@ Widget_t* add_multi_listview(Widget_t *parent, const char * label,
     filelist->folder = surface_get_png(wid, filelist->folder, LDVAR(directory_png));
     filelist->folder_select = surface_get_png(wid, filelist->folder_select, LDVAR(directory_select_png));
     filelist->file = surface_get_png(wid, filelist->folder, LDVAR(file_png));
+    filelist->folder_scaled = NULL;
+    filelist->folder_select_scaled = NULL;
+    filelist->file_scaled = NULL;
     filelist->scale_down = 0.2;
     filelist->scale_up = 1.0/0.2;
     filelist->item_height = 375*filelist->scale_down;
@@ -138,7 +141,7 @@ void multi_listview_set_list(Widget_t *listview, char **list, int list_size) {
     set_adjustment(listview->adj,0.0, 0.0, 0.0, (float)(list_size-1.0),1.0, CL_NONE);
     float max_value = view_port->adj->max_value+ (float)list_size;
     set_adjustment(view_port->adj,0.0, 0.0, 0.0, max_value,1.0, CL_VIEWPORT);
-    _reconfigure_multi_listview_viewport(view_port, NULL);
+    multi_listview_set_item_size(listview, filelist->scale_down);
 }
 
 void multi_listview_set_check_dir(Widget_t *listview, int set) {
@@ -147,13 +150,35 @@ void multi_listview_set_check_dir(Widget_t *listview, int set) {
     filelist->check_dir = set;
 }
 
+cairo_surface_t * scale_image(Widget_t *listview, ViewMultiList_t *filelist,
+                cairo_surface_t *orig, cairo_surface_t *scaled) {
+
+    cairo_surface_destroy(scaled);
+    scaled = cairo_surface_create_similar (listview->surface, 
+        CAIRO_CONTENT_COLOR_ALPHA, filelist->item_width,
+                                    filelist->item_height);
+    assert(cairo_surface_status(scaled) == CAIRO_STATUS_SUCCESS); 
+
+    cairo_t *cri = cairo_create (scaled);
+    cairo_scale(cri,filelist->scale_down, filelist->scale_down);
+    cairo_set_source_surface (cri, orig,0,0);
+    cairo_rectangle(cri, 0, 0, filelist->item_width* filelist->scale_up,
+                                filelist->item_height* filelist->scale_up);
+    cairo_fill (cri);
+    cairo_destroy(cri);
+    return scaled;
+}
+
 void multi_listview_set_item_size(Widget_t *listview, float set) {
     Widget_t* view_port =  listview->childlist->childs[0];
     ViewMultiList_t *filelist = (ViewMultiList_t*)view_port->parent_struct;
     filelist->scale_down = set;
     filelist->scale_up = 1.0/set;
     filelist->item_height = 375*filelist->scale_down;
-    filelist->item_width = 500*filelist->scale_down;    
+    filelist->item_width = 500*filelist->scale_down;
     _reconfigure_multi_listview_viewport(view_port, NULL);
+    filelist->folder_scaled = scale_image(listview,filelist,filelist->folder, filelist->folder_scaled);
+    filelist->folder_select_scaled = scale_image(listview,filelist,filelist->folder_select, filelist->folder_select_scaled);
+    filelist->file_scaled = scale_image(listview,filelist,filelist->file, filelist->file_scaled);
     expose_widget(view_port);
 }
