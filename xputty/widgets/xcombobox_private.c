@@ -145,6 +145,7 @@ void _draw_combobox(void *w_, void* user_data) {
     cairo_stroke(w->crb);
     cairo_rectangle(w->crb,3.0, 3.0, width, height);
     cairo_stroke(w->crb);
+    if (comboboxlist->list_size<1) return;
 
     cairo_text_extents_t extents;
 

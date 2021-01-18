@@ -628,7 +628,9 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
 
         case MotionNotify:
             if (wid->state == 4) break;
-            adj_set_motion_state(wid, xev->xmotion.x, xev->xmotion.y);
+            if (xev->xmotion.state) {
+                adj_set_motion_state(wid, xev->xmotion.x, xev->xmotion.y);
+            }
             wid->func.motion_callback(w_,&xev->xmotion, user_data);
             debug_print("Widget_t MotionNotify x = %i Y = %i \n",xev->xmotion.x,xev->xmotion.y );
         break;
