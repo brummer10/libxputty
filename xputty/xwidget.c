@@ -25,7 +25,7 @@
 
 int key_mapping(Display *dpy, XKeyEvent *xkey) {
     if (xkey->keycode == XKeysymToKeycode(dpy,XK_Tab))
-        return (xkey->state == ShiftMask) ? 1 : 2;
+        return (xkey->state & ShiftMask) ? 1 : 2;
     else if (xkey->keycode == XKeysymToKeycode(dpy,XK_Up))
         return 3;
     else if (xkey->keycode == XKeysymToKeycode(dpy,XK_Right))

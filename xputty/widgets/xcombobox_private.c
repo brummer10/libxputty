@@ -106,6 +106,7 @@ void _draw_combobox(void *w_, void* user_data) {
     int height = attrs.height-2;
     if (attrs.map_state != IsViewable) return;
     int v = (int)adj_get_value(w->adj);
+    int vl = v - (int) w->adj->min_value;
     if (v<0) return;
     Widget_t * menu = w->childlist->childs[1];
     Widget_t* view_port =  menu->childlist->childs[0];
@@ -156,10 +157,10 @@ void _draw_combobox(void *w_, void* user_data) {
     double h = extents.height;
 
     cairo_move_to (w->crb, 15, (height+h)*0.55);
-    cairo_show_text(w->crb, comboboxlist->list_names[v]);
+    cairo_show_text(w->crb, comboboxlist->list_names[vl]);
     cairo_new_path (w->crb);
     if (extents.width > (float)width-20) {
-        tooltip_set_text(w,comboboxlist->list_names[v]);
+        tooltip_set_text(w,comboboxlist->list_names[vl]);
         w->flags |= HAS_TOOLTIP;
     } else {
         w->flags &= ~HAS_TOOLTIP;
@@ -295,7 +296,8 @@ void _combobox_entry_released(void *w_, void* button_, void* user_data) {
             Widget_t* combobox = (Widget_t*) w->parent;
             comboboxlist->active_item = comboboxlist->prelight_item;
             adj_set_value(combobox->adj,comboboxlist->active_item);
-            adj_set_value(comboboxlist->combobox->adj,comboboxlist->active_item);
+            adj_set_value(comboboxlist->combobox->adj,comboboxlist->active_item +
+                                        comboboxlist->combobox->adj->min_value);
             combobox->func.button_release_callback(combobox,NULL,NULL);
         }
     }
@@ -396,7 +398,7 @@ void _entry_released(void *w_, void* item_, void* user_data) {
 
 void _set_entry(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    int v = (int)adj_get_value(w->adj);
+    int v = (int)adj_get_value(w->adj)-w->adj->min_value;
     Widget_t * menu = w->childlist->childs[1];
     Widget_t* view_port =  menu->childlist->childs[0];
     ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
@@ -419,7 +421,8 @@ void _configure_combobox_menu(Widget_t *parent, Widget_t *menu, int elem, bool a
     int item_width = 1.0;
     cairo_text_extents_t extents;
     int i = comboboxlist->list_size-1;
-    set_adjustment(view_port->adj,0.0, view_port->adj->value, 0.0, i-(elem-1),1.0, CL_VIEWPORT);
+    float m = view_port->adj->min_value;
+    set_adjustment(view_port->adj,0.0, view_port->adj->value, m, i-(elem-1)+m,1.0, CL_VIEWPORT);
     bool is_not_scrolable = false;
     if(comboboxlist->list_size <= elem) {
         elem = comboboxlist->list_size;
