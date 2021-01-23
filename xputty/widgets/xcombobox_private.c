@@ -107,7 +107,7 @@ void _draw_combobox(void *w_, void* user_data) {
     if (attrs.map_state != IsViewable) return;
     int v = (int)adj_get_value(w->adj);
     int vl = v - (int) w->adj->min_value;
-    if (v<0) return;
+   // if (v<0) return;
     Widget_t * menu = w->childlist->childs[1];
     Widget_t* view_port =  menu->childlist->childs[0];
     ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
@@ -140,13 +140,14 @@ void _draw_combobox(void *w_, void* user_data) {
         cairo_set_line_width(w->crb, 1.0);
         use_frame_color_scheme(w, INSENSITIVE_);
     }
-    cairo_stroke(w->crb); 
+    cairo_stroke(w->crb);
 
     cairo_rectangle(w->crb,4.0, 4.0, width, height);
     cairo_stroke(w->crb);
     cairo_rectangle(w->crb,3.0, 3.0, width, height);
     cairo_stroke(w->crb);
     if (comboboxlist->list_size<1) return;
+    if (vl<0) return;
 
     cairo_text_extents_t extents;
 
@@ -402,7 +403,7 @@ void _set_entry(void *w_, void* user_data) {
     Widget_t * menu = w->childlist->childs[1];
     Widget_t* view_port =  menu->childlist->childs[0];
     ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
-    if(v>=0) {
+    if(v>=0 && comboboxlist->list_size) {
         w->label = comboboxlist->list_names[v];
         transparent_draw(w, user_data);
     }

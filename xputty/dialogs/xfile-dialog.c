@@ -71,6 +71,10 @@ static void draw_window(void *w_, void* user_data) {
     cairo_move_to (w->crb, 60, 330-w->scale.scale_y);
     cairo_show_text(w->crb, w->label);
     //widget_reset_scale(w);
+    if (w->image) {
+        cairo_set_source_surface (w->crb, w->image, 180, 332-w->scale.scale_y);
+        cairo_paint (w->crb);
+    }
 }
 
 static void draw_fd_hslider(void *w_, void* user_data) {
@@ -178,6 +182,29 @@ static void reload_from_dir(FileDialog *file_dialog) {
     expose_widget(file_dialog->xdg_dirs);
 }
 
+static void show_preview(FileDialog *file_dialog, const char* file_name) {
+    Widget_t* w = file_dialog->w;
+    cairo_surface_t *getpng = cairo_image_surface_create_from_png (file_name);
+    int width = cairo_image_surface_get_width(getpng);
+    int height = cairo_image_surface_get_height(getpng);
+    int width_t = 80;
+    int height_t = 80;
+    double x = (double)width_t/(double)width;
+    double y = (double)height_t/(double)height;
+    cairo_surface_destroy(w->image);
+    w->image = NULL;
+
+    w->image = cairo_surface_create_similar (w->surface, 
+                        CAIRO_CONTENT_COLOR_ALPHA, width_t, height_t);
+    cairo_t *cri = cairo_create (w->image);
+    cairo_scale(cri, x,y);    
+    cairo_set_source_surface (cri, getpng,0,0);
+    cairo_paint (cri);
+    cairo_surface_destroy(getpng);
+    cairo_destroy(cri);
+    expose_widget(w);
+}
+
 static void set_selected_file(FileDialog *file_dialog) {
     if(adj_get_value(file_dialog->ft->adj)<0 ||
         adj_get_value(file_dialog->ft->adj) > file_dialog->fp->file_counter) return;
@@ -204,6 +231,13 @@ static void set_selected_file(FileDialog *file_dialog) {
             file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)]);
     }
     assert(file_dialog->fp->selected_file != NULL);
+    if (strstr(file_dialog->fp->selected_file, ".png")) {
+        show_preview(file_dialog, file_dialog->fp->selected_file);
+    } else if (file_dialog->w->image) {
+        cairo_surface_destroy(file_dialog->w->image);
+        file_dialog->w->image = NULL;
+        expose_widget(file_dialog->w);
+    }
 }
 
 static void reload_file_entrys(FileDialog *file_dialog) {
