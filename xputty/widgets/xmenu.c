@@ -181,6 +181,35 @@ Widget_t *menu_add_submenu(Widget_t *w, const char  * label) {
     return wid;
 }
 
+Widget_t *cmenu_add_submenu(Widget_t *w, const char  * label) {
+    Widget_t *menu = w;
+    Widget_t* view_port =  menu->childlist->childs[0];
+    XWindowAttributes attrs;
+    XGetWindowAttributes(menu->app->dpy, (Window)menu->widget, &attrs);
+    int width = attrs.width;
+    int height = menu->scale.init_height;
+    int si = childlist_has_child(view_port->childlist);
+    Widget_t *wid = create_widget(menu->app, view_port, 0, height*si, width, height);
+    float max_value1 = view_port->adj->max_value+1.0;
+    set_adjustment(view_port->adj,0.0, 0.0, 0.0, max_value1,1.0, CL_VIEWPORT);
+    wid->scale.gravity = MENUITEM;
+    wid->flags &= ~USE_TRANSPARENCY;
+    wid->label = label;
+    wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, -1.0,1.0, CL_NONE);
+    wid->adj = wid->adj_y;
+    float max_value = wid->adj->max_value+1.0;
+    set_adjustment(wid->adj,0.0, max_value, 0.0, max_value,1.0, CL_NONE);
+    wid->func.adj_callback = set_active_radio_entry;
+    wid->func.expose_callback = _draw_submenu;
+    wid->func.enter_callback = _enter_submenu;
+    wid->func.leave_callback = _leave_submenu;
+    Widget_t* submenu = create_menu(wid, 25);
+    submenu->flags |= IS_SUBMENU;
+
+    submenu->func.button_release_callback = _menu_entry_released;
+    return wid;
+}
+
 Widget_t* create_menu(Widget_t *parent, int height) {
 
     int x1, y1;

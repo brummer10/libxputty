@@ -126,6 +126,15 @@ Widget_t *menu_add_check_entry(Widget_t *wid, const char  * label);
 Widget_t *menu_add_submenu(Widget_t *wid, const char  * label);
 
 /**
+ * @brief cmenu_add_submenu   - add a submenu to a create_menu
+ * @param *parent             - pointer to the Widget_t the menu should pop over
+ * @param *label              - the label of the menu
+ * @return Widget_t*          - pointer to the Widget_t submenu struct
+ */
+
+Widget_t *cmenu_add_submenu(Widget_t *wid, const char  * label);
+
+/**
  * @brief create_menu         - create a menu to a Widget_t
  * @param *parent             - pointer to the Widget_t the menu should pop over
  * @param height              - define the height of a single menu item
