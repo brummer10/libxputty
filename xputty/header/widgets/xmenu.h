@@ -188,6 +188,14 @@ Widget_t* menu_add_check_item(Widget_t *menu, const char * label);
 void radio_item_set_active(Widget_t *w);
 
 /**
+ * @brief set_active_radio_item       - activate selected radio item by number
+ * @param *w                          - the Widget_t hold the menu
+ * @return void
+ */
+
+void set_active_radio_entry_num(Widget_t *w, int active);
+
+/**
  * @brief menu_add_radio_item - add a radio item to menu
  * @param *menu               - pointer to the Widget_t menu
  * @param *label              - Label to show on the menu

@@ -77,6 +77,14 @@ void set_active_radio_entry(void *w_, void* user_data) {
     }
 }
 
+void set_active_radio_entry_num(Widget_t *w, int active) {
+    Widget_t *menu = w->childlist->childs[0];
+    Widget_t *view_port =  menu->childlist->childs[0];
+    Widget_t *wid = view_port->childlist->childs[active];
+    if (wid->adj && wid->flags & IS_RADIO)
+        radio_item_set_active(wid);
+}
+
 Widget_t *add_menu(Widget_t *parent, const char * label,
                         int x, int y, int width, int height) {
     Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
