@@ -191,6 +191,8 @@ static void show_preview(FileDialog *file_dialog, const char* file_name) {
     int height_t = 80;
     double x = (double)width_t/(double)width;
     double y = (double)height_t/(double)height;
+    if (width > 20*height)
+        x = y = (double)width_t/(double)height;
     cairo_surface_destroy(w->image);
     w->image = NULL;
 

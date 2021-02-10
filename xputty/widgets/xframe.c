@@ -18,33 +18,17 @@
  *
  */
 
-#pragma once
 
-#ifndef XWIDGETS_H_
-#define XWIDGETS_H_
-
-
-/** xwidgets.h include some predefined widgets for libxputty, include this to use them 
- * if you would only use libxputty and define your own widgets, include xputt.h 
- * instead this one in your project.
- */
-
-// widget header
-#include "xbutton.h"
-#include "xslider.h"
-#include "xknob.h"
-#include "xmenu.h"
-#include "xcombobox.h"
-#include "xtooltip.h"
-#include "xmeter.h"
-#include "xlabel.h"
 #include "xframe.h"
-#include "xlistbox.h"
-#include "xlistview.h"
-#include "xmultilistview.h"
-#include "xplayhead.h"
-#include "xtuner.h"
-#include "xvaluedisplay.h"
+#include "xframe_private.h"
 
 
-#endif //XWIDGETS_H_
+Widget_t* add_frame(Widget_t *parent, const char * label,
+                int x, int y, int width, int height) {
+
+    Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
+    wid->label = label;
+    wid->scale.gravity = ASPECT;
+    wid->func.expose_callback = _draw_frame;
+    return wid;
+}

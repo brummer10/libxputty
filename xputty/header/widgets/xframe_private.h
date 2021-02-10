@@ -20,31 +20,27 @@
 
 #pragma once
 
-#ifndef XWIDGETS_H_
-#define XWIDGETS_H_
+#ifndef XFRAME_PRIVATE_H_
+#define XFRAME_PRIVATE_H_
+
+#include "xframe.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
-/** xwidgets.h include some predefined widgets for libxputty, include this to use them 
- * if you would only use libxputty and define your own widgets, include xputt.h 
- * instead this one in your project.
+/**
+ * @brief _draw_frame            - internal draw the frame to the buffer
+ * @param *w_                    - void pointer to the Widget_t frame
+ * @param *user_data             - void pointer to attached user_data
+ * @return void
  */
 
-// widget header
-#include "xbutton.h"
-#include "xslider.h"
-#include "xknob.h"
-#include "xmenu.h"
-#include "xcombobox.h"
-#include "xtooltip.h"
-#include "xmeter.h"
-#include "xlabel.h"
-#include "xframe.h"
-#include "xlistbox.h"
-#include "xlistview.h"
-#include "xmultilistview.h"
-#include "xplayhead.h"
-#include "xtuner.h"
-#include "xvaluedisplay.h"
+void _draw_frame(void *w_, void* user_data);
 
+#ifdef __cplusplus
+}
+#endif
 
-#endif //XWIDGETS_H_
+#endif //XFRAME_PRIVATE_H_
