@@ -28,7 +28,7 @@ Widget_t* add_frame(Widget_t *parent, const char * label,
 
     Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
     wid->label = label;
-    wid->scale.gravity = ASPECT;
+    wid->scale.gravity = CENTER;
     wid->func.expose_callback = _draw_frame;
     return wid;
 }

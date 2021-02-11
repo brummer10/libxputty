@@ -58,8 +58,8 @@ void _draw_frame(void *w_, void* user_data) {
     cairo_show_text(w->crb, w->label);
     cairo_new_path (w->crb);
 
-    cairo_set_line_width(w->crb,5);
-    use_frame_color_scheme(w, NORMAL_);
+    cairo_set_line_width(w->crb,3);
+    use_frame_color_scheme(w, INSENSITIVE_);
     _rounded_frame(w->crb, 5, 5, width_t-10, height_t-10, extents.width+10);
     cairo_stroke(w->crb);
 }
