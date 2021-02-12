@@ -52,7 +52,9 @@ void _draw_frame(void *w_, void* user_data) {
         double y1 = (double)height/(double)height_t;
         cairo_scale(w->crb, x,y);
         cairo_set_source_surface (w->crb, w->image, 0, 0);
-        cairo_paint (w->crb);
+        _rounded_frame(w->crb, 5/x, 5/y, (width_t-10)/x, (height_t-10)/y, 0);
+        cairo_close_path (w->crb);
+        cairo_fill (w->crb);
         cairo_scale(w->crb, x1,y1);
     }
 
