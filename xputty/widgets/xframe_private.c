@@ -44,10 +44,16 @@ void _draw_frame(void *w_, void* user_data) {
     int height_t = attrs.height;
 
     if (w->image) {
-        widget_set_scale(w);
+        int width = cairo_xlib_surface_get_width(w->image);
+        int height = cairo_xlib_surface_get_height(w->image);
+        double x = (double)width_t/(double)(width);
+        double y = (double)height_t/(double)height;
+        double x1 = (double)(width)/(double)width_t;
+        double y1 = (double)height/(double)height_t;
+        cairo_scale(w->crb, x,y);
         cairo_set_source_surface (w->crb, w->image, 0, 0);
         cairo_paint (w->crb);
-        widget_reset_scale(w);
+        cairo_scale(w->crb, x1,y1);
     }
 
     cairo_text_extents_t extents;
