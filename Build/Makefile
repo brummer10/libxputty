@@ -1,4 +1,16 @@
 
+
+	# check LD
+	ifneq ($(shell $(LD) --version 2>&1 | head -n 1 | grep LLD),)
+		ifneq ($(shell uname -a | grep  x86_64), )
+			LDEMULATION := elf_x86_64
+		else ifneq ($(shell uname -a | grep i386), )
+			LDEMULATION := elf_i386
+		endif
+		USE_LDD = 1
+	endif
+
+
 	# set  name
 	NAME = Xputty
 	VER = 0.1
@@ -77,8 +89,13 @@ $(RESOURCEHEADER): $(RESOURCES_OBJ)
 $(XDG_OBJ): $(XDG_SOURCES)
 	$(CC) -MMD -Wall -DHAVE_MMAP -c $(addprefix $(XDG_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
 
+ifdef USE_LDD
 $(RESOURCES_OBJ): $(RESOURCES)
-	cd $(RESOURCES_DIR) && $(LD) -r -b binary $(patsubst %.o,%.png,$@) -o ../../Build/$@
+	cd $(RESOURCES_DIR) && $(LD) -r -b binary -m $(LDEMULATION) -z noexecstack $(patsubst %.o,%.png,$@) -o ../../Build/$@
+else
+$(RESOURCES_OBJ): $(RESOURCES)
+	cd $(RESOURCES_DIR) && $(LD) -r -b binary -z noexecstack $(patsubst %.o,%.png,$@) -o ../../Build/$@
+endif
 
 $(DIALOG_OBJ): $(DIALOG_SOURCES)
 	$(CC) -MMD -Wall -c $(addprefix $(DIALOG_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
