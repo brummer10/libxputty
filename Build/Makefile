@@ -110,6 +110,7 @@ $(LIB_OBJ): $(LIB_SOURCES)
 
 libxputty.a:  $(RESOURCES_OBJ) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
 	$(AR) rcs libxputty.a $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ) $(XDG_OBJ)
+	#$(CC) -shared $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ) $(XDG_OBJ) -o libxputty.so
 	mkdir -p $(RELEASE_DIR)include/
 	cp $(HEADER_DIR)*.h $(RELEASE_DIR)include/
 	cp $(WIDGET_HEADER_DIR)*.h $(RELEASE_DIR)include/

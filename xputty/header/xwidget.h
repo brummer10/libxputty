@@ -318,6 +318,8 @@ struct Widget_t {
     void *parent;
 /** pointer to the Parent struct */
     void *parent_struct;
+/** pointer to the Parent struct */
+    void *private_struct;
 /** the main XEvent callback */
     vfunc event_callback;
 /** struct holding the event callbacks */
