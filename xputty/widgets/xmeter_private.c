@@ -136,6 +136,8 @@ float _log_meter (float db) {
 }
 
 void _create_vertical_meter_image(Widget_t *w, int width, int height) {
+    cairo_surface_destroy(w->image);
+    w->image = NULL;   
     w->image = cairo_surface_create_similar (w->surface, 
                         CAIRO_CONTENT_COLOR_ALPHA, width*2, height);
     cairo_t *cri = cairo_create (w->image);
@@ -192,6 +194,8 @@ void _create_vertical_meter_image(Widget_t *w, int width, int height) {
 }
 
 void _create_horizontal_meter_image(Widget_t *w, int width, int height) {
+    cairo_surface_destroy(w->image);
+    w->image = NULL;   
     w->image = cairo_surface_create_similar (w->surface, 
                         CAIRO_CONTENT_COLOR_ALPHA, width, height*2);
     cairo_t *cri = cairo_create (w->image);
@@ -252,9 +256,17 @@ void _draw_v_meter(void *w_, void* user_data) {
 
     int width = cairo_xlib_surface_get_width(w->image);
     int height = cairo_xlib_surface_get_height(w->image);
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    int width_t = attrs.width;
+    int height_t = attrs.height;
+    if (width != width_t*2 || height != height_t) {
+        _create_vertical_meter_image(w, width_t, height_t);
+        width = cairo_xlib_surface_get_width(w->image);
+        height = cairo_xlib_surface_get_height(w->image);
+    }
     double meterstate = _log_meter(adj_get_value(w->adj_y));
     double oldstate = _log_meter(w->adj_y->start_value);
-    widget_set_scale(w);
     cairo_set_source_surface (w->crb, w->image, 0, 0);
     cairo_rectangle(w->crb,0, 0, width/2, height);
     cairo_fill(w->crb);
@@ -264,7 +276,6 @@ void _draw_v_meter(void *w_, void* user_data) {
 
     cairo_rectangle(w->crb, 0, height-height*oldstate, width/2, 3);
     cairo_fill(w->crb);
-    widget_reset_scale(w);
 }
 
 void _draw_h_meter(void *w_, void* user_data) {
@@ -272,9 +283,17 @@ void _draw_h_meter(void *w_, void* user_data) {
 
     int width = cairo_xlib_surface_get_width(w->image);
     int height = cairo_xlib_surface_get_height(w->image);
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    int width_t = attrs.width;
+    int height_t = attrs.height;
+    if (width != width_t || height != height_t*2) {
+        _create_horizontal_meter_image(w, width_t, height_t);
+        width = cairo_xlib_surface_get_width(w->image);
+        height = cairo_xlib_surface_get_height(w->image);
+    }
     double meterstate = _log_meter(adj_get_value(w->adj_x));
     double oldstate = _log_meter(w->adj_x->start_value);
-    widget_set_scale(w);
     cairo_set_source_surface (w->crb, w->image, 0, 0);
     cairo_rectangle(w->crb,0, 0, width, height/2);
     cairo_fill(w->crb);
@@ -284,6 +303,4 @@ void _draw_h_meter(void *w_, void* user_data) {
 
     cairo_rectangle(w->crb,(width*oldstate)-3, 0, 3, height/2);
     cairo_fill(w->crb);
-
-    widget_reset_scale(w);
 }

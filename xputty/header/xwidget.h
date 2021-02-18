@@ -609,7 +609,7 @@ void send_systray_message(Widget_t *w);
 /**
  * @brief expose_widgets    - send a expose event (EXPOSE) to a Widget_t
  * @param w                 - the Widget_t to send the event to
- * @return void 
+ * @return void
  */
 
 void expose_widget(Widget_t *w);
@@ -622,6 +622,16 @@ void expose_widget(Widget_t *w);
  */
 
 int key_mapping(Display *dpy, XKeyEvent *xkey);
+
+/**
+ * @brief strdecode         - replace string in char*
+ * @param *target           - the string to modify
+ * @param *needle           - the string to replace
+ * @param *replacement      - the replacement for the needle
+ * @return void
+ */
+
+void strdecode(char *target, const char *needle, const char *replacement);
 
 /**
  * @brief widget_set_dnd_aware    - allow drag and drop for on Widget_t
