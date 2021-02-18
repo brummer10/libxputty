@@ -158,6 +158,16 @@ Widget_t *menu_add_check_entry(Widget_t *wid, const char  * label) {
     return item;
 }
 
+Widget_t *menu_add_accel_check_entry(Widget_t *wid, const char  * label) {
+    Widget_t *menu = wid->childlist->childs[0];
+    Widget_t *item = menu_add_check_item(menu,label);
+    item->func.expose_callback = _draw_accel_check_item;
+    float max_value = wid->adj->max_value+1.0;
+    set_adjustment(wid->adj,0.0, max_value, 0.0, max_value,1.0, CL_NONE);
+    
+    return item;
+}
+
 Widget_t *menu_add_submenu(Widget_t *w, const char  * label) {
     float max_value2 = w->adj->max_value+1.0;
     set_adjustment(w->adj,0.0, max_value2, 0.0, max_value2,1.0, CL_NONE);

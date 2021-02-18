@@ -341,6 +341,30 @@ void _draw_accel_item(void *w_, void* user_data) {
     cairo_new_path (w->crb);
 }
 
+void _draw_accel_check_item(void *w_, void* user_data) {
+    _draw_accel_item(w_, user_data);
+    Widget_t *w = (Widget_t*)w_;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    int height = attrs.height;
+    if (w->flags & IS_RADIO) {
+        cairo_arc(w->crb, height/3, height/2, height/6, 0, 2 * M_PI );
+    } else {
+        cairo_rectangle(w->crb, height/6, height/3, height/3 , height/3);
+    }
+    use_shadow_color_scheme(w, get_color_state(w));
+    cairo_fill(w->crb);
+    if ((int) w->adj_y->value) {
+        if (w->flags & IS_RADIO) {
+            cairo_arc(w->crb, height/3, height/2, height/6-2, 0, 2 * M_PI );
+        } else {
+            cairo_rectangle(w->crb, height/6+1, height/3+1, height/3-2 , height/3-2);
+        }
+        use_fg_color_scheme(w, ACTIVE_);
+        cairo_fill(w->crb);
+    }
+}
+
 void _draw_check_item(void *w_, void* user_data) {
     _draw_item(w_, user_data);
     Widget_t *w = (Widget_t*)w_;

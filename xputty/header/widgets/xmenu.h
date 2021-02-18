@@ -117,6 +117,14 @@ Widget_t *menu_add_radio_entry(Widget_t *wid, const char  * label);
 Widget_t *menu_add_check_entry(Widget_t *wid, const char  * label);
 
 /**
+ * @brief menu_add_accel_check_entry- add a check entry with accel to menu
+ * @param *wid                - pointer to the Widget_t menu
+ * @param *label              - Label to show on the menu
+ * @return Widget_t*          - pointer to the Widget_t menu_item struct
+ */
+
+Widget_t *menu_add_accel_check_entry(Widget_t *wid, const char  * label);
+/**
  * @brief menu_add_submenu    - add a submenu to a Widget_t
  * @param *parent             - pointer to the Widget_t the menu should pop over
  * @param *label              - the label of the menu

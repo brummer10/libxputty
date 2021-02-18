@@ -140,6 +140,15 @@ void _draw_accel_item(void *w_, void* user_data);
 void _draw_check_item(void *w_, void* user_data);
 
 /**
+ * @brief _accel_draw_check_item     - draw item on expose call
+ * @param *w_                  - the item to draw
+ * @param *user_data           - attached user_data
+ * @return void
+ */
+
+void _draw_accel_check_item(void *w_, void* user_data);
+
+/**
  * @brief _set_viewpoint       - move the view_port to position
  * @param *w_                  - void pointer to view_port
  * @param *user_data           - attached user_data
