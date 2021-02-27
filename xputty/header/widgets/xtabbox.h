@@ -20,33 +20,24 @@
 
 #pragma once
 
-#ifndef XWIDGETS_H_
-#define XWIDGETS_H_
+#ifndef XTABBOX_H_
+#define XTABBOX_H_
 
+#include "xputty.h"
 
-/** xwidgets.h include some predefined widgets for libxputty, include this to use them 
- * if you would only use libxputty and define your own widgets, include xputt.h 
- * instead this one in your project.
- */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-// widget header
-#include "xbutton.h"
-#include "xslider.h"
-#include "xknob.h"
-#include "xmenu.h"
-#include "xcombobox.h"
-#include "xtooltip.h"
-#include "xmeter.h"
-#include "xlabel.h"
-#include "xframe.h"
-#include "xlistbox.h"
-#include "xlistview.h"
-#include "xmultilistview.h"
-#include "xplayhead.h"
-#include "xtuner.h"
-#include "xvaluedisplay.h"
-#include "xwaveview.h"
-#include "xtabbox.h"
+Widget_t* tabbox_add_tab(Widget_t *tabbox, const char * label);
 
+Widget_t* add_tabbox(Widget_t *parent, const char * label,
+                int x, int y, int width, int height);
 
-#endif //XWIDGETS_H_
+void tabbox_remove_tab(Widget_t *tabbox, int tab);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif //XTABBOX_H_

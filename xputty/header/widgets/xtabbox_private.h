@@ -20,33 +20,23 @@
 
 #pragma once
 
-#ifndef XWIDGETS_H_
-#define XWIDGETS_H_
+#ifndef XTABBOX_PRIVATE_H_
+#define XTABBOX_PRIVATE_H_
 
-
-/** xwidgets.h include some predefined widgets for libxputty, include this to use them 
- * if you would only use libxputty and define your own widgets, include xputt.h 
- * instead this one in your project.
- */
-
-// widget header
-#include "xbutton.h"
-#include "xslider.h"
-#include "xknob.h"
-#include "xmenu.h"
-#include "xcombobox.h"
-#include "xtooltip.h"
-#include "xmeter.h"
-#include "xlabel.h"
-#include "xframe.h"
-#include "xlistbox.h"
-#include "xlistview.h"
-#include "xmultilistview.h"
-#include "xplayhead.h"
-#include "xtuner.h"
-#include "xvaluedisplay.h"
-#include "xwaveview.h"
 #include "xtabbox.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#endif //XWIDGETS_H_
+void _draw_tabbox(void *w_, void* user_data);
+
+void _draw_tab(void *w_, void* user_data);
+
+void _tab_button_released(void *w_, void* button_, void* user_data);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif //XTABBOX_PRIVATE_H_
