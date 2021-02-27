@@ -4,6 +4,8 @@
 	ifneq ($(shell $(LD) --version 2>&1 | head -n 1 | grep LLD),)
 		ifneq ($(shell uname -a | grep  x86_64), )
 			LDEMULATION := elf_x86_64
+		else ifneq ($(shell uname -a | grep amd64), )
+			LDEMULATION := elf_x86_64
 		else ifneq ($(shell uname -a | grep i386), )
 			LDEMULATION := elf_i386
 		endif
