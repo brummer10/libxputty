@@ -458,6 +458,10 @@ void show_tooltip(Widget_t *wid) {
     for(;i<wid->childlist->elem;i++) {
         Widget_t *w = wid->childlist->childs[i];
         if (w->flags & IS_TOOLTIP) {
+            XWindowAttributes attrs;
+            XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+            int width_t = attrs.width;
+            int height_t = attrs.height;
             unsigned int mask;
             int x, y, rx, ry;
             Window child, root;
@@ -465,6 +469,10 @@ void show_tooltip(Widget_t *wid) {
             int x1, y1;
             XTranslateCoordinates( wid->app->dpy, wid->widget, DefaultRootWindow(wid->app->dpy),
                                                                        x, y, &x1, &y1, &child );
+            int snum = DefaultScreen(wid->app->dpy);
+            int screen_width = DisplayWidth(wid->app->dpy, snum);
+            if (x1+10+width_t > screen_width) x1 = x1-width_t-10;
+
             XMoveWindow(w->app->dpy,w->widget,x1+10, y1-10);
             widget_show(w);
             break;
