@@ -461,7 +461,6 @@ void show_tooltip(Widget_t *wid) {
             XWindowAttributes attrs;
             XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
             int width_t = attrs.width;
-            int height_t = attrs.height;
             unsigned int mask;
             int x, y, rx, ry;
             Window child, root;
