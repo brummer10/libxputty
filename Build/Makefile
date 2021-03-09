@@ -10,12 +10,18 @@
 			LDEMULATION := elf_i386
 		endif
 		USE_LDD = 1
+	else ifneq ($(shell gold --version 2>&1 | head -n 1 | grep gold),)
+		LD = gold
 	endif
-
 
 	# set  name
 	NAME = Xputty
-	VER = 0.1
+	VER = 1.0
+
+	PREFIX ?= /usr
+	INSTALL_DIR ?= $(PREFIX)/lib/
+	INCLUDE_DIR ?= $(PREFIX)/include/
+	SHARE_DIR ?= $(PREFIX)/share/
 
 	LIB_DIR := ../xputty/
 	HEADER_DIR := $(LIB_DIR)header/
@@ -62,7 +68,7 @@
 
 	DEP = $(LIB_OBJ:%.o=%.d) $(WIDGET_OBJ:%.o=%.d) $(DIALOG_OBJ:%.o=%.d) $(XDG_OBJ:%.o=%.d)
 
-.PHONY : all clean debug nls updatepot po
+.PHONY : all clean debug nls updatepot po shared
 
 .NOTPARALLEL:
 
@@ -79,7 +85,7 @@ updatepot:
 po:
 
 clean:
-	rm -f libxputty.a $(LIB_OBJ) $(WIDGET_OBJ) $(RESOURCES_OBJ) $(DIALOG_OBJ) $(XDG_OBJ) $(DEP) $(RESOURCEHEADER)
+	rm -f libxputty.a libxputty.so libxputty.so.1 libxputty.so.1.0 xputty.pc $(LIB_OBJ) $(WIDGET_OBJ) $(RESOURCES_OBJ) $(DIALOG_OBJ) $(XDG_OBJ) $(DEP) $(RESOURCEHEADER)
 	rm -rf $(RELEASE_DIR)
 
 $(RESOURCEHEADER): $(RESOURCES_OBJ) 
@@ -110,9 +116,11 @@ $(LIB_OBJ): $(LIB_SOURCES)
 
 -include $(DEP)
 
-libxputty.a:  $(RESOURCES_OBJ) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
+xputty.pc: xputty.pc.in
+	sed 's;PATH;$(PREFIX);' $< >$@
+
+libxputty.a: $(RESOURCES_OBJ) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
 	$(AR) rcs libxputty.a $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ) $(XDG_OBJ)
-	#$(CC) -shared $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ) $(XDG_OBJ) -o libxputty.so
 	mkdir -p $(RELEASE_DIR)include/
 	cp $(HEADER_DIR)*.h $(RELEASE_DIR)include/
 	cp $(WIDGET_HEADER_DIR)*.h $(RELEASE_DIR)include/
@@ -122,11 +130,36 @@ libxputty.a:  $(RESOURCES_OBJ) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
 	cp -r $(LIB_DIR)lv2_plugin $(RELEASE_DIR)
 	cp libxputty.a $(RELEASE_DIR)
 
+shared: xputty.pc $(RESOURCEHEADER) libxputty.a
+	$(CC) -shared -Wl,-soname,libxputty.so.1 -o libxputty.so.1.0 $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ) $(XDG_OBJ)
+	cp libxputty.so.1.0 $(RELEASE_DIR)
+	ln -sf libxputty.so.1.0 libxputty.so.1
+	ln -sf libxputty.so.1 libxputty.so
+	cp -df libxputty.so.1 $(RELEASE_DIR)
+	cp -df libxputty.so $(RELEASE_DIR)
+	cp xputty.pc $(RELEASE_DIR)
+
 doc:
 
 mod:
 
-install:
+install: shared
+ifneq ("$(wildcard $(RELEASE_DIR))","")
+	mkdir -p $(DESTDIR)$(INCLUDE_DIR)xputty/
+	mkdir -p $(DESTDIR)$(INSTALL_DIR)
+	mkdir -p $(DESTDIR)$(SHARE_DIR)pkgconfig/
+	cp $(RELEASE_DIR)include/*.h $(DESTDIR)$(INCLUDE_DIR)xputty/
+	cp $(RELEASE_DIR)*.so.1.0 $(DESTDIR)$(INSTALL_DIR)
+	cp -df $(RELEASE_DIR)*.so.1 $(DESTDIR)$(INSTALL_DIR)
+	cp -df $(RELEASE_DIR)*.so $(DESTDIR)$(INSTALL_DIR)
+	cp $(RELEASE_DIR)libxputty.a $(DESTDIR)$(INSTALL_DIR)
+	cp $(RELEASE_DIR)xputty.pc $(DESTDIR)$(SHARE_DIR)pkgconfig/
+else
+	@echo "you must run 'make' first"
+endif
 
 uninstall:
-
+	@rm -rf $(DESTDIR)$(INSTALL_DIR)libxputty.so $(DESTDIR)$(INSTALL_DIR)libxputty.so.1 \
+	$(DESTDIR)$(INSTALL_DIR)libxputty.so.1.0 $(DESTDIR)$(INSTALL_DIR)libxputty.a
+	@rm -rf $(DESTDIR)$(INCLUDE_DIR)xputty/
+	@rm -rf $(DESTDIR)$(SHARE_DIR)pkgconfig/xputty.pc

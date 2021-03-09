@@ -51,12 +51,12 @@ void _draw_waveview(void *w_, void* user_data) {
 
     cairo_set_line_width(w->crb,2);
     use_bg_color_scheme(w, NORMAL_);
-    _rounded_view(w->crb, 5, 5, width_t-10, height_t-10, extents.width+10);
+    _rounded_view(w->crb, 2, 5, width_t-4, height_t-7, extents.width+15);
     cairo_fill_preserve(w->crb);
     use_frame_color_scheme(w, NORMAL_);
     cairo_stroke(w->crb);
-    cairo_move_to(w->crb,5,half_height_t);
-    cairo_line_to(w->crb, width_t-5, half_height_t);
+    cairo_move_to(w->crb,2,half_height_t);
+    cairo_line_to(w->crb, width_t-4, half_height_t);
     cairo_stroke(w->crb);
 
     use_text_color_scheme(w, get_color_state(w));
@@ -73,5 +73,22 @@ void _draw_waveview(void *w_, void* user_data) {
     for (;i<wave_view->size;i++) {
         cairo_line_to(w->crb, (float)(i+0.5)*step,(float)(half_height_t)+ -wave_view->wave[i]*lstep);
     }
+    cairo_line_to(w->crb, width_t, half_height_t);
+    cairo_line_to(w->crb, 2, half_height_t);
+    cairo_close_path(w->crb);
+    use_light_color_scheme(w, NORMAL_);
+    cairo_fill_preserve(w->crb);
+    use_fg_color_scheme(w, NORMAL_);
+    cairo_stroke(w->crb);
+    i = 0;
+    for (;i<wave_view->size;i++) {
+        cairo_line_to(w->crb, (float)(i+0.5)*step,(float)(half_height_t)+ wave_view->wave[i]*lstep);
+    }
+    cairo_line_to(w->crb, width_t, half_height_t);
+    cairo_line_to(w->crb, 2, half_height_t);
+    cairo_close_path(w->crb);
+    use_light_color_scheme(w, NORMAL_);
+    cairo_fill_preserve(w->crb);
+    use_fg_color_scheme(w, NORMAL_);
     cairo_stroke(w->crb);
 }

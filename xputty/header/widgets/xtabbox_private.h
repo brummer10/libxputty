@@ -29,9 +29,30 @@
 extern "C" {
 #endif
 
+/**
+ * @brief _draw_tabbox         - draw the tabbox on expose call
+ * @param *w_                  - the tabbox to draw
+ * @param *user_data           - attached user_data
+ * @return void
+ */
+
 void _draw_tabbox(void *w_, void* user_data);
 
+/**
+ * @brief _draw_tab            - draw a single tab on expose call
+ * @param *w_                  - the tab to draw
+ * @param *user_data           - attached user_data
+ * @return void
+ */
+
 void _draw_tab(void *w_, void* user_data);
+
+/**
+ * @brief _tab_button_released   - select the tab to show (hide all other)
+ * @param *button                - the xbutton which is pressed
+ * @param *user_data             - attached user_data
+ * @return void
+ */
 
 void _tab_button_released(void *w_, void* button_, void* user_data);
 

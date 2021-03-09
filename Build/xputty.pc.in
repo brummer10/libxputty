@@ -1,0 +1,11 @@
+prefix=PATH
+exec_prefix=${prefix}
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib
+
+Name: xputty
+Description: A damn tiny abstraction Layer to create X11 window/widgets with cairo surfaces
+Version: 1.0
+Requires.private: cairo x11
+Libs: -L${libdir} -lxputty
+Cflags: -I${includedir}/xputty

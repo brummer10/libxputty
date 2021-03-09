@@ -29,10 +29,32 @@
 extern "C" {
 #endif
 
+/**
+ * @brief tabbox_add_tab      - add a tab to a tabbox Widget_t
+ * @param *tabbox             - pointer to the tabbox Widget_t the tab should added to
+ * @param *label              - the label of the tab
+ * @return Widget_t*          - pointer to the Widget_t tab struct
+ */
+
 Widget_t* tabbox_add_tab(Widget_t *tabbox, const char * label);
+
+/**
+ * @brief add_tabbox          - add a tabbox to a Widget_t
+ * @param *parent             - pointer to the Widget_t request the tabbox 
+ * @param *label              - the label of the tabbox
+ * @param x,y,width,height    - the position/geometry to create the tabbox
+ * @return Widget_t*          - pointer to the Widget_t tabbox struct
+ */
 
 Widget_t* add_tabbox(Widget_t *parent, const char * label,
                 int x, int y, int width, int height);
+
+/**
+ * @brief tabbox_remove_tab   - remove a tab from a tabbox Widget_t
+ * @param *tabbox             - pointer to the tabbox Widget_t the tab should removed from
+ * @param tab                 - the number of the tab
+ * @return void
+ */
 
 void tabbox_remove_tab(Widget_t *tabbox, int tab);
 
