@@ -130,7 +130,7 @@ libxputty.a: $(RESOURCES_OBJ) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
 	cp -r $(LIB_DIR)lv2_plugin $(RELEASE_DIR)
 	cp libxputty.a $(RELEASE_DIR)
 
-shared: xputty.pc $(RESOURCEHEADER) libxputty.a
+libxputty.so: xputty.pc libxputty.a
 	$(CC) -shared -Wl,-soname,libxputty.so.1 -o libxputty.so.1.0 $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ) $(XDG_OBJ)
 	cp libxputty.so.1.0 $(RELEASE_DIR)
 	ln -sf libxputty.so.1.0 libxputty.so.1
@@ -138,6 +138,8 @@ shared: xputty.pc $(RESOURCEHEADER) libxputty.a
 	cp -df libxputty.so.1 $(RELEASE_DIR)
 	cp -df libxputty.so $(RELEASE_DIR)
 	cp xputty.pc $(RELEASE_DIR)
+
+shared: libxputty.so
 
 doc:
 
