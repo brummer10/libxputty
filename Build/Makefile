@@ -1,7 +1,9 @@
 
 
-	# check LD
-	ifneq ($(shell $(LD) --version 2>&1 | head -n 1 | grep LLD),)
+	# check if we need LD to implement images
+	ifneq ($(shell xxd --version 2>&1 | head -n 1 | grep xxd),)
+		USE_XXD = 1
+	else ifneq ($(shell $(LD) --version 2>&1 | head -n 1 | grep LLD),)
 		ifneq ($(shell uname -a | grep  x86_64), )
 			LDEMULATION := elf_x86_64
 		else ifneq ($(shell uname -a | grep amd64), )
@@ -60,6 +62,7 @@
 
 	RESOURCES := $(wildcard $(RESOURCES_DIR)*.png)
 	RESOURCES_OBJ := $(notdir $(patsubst %.png,%.o,$(RESOURCES)))
+	RESOURCES_C := $(notdir $(patsubst %.png,%.c,$(RESOURCES)))
 	RESOURCE_EXTLD := $(notdir $(patsubst %.png,%_png,$(RESOURCES)))
 	RESOURCEHEADER := $(RESOURCES_DIR)xresources.h
 
@@ -85,7 +88,8 @@ updatepot:
 po:
 
 clean:
-	rm -f libxputty.a libxputty.so libxputty.so.1 libxputty.so.1.0 xputty.pc $(LIB_OBJ) $(WIDGET_OBJ) $(RESOURCES_OBJ) $(DIALOG_OBJ) $(XDG_OBJ) $(DEP) $(RESOURCEHEADER)
+	rm -f libxputty.a libxputty.so libxputty.so.1 libxputty.so.1.0 xputty.pc $(RESOURCES_C) \
+	$(LIB_OBJ) $(WIDGET_OBJ) $(RESOURCES_OBJ) $(DIALOG_OBJ) $(XDG_OBJ) $(DEP) $(RESOURCEHEADER)
 	rm -rf $(RELEASE_DIR)
 
 $(RESOURCEHEADER): $(RESOURCES_OBJ) 
@@ -97,12 +101,18 @@ $(RESOURCEHEADER): $(RESOURCES_OBJ)
 $(XDG_OBJ): $(XDG_SOURCES)
 	$(CC) -MMD -Wall -DHAVE_MMAP -c $(addprefix $(XDG_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
 
-ifdef USE_LDD
+ifdef USE_XXD
+$(RESOURCES_OBJ): $(RESOURCES)
+	cd $(RESOURCES_DIR) && xxd -i $(patsubst %.o,%.png,$@) > ../../Build/$(patsubst %.o,%.c,$@)
+	$(CC) -c $(patsubst %.o,%.c,$@) -o $@
+else ifdef USE_LDD
 $(RESOURCES_OBJ): $(RESOURCES)
 	cd $(RESOURCES_DIR) && $(LD) -r -b binary -m $(LDEMULATION) -z noexecstack $(patsubst %.o,%.png,$@) -o ../../Build/$@
+	LDFLAGS += -DUSE_LD=1
 else
 $(RESOURCES_OBJ): $(RESOURCES)
 	cd $(RESOURCES_DIR) && $(LD) -r -b binary -z noexecstack $(patsubst %.o,%.png,$@) -o ../../Build/$@
+	LDFLAGS += -DUSE_LD=1
 endif
 
 $(DIALOG_OBJ): $(DIALOG_SOURCES)

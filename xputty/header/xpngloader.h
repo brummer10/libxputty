@@ -36,6 +36,8 @@ extern "C" {
         ld -r -b binary name.png -o name.o
 */
 
+#ifdef USE_LD
+
 #ifdef __APPLE__
 
 #ifdef __cplusplus
@@ -54,6 +56,7 @@ extern "C" {
 #define LDLEN(NAME) (getsectbyname("__DATA", "__" #NAME)->size)
 
 #elif (defined __WIN32__)  /* mingw */
+
 
 #define EXTLD(NAME) \
   extern const unsigned char binary_ ## NAME ## _start[]; \
@@ -74,6 +77,14 @@ extern "C" {
   ((_binary_ ## NAME ## _end) - (_binary_ ## NAME ## _start))
 #endif
 
+#else /* xxd -i NAME */
+
+#define EXTLD(NAME) \
+    extern const unsigned char NAME;
+#define LDVAR(NAME) \
+    (const unsigned char*)&NAME
+
+#endif
 
 /*---------------------------------------------------------------------
 -----------------------------------------------------------------------    
