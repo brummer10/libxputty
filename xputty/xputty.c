@@ -52,6 +52,14 @@ void main_init(Xputty *main) {
     main->dnd_type = None;
     main->dnd_source_window = 0;
     main->dnd_version = 5;
+
+    main->selection = XInternAtom(main->dpy, "CLIPBOARD", 0);
+    main->targets_atom = XInternAtom(main->dpy, "TARGETS", 0);
+    main->text_atom = XInternAtom(main->dpy, "TEXT", 0);
+    main->UTF8 = XInternAtom(main->dpy, "UTF8_STRING", 1);
+    if (main->UTF8 == None) main->UTF8 = XA_STRING;
+    main->ctext = NULL;
+    main->csize = 0;
 }
 
 void main_run(Xputty *main) {
@@ -203,5 +211,6 @@ void main_quit(Xputty *main) {
     free(main->childlist);
     free(main->color_scheme);
     XCloseDisplay(main->dpy);
+    free(main->ctext);
     debug_print("quit\n");
 }

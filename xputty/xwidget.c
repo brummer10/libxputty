@@ -644,6 +644,10 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
         break;
 
         case SelectionRequest:
+            if (xev->xselectionrequest.selection != main->selection) break;
+            send_to_clipboard(wid, xev);
+            break;
+        case SelectionClear:
             break;
         case SelectionNotify:
             debug_print("Widget_t SelectionNotify\n");
@@ -835,6 +839,43 @@ void send_dnd_finished_event(Widget_t *w, XEvent* event) {
     xev.xclient.data.l[1]    = 1;
     xev.xclient.data.l[2]    = w->app->XdndActionCopy;
     XSendEvent (w->app->dpy, w->app->dnd_source_window, False, NoEventMask, &xev);
+}
+
+void copy_to_clipboard(Widget_t *w, char* text, int size) {
+    XSetSelectionOwner (w->app->dpy, w->app->selection, w->widget, 0);
+    if (XGetSelectionOwner (w->app->dpy, w->app->selection) != w->widget) return;
+    free(w->app->ctext);
+    w->app->ctext = NULL;
+    w->app->ctext = (unsigned char*)strdup(text);
+    w->app->csize = size;
+}
+
+void send_to_clipboard(Widget_t *w, XEvent* event) {
+    XSelectionRequestEvent * xsr = &event->xselectionrequest;
+    XSelectionEvent xev;
+    memset (&xev, 0, sizeof (XSelectionEvent));
+    int R = 0;
+    xev.type = SelectionNotify;
+    xev.display = xsr->display;
+    xev.requestor = xsr->requestor;
+    xev.selection = xsr->selection;
+    xev.time = xsr->time;
+    xev.target = xsr->target;
+    xev.property = xsr->property;
+    if (xev.target == w->app->targets_atom) {
+        R = XChangeProperty (xev.display, xev.requestor, xev.property, XA_ATOM, 32,
+            PropModeReplace, (unsigned char*)&w->app->UTF8, 1);
+    } else if (xev.target == XA_STRING || xev.target == w->app->text_atom) {
+        R = XChangeProperty(xev.display, xev.requestor, xev.property, XA_STRING, 8,
+            PropModeReplace, w->app->ctext, w->app->csize);
+    } else if (xev.target == w->app->UTF8) {
+        R = XChangeProperty(xev.display, xev.requestor, xev.property, w->app->UTF8, 8,
+            PropModeReplace, w->app->ctext, w->app->csize);
+    } else {
+        xev.property = None;
+    }
+    if ((R & 2) == 0) XSendEvent (w->app->dpy, xev.requestor, 0, 0, (XEvent *)&xev);
+    debug_print("send to clipboard %s\n", w->app->ctext);
 }
 
 void send_configure_event(Widget_t *w,int x, int y, int width, int height) {

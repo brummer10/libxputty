@@ -226,6 +226,12 @@ struct Xputty{
     Atom dnd_type;
     Window dnd_source_window;
     int dnd_version;
+    Atom selection;
+    Atom targets_atom;
+    Atom text_atom;
+    Atom UTF8;
+    unsigned char * ctext;
+    int csize;
 };
 
 /**

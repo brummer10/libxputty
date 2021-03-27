@@ -685,6 +685,25 @@ void send_dnd_finished_event(Widget_t *w, XEvent* event);
 
 void send_dnd_status_event(Widget_t *w, XEvent* event);
 
+/**
+ * @brief copy_to_clipboard       - send textbuffer to clipboard
+ * @param w                       - the Widget_t to send the event 
+ * @param text                    - the text buffer to send to clipboard 
+ * @param size                    - the size of the buffer to send
+ * @return void 
+ */
+
+void copy_to_clipboard(Widget_t *w, char* text, int size);
+
+/**
+ * @brief send_to_clipboard       - send textbuffer to clipboard on request
+ * @param w                       - the Widget_t to send the event 
+ * @param event                   - the event contain the request
+ * @return void 
+ */
+
+void send_to_clipboard(Widget_t *w, XEvent* event);
+
 #ifdef __cplusplus
 }
 #endif
