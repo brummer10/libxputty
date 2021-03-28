@@ -652,6 +652,10 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
         case SelectionClear:
             break;
         case SelectionNotify:
+            if (xev->xselection.property == None) {
+                wid->func.paste_notify_callback(wid, NULL);
+                break;
+            }
             if (xev->xselection.selection == main->selection) {
                 receive_paste_from_clipboard(wid, xev);
                 break;
@@ -845,6 +849,10 @@ void send_dnd_finished_event(Widget_t *w, XEvent* event) {
     xev.xclient.data.l[1]    = 1;
     xev.xclient.data.l[2]    = w->app->XdndActionCopy;
     XSendEvent (w->app->dpy, w->app->dnd_source_window, False, NoEventMask, &xev);
+}
+
+int have_paste(Widget_t *w) {
+    return XGetSelectionOwner(w->app->dpy,w->app->selection);
 }
 
 void request_paste_from_clipboard(Widget_t *w) {

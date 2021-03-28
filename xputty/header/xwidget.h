@@ -705,6 +705,15 @@ void copy_to_clipboard(Widget_t *w, char* text, int size);
 
 void send_to_clipboard(Widget_t *w, XEvent* event);
 
+
+/**
+ * @brief have_paste                     - check if clipboard contain a textbuffer
+ * @param w                              - the Widget_t to send the request 
+ * @return void 
+ */
+
+int have_paste(Widget_t *w);
+
 /**
  * @brief request_paste_from_clipboard   - request textbuffer from clipboard
  * @param w                              - the Widget_t to send the request 
