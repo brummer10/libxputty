@@ -90,7 +90,6 @@ typedef struct {
     xevfunc unmap_notify_callback;
     xevfunc dialog_callback;
     xevfunc dnd_notify_callback;
-    xevfunc paste_notify_callback;
 
     evfunc button_press_callback;
     evfunc button_release_callback;
@@ -705,31 +704,6 @@ void copy_to_clipboard(Widget_t *w, char* text, int size);
 
 void send_to_clipboard(Widget_t *w, XEvent* event);
 
-
-/**
- * @brief have_paste                     - check if clipboard contain a textbuffer
- * @param w                              - the Widget_t to send the request 
- * @return void 
- */
-
-int have_paste(Widget_t *w);
-
-/**
- * @brief request_paste_from_clipboard   - request textbuffer from clipboard
- * @param w                              - the Widget_t to send the request 
- * @return void 
- */
-
-void request_paste_from_clipboard(Widget_t *w);
-
-/**
- * @brief receive_paste_from_clipboard   - receive textbuffer from clipboard
- * @param w                              - the Widget_t which requested the buffer 
- * @param event                          - the event contain the request
- * @return void 
- */
-
-void receive_paste_from_clipboard(Widget_t *w, XEvent* event);
 
 #ifdef __cplusplus
 }

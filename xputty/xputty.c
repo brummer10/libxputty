@@ -211,6 +211,6 @@ void main_quit(Xputty *main) {
     free(main->childlist);
     free(main->color_scheme);
     XCloseDisplay(main->dpy);
-    free(main->ctext);
+    //free(main->ctext);
     debug_print("quit\n");
 }
