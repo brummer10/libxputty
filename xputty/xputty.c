@@ -20,6 +20,10 @@
 
 #include "xputty.h"
 
+void xdummy_callback(void *w_, void* user_data) {
+    debug_print("xputty xdummy callback\n");
+}
+
 
 void main_init(Xputty *main) {
     main->dpy = XOpenDisplay(0);
@@ -36,6 +40,12 @@ void main_init(Xputty *main) {
     main->small_font = 10;
     main->normal_font = 12;
     main->big_font = 16;
+    main->ctext = NULL;
+    main->csize = 0;
+    main->xpaste_notify_callback = xdummy_callback;
+
+    main->dnd_source_window = 0;
+    main->dnd_version = 5;
     main->XdndAware = XInternAtom (main->dpy, "XdndAware", False);
     main->XdndTypeList = XInternAtom (main->dpy, "XdndTypeList", False);
     main->XdndSelection = XInternAtom (main->dpy, "XdndSelection", False);
@@ -50,16 +60,12 @@ void main_init(Xputty *main) {
     main->dnd_type_text = XInternAtom (main->dpy, "text/plain", False);
     main->dnd_type_utf8 = XInternAtom (main->dpy, "UTF8_STRING", False);
     main->dnd_type = None;
-    main->dnd_source_window = 0;
-    main->dnd_version = 5;
 
     main->selection = XInternAtom(main->dpy, "CLIPBOARD", 0);
     main->targets_atom = XInternAtom(main->dpy, "TARGETS", 0);
     main->text_atom = XInternAtom(main->dpy, "TEXT", 0);
     main->UTF8 = XInternAtom(main->dpy, "UTF8_STRING", 1);
     if (main->UTF8 == None) main->UTF8 = XA_STRING;
-    main->ctext = NULL;
-    main->csize = 0;
 }
 
 void main_run(Xputty *main) {
@@ -211,6 +217,6 @@ void main_quit(Xputty *main) {
     free(main->childlist);
     free(main->color_scheme);
     XCloseDisplay(main->dpy);
-    //free(main->ctext);
+    free(main->ctext);
     debug_print("quit\n");
 }

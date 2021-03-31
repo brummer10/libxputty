@@ -650,6 +650,14 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
         case SelectionClear:
             break;
         case SelectionNotify:
+            if (xev->xselection.property == None) {
+                main->xpaste_notify_callback(wid, NULL);
+                break;
+            }
+            if (xev->xselection.selection == main->selection) {
+                receive_paste_from_clipboard(wid, xev);
+                break;
+            }
             debug_print("Widget_t SelectionNotify\n");
             handle_drag_data(wid, xev);
             break;
@@ -841,12 +849,41 @@ void send_dnd_finished_event(Widget_t *w, XEvent* event) {
     XSendEvent (w->app->dpy, w->app->dnd_source_window, False, NoEventMask, &xev);
 }
 
+int have_paste(Widget_t *w) {
+    return XGetSelectionOwner(w->app->dpy,w->app->selection);
+}
+
+void request_paste_from_clipboard(Widget_t *w) {
+    Atom XSEL_DATA = XInternAtom(w->app->dpy, "XSEL_DATA", 0);
+    XConvertSelection(w->app->dpy, w->app->selection, w->app->UTF8, XSEL_DATA, w->widget, CurrentTime);
+}
+
+void receive_paste_from_clipboard(Widget_t *w, XEvent* event) {
+    if(event->xselection.property) {
+        Atom target;
+        char * data = NULL;
+        int format;
+        unsigned long N, size;
+        XGetWindowProperty(event->xselection.display, event->xselection.requestor,
+            event->xselection.property, 0L,(~0L), 0, AnyPropertyType, &target,
+            &format, &size, &N,(unsigned char**)&data);
+        if(target == w->app->UTF8 || target == XA_STRING) {
+            free(w->app->ctext);
+            w->app->ctext = NULL;
+            w->app->ctext = (unsigned char*)strndup(data, size);
+            XFree(data);
+        }
+        XDeleteProperty(event->xselection.display, event->xselection.requestor, event->xselection.property);
+        w->app->xpaste_notify_callback(w, (void*)&w->app->ctext);
+    }
+}
+
 void copy_to_clipboard(Widget_t *w, char* text, int size) {
     XSetSelectionOwner (w->app->dpy, w->app->selection, w->widget, 0);
     if (XGetSelectionOwner (w->app->dpy, w->app->selection) != w->widget) return;
     free(w->app->ctext);
     w->app->ctext = NULL;
-    w->app->ctext = (unsigned char*)strdup(text);
+    w->app->ctext = (unsigned char*)strndup(text, size);
     w->app->csize = size;
 }
 

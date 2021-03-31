@@ -150,6 +150,15 @@ typedef struct XColor_t XColor_t;
 
 typedef struct Xputty Xputty;
 
+/**
+ * @brief *xfunc       - function pointer to connect XEvents from a Widget_t to a event handler
+ * @param *widget      - void pointer to the widget
+ * @param *user_data   - void pointer to attached user_data, maybe NULL
+ * @return void
+ */
+
+typedef void (*xfunc)(void * widget, void* user_data);
+
 #ifdef __cplusplus
 }
 #endif
@@ -208,7 +217,15 @@ struct Xputty{
     int normal_font;
 /** big fontsize  for all Widget_t*/
     int big_font;
+/** size of the textbuffer for copy/paste */
+    int csize;
+/** pointer to the textbuffer for copy/paste */
+    unsigned char *ctext;
+/** notify callback when a paste is recived */
+    xfunc xpaste_notify_callback;
 /** Atoms for handling drag and drop */
+    int dnd_version;
+    Window dnd_source_window;
     Atom XdndAware;
     Atom XdndTypeList;
     Atom XdndSelection;
@@ -224,14 +241,11 @@ struct Xputty{
     Atom dnd_type_uri;
     Atom dnd_type_utf8;
     Atom dnd_type;
-    Window dnd_source_window;
-    int dnd_version;
+
     Atom selection;
     Atom targets_atom;
     Atom text_atom;
     Atom UTF8;
-    unsigned char * ctext;
-    int csize;
 };
 
 /**
