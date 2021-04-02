@@ -372,6 +372,8 @@ struct Widget_t {
     int height;
 /** struct used to resize child widgets */
     Resize_t scale;
+/** notify widget that a paste is in clipboard */
+    xevfunc xpaste_callback;
 };
 
 

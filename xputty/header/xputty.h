@@ -221,8 +221,6 @@ struct Xputty{
     int csize;
 /** pointer to the textbuffer for copy/paste */
     unsigned char *ctext;
-/** notify callback when a paste is recived */
-    xfunc xpaste_notify_callback;
 /** Atoms for handling drag and drop */
     int dnd_version;
     Window dnd_source_window;

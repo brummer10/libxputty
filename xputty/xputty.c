@@ -20,10 +20,6 @@
 
 #include "xputty.h"
 
-void xdummy_callback(void *w_, void* user_data) {
-    debug_print("xputty xdummy callback\n");
-}
-
 
 void main_init(Xputty *main) {
     main->dpy = XOpenDisplay(0);
@@ -42,7 +38,6 @@ void main_init(Xputty *main) {
     main->big_font = 16;
     main->ctext = NULL;
     main->csize = 0;
-    main->xpaste_notify_callback = xdummy_callback;
 
     main->dnd_source_window = 0;
     main->dnd_version = 5;

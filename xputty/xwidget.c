@@ -266,6 +266,7 @@ Widget_t *create_window(Xputty *app, Window win,
     w->func.unmap_notify_callback = _dummy_callback;
     w->func.dialog_callback = _dummy_callback;
     w->func.dnd_notify_callback = _dummy_callback;
+    w->xpaste_callback = _dummy_callback;
 
     childlist_add_child(app->childlist,w);
     //XMapWindow(app->dpy, w->widget);
@@ -383,6 +384,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     w->func.unmap_notify_callback = _dummy_callback;
     w->func.dialog_callback = _dummy_callback;
     w->func.dnd_notify_callback = _dummy_callback;
+    w->xpaste_callback = _dummy_callback;
 
     childlist_add_child(app->childlist,w);
     //XMapWindow(app->dpy, w->widget);
@@ -651,7 +653,7 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
             break;
         case SelectionNotify:
             if (xev->xselection.property == None) {
-                main->xpaste_notify_callback(wid, NULL);
+                wid->xpaste_callback(wid, NULL);
                 break;
             }
             if (xev->xselection.selection == main->selection) {
@@ -874,7 +876,7 @@ void receive_paste_from_clipboard(Widget_t *w, XEvent* event) {
             XFree(data);
         }
         XDeleteProperty(event->xselection.display, event->xselection.requestor, event->xselection.property);
-        w->app->xpaste_notify_callback(w, (void*)&w->app->ctext);
+        w->xpaste_callback(w, (void*)&w->app->ctext);
     }
 }
 
