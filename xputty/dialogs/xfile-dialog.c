@@ -509,6 +509,7 @@ static void parse_xdg_dirs(FileDialog *file_dialog) {
                 assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter-1] != NULL);
             }
         }
+        fclose(fp);
     }
 
     file_dialog->xdg_user_dirs = (char **)realloc(file_dialog->xdg_user_dirs,
@@ -517,7 +518,6 @@ static void parse_xdg_dirs(FileDialog *file_dialog) {
     asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", _("Computer"));
     assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter-1] != NULL);
 
-    fclose(fp);
     if (line)
         free(line);    
 }
