@@ -586,20 +586,17 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
             debug_print("Widget_t KeyPress %u\n", xev->xkey.keycode);
         break;
 
-        case KeyRelease: 
+        case KeyRelease:
+        {
             if (wid->state == 4) break;
-            {
             unsigned short is_retriggered = 0;
             if(wid->flags & NO_AUTOREPEAT) {
-                if (XEventsQueued(main->dpy, QueuedAfterReading)) {
-                    XEvent nev;
-                    XPeekEvent(main->dpy, &nev);
-                    if (nev.type == KeyPress && nev.xkey.time == xev->xkey.time &&
-                        nev.xkey.keycode == xev->xkey.keycode && 
-                        (nev.xkey.keycode > 119 || nev.xkey.keycode < 110)) {
-                        XNextEvent (main->dpy, xev);
-                        is_retriggered = 1;
-                    }
+                char keys[32];
+                XQueryKeymap(main->dpy, keys);
+
+                if((keys[xev->xkey.keycode>>3] & (0x1 << (xev->xkey.keycode % 8))) && 
+                        (xev->xkey.keycode > 119 || xev->xkey.keycode < 110)) {
+                    is_retriggered = 1;
                 }
             }
             if (!is_retriggered) {
