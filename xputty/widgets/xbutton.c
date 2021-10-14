@@ -134,5 +134,6 @@ Widget_t* add_check_box(Widget_t *parent, const char * label,
     wid->func.enter_callback = transparent_draw;
     wid->func.leave_callback = transparent_draw;
     wid->func.button_press_callback = _toggle_button_pressed;
+    wid->func.button_release_callback = _toggle_button_released;
     return wid;
 }
