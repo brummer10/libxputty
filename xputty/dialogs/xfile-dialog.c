@@ -702,7 +702,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
 
 static void fdialog_response(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    FileButton *filebutton = (FileButton *)w->parent_struct;
+    FileButton *filebutton = (FileButton *)w->private_struct;
     if(user_data !=NULL) {
         char *tmp = strdup(*(const char**)user_data);
         free(filebutton->last_path);
@@ -718,7 +718,7 @@ static void fdialog_response(void *w_, void* user_data) {
 
 static void fbutton_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    FileButton *filebutton = (FileButton *)w->parent_struct;
+    FileButton *filebutton = (FileButton *)w->private_struct;
     if (w->flags & HAS_POINTER && adj_get_value(w->adj)){
         filebutton->w = open_file_dialog(w,filebutton->path,filebutton->filter);
         Atom wmStateAbove = XInternAtom(w->app->dpy, "_NET_WM_STATE_ABOVE", 1 );
@@ -734,7 +734,7 @@ static void fbutton_callback(void *w_, void* user_data) {
 
 static void fbutton_mem_free(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    FileButton *filebutton = (FileButton *)w->parent_struct;
+    FileButton *filebutton = (FileButton *)w->private_struct;
     free(filebutton->last_path);
     filebutton->last_path = NULL;
     free(filebutton);
@@ -750,7 +750,7 @@ Widget_t *add_file_button(Widget_t *parent, int x, int y, int width, int height,
     filebutton->w = NULL;
     filebutton->is_active = false;
     Widget_t *fbutton = add_image_toggle_button(parent, "", x, y, width, height);
-    fbutton->parent_struct = filebutton;
+    fbutton->private_struct = filebutton;
     fbutton->flags |= HAS_MEM;
     widget_get_png(fbutton, LDVAR(directory_open_png));
     fbutton->scale.gravity = CENTER;
