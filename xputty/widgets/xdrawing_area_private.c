@@ -22,6 +22,20 @@
 #include "xdrawing_area_private.h"
 
 
+void _rounded_iframe(cairo_t *cr,float x, float y, float w, float h) {
+    cairo_new_path (cr);
+    float r = 20.0;
+    cairo_move_to(cr, x+r,y);
+    cairo_line_to(cr, x+w-r,y);
+    cairo_curve_to(cr, x+w,y,x+w,y,x+w,y+r);
+    cairo_line_to(cr, x+w,y+h-r);
+    cairo_curve_to(cr, x+w,y+h,x+w,y+h,x+w-r,y+h);
+    cairo_line_to(cr, x+r,y+h);
+    cairo_curve_to(cr, x,y+h,x,y+h,x,y+h-r);
+    cairo_line_to(cr, x,y+r);
+    cairo_curve_to(cr, x,y,x,y,x+r,y);
+}
+
 void _draw_image(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     XWindowAttributes attrs;
@@ -30,7 +44,17 @@ void _draw_image(void *w_, void* user_data) {
     int height_t = attrs.height;
 
     if (!w->image) {
-         widget_get_png(w, LDVAR(warning_png));
+        cairo_text_extents_t extents;
+        use_base_color_scheme(w, get_color_state(w));
+        cairo_set_font_size (w->crb, w->app->big_font/w->scale.ascale);
+        cairo_text_extents(w->crb,"Missing Image" , &extents);
+        cairo_move_to (w->crb, (w->width -extents.width)*0.5, (w->height - extents.height)*0.5);
+        cairo_show_text(w->crb, "Missing Image");
+        cairo_new_path (w->crb);
+
+        cairo_set_line_width(w->crb,3);
+        _rounded_iframe(w->crb, 5, 5, width_t-10, height_t-10);
+        cairo_stroke(w->crb);
     }
 
     if (w->image) {
