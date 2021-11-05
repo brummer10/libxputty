@@ -207,6 +207,12 @@ static void show_preview(FileDialog *file_dialog, const char* file_name) {
     expose_widget(w);
 }
 
+static void show_svg_preview(FileDialog *file_dialog, const char* file_name) {
+    Widget_t* w = file_dialog->w;
+    widget_get_scaled_svg_from_file(w, file_name, 80, 80);
+    expose_widget(w);
+}
+
 static void set_selected_file(FileDialog *file_dialog) {
     if(adj_get_value(file_dialog->ft->adj)<0 ||
         adj_get_value(file_dialog->ft->adj) > file_dialog->fp->file_counter) return;
@@ -235,6 +241,8 @@ static void set_selected_file(FileDialog *file_dialog) {
     assert(file_dialog->fp->selected_file != NULL);
     if (strstr(file_dialog->fp->selected_file, ".png")) {
         show_preview(file_dialog, file_dialog->fp->selected_file);
+    } else if (strstr(file_dialog->fp->selected_file, ".svg")) {
+        show_svg_preview(file_dialog, file_dialog->fp->selected_file);
     } else if (file_dialog->w->image) {
         cairo_surface_destroy(file_dialog->w->image);
         file_dialog->w->image = NULL;

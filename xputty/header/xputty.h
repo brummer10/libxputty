@@ -175,6 +175,7 @@ typedef void (*xfunc)(void * widget, void* user_data);
 #include "xchildlist.h"
 #include "xcolor.h"
 #include "xpngloader.h"
+#include "xsvgloader.h"
 
 
 #ifdef __cplusplus

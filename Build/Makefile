@@ -66,6 +66,11 @@
 	RESOURCE_EXTLD := $(notdir $(patsubst %.png,%_png,$(RESOURCES)))
 	RESOURCEHEADER := $(RESOURCES_DIR)xresources.h
 
+	SVGRESOURCES := $(wildcard $(RESOURCES_DIR)*.svg)
+	SVGRESOURCES_OBJ := $(notdir $(patsubst %.svg,%.o,$(SVGRESOURCES)))
+	SVGRESOURCES_C := $(notdir $(patsubst %.svg,%.c,$(SVGRESOURCES)))
+	SVGRESOURCE_EXTLD := $(notdir $(patsubst %.svg,%_svg,$(SVGRESOURCES)))
+
 	XDG_SOURCES :=  $(wildcard $(XDG_DIR)*.c)
 	XDG_OBJ := $(notdir $(patsubst %.c,%.o,$(XDG_SOURCES)))
 
@@ -88,14 +93,17 @@ updatepot:
 po:
 
 clean:
-	rm -f libxputty.a libxputty.so libxputty.so.1 libxputty.so.1.0 xputty.pc $(RESOURCES_C) \
-	$(LIB_OBJ) $(WIDGET_OBJ) $(RESOURCES_OBJ) $(DIALOG_OBJ) $(XDG_OBJ) $(DEP) $(RESOURCEHEADER)
+	rm -f libxputty.a libxputty.so libxputty.so.1 libxputty.so.1.0 xputty.pc $(RESOURCES_C) $(SVGRESOURCES_C) \
+	$(LIB_OBJ) $(WIDGET_OBJ) $(RESOURCES_OBJ) $(SVGRESOURCES_OBJ) $(DIALOG_OBJ) $(XDG_OBJ) $(DEP) $(RESOURCEHEADER)
 	rm -rf $(RELEASE_DIR)
 
 $(RESOURCEHEADER): $(RESOURCES_OBJ) 
 	rm -f $(RESOURCEHEADER)
 	for f in $(RESOURCE_EXTLD); do \
 		echo 'EXTLD('$${f}')' >> $(RESOURCEHEADER) ; \
+	done
+	for f in $(SVGRESOURCE_EXTLD); do \
+		echo 'extern const char* '$${f}';' >> $(RESOURCEHEADER) ; \
 	done
 
 $(XDG_OBJ): $(XDG_SOURCES)
@@ -115,6 +123,12 @@ $(RESOURCES_OBJ): $(RESOURCES)
 	LDFLAGS += -DUSE_LD=1
 endif
 
+$(SVGRESOURCES_OBJ): $(SVGRESOURCES)
+	@cd $(RESOURCES_DIR) && echo "const char* $(patsubst %.o,%_svg,$@) = \""| tr -d '\r\n' > ../../Build/$(patsubst %.o,%.c,$@)
+	@cd $(RESOURCES_DIR) && base64  $(patsubst %.o,%.svg,$@) | tr -d '\r\n' >> ../../Build/$(patsubst %.o,%.c,$@)
+	@cd $(RESOURCES_DIR) && echo "\";" >> ../../Build/$(patsubst %.o,%.c,$@)
+	$(CC) -c $(patsubst %.o,%.c,$@) -o $@
+
 $(DIALOG_OBJ): $(DIALOG_SOURCES)
 	$(CC) -MMD -Wall -c $(addprefix $(DIALOG_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
 
@@ -129,8 +143,8 @@ $(LIB_OBJ): $(LIB_SOURCES)
 xputty.pc: xputty.pc.in
 	sed 's;PATH;$(PREFIX);' $< >$@
 
-libxputty.a: $(RESOURCES_OBJ) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
-	$(AR) rcs libxputty.a $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ) $(XDG_OBJ)
+libxputty.a: $(RESOURCES_OBJ) $(SVGRESOURCES_OBJ) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
+	$(AR) rcs libxputty.a $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ)  $(SVGRESOURCES_OBJ) $(XDG_OBJ)
 	mkdir -p $(RELEASE_DIR)include/
 	cp $(HEADER_DIR)*.h $(RELEASE_DIR)include/
 	cp $(WIDGET_HEADER_DIR)*.h $(RELEASE_DIR)include/
