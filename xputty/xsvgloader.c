@@ -246,6 +246,27 @@ void widget_get_svg(Widget_t *w, const char* name) {
     struct NSVGimage* const image = nsvgParse(b64dst, "px", 96);
 
     if (!image) return;
+    int width_t = image->width;
+    int height_t = image->height;
+    cairo_surface_destroy(w->image);
+    w->image = NULL;
+    
+    w->image = cairo_surface_create_similar (w->surface, 
+                        CAIRO_CONTENT_COLOR_ALPHA, width_t, height_t);
+    cairo_t *cri = cairo_create (w->image);
+    draw_svg_image(cri, image, width_t, height_t);
+    nsvgDelete(image);
+    free(b64dst);
+    cairo_destroy(cri);
+}
+
+void widget_get_scaled_svg(Widget_t *w, const char* name) {
+    char* b64dst;
+    b64dst = (char*)malloc((strlen(name)+1) * sizeof(char));
+    b64_decode((char*)name, b64dst);
+    struct NSVGimage* const image = nsvgParse(b64dst, "px", 96);
+
+    if (!image) return;
     int width_t = w->scale.init_width;
     int height_t = w->scale.init_height;
     cairo_surface_destroy(w->image);
@@ -292,3 +313,16 @@ void widget_get_scaled_svg_from_file(Widget_t *w, const char* filename, int widt
     cairo_destroy(cri);
 }
 
+cairo_surface_t *cairo_image_surface_create_from_svg ( const char* filename) {
+    struct NSVGimage* const image = nsvgParseFromFile(filename, "px", 96);
+
+    if (!image) return NULL;
+    int width_t = image->width;
+    int height_t = image->height;
+    
+    cairo_surface_t *getsvg = cairo_image_surface_create ( CAIRO_FORMAT_ARGB32, width_t, height_t);
+    cairo_t *cri = cairo_create (getsvg);
+    draw_svg_image(cri, image, width_t, height_t);
+    nsvgDelete(image);
+    return getsvg;
+}
