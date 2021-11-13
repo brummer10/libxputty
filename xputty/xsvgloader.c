@@ -267,15 +267,29 @@ void widget_get_scaled_svg(Widget_t *w, const char* name) {
     struct NSVGimage* const image = nsvgParse(b64dst, "px", 96);
 
     if (!image) return;
+    int width = image->width;
+    int height = image->height;
     int width_t = w->scale.init_width;
     int height_t = w->scale.init_height;
+    double x = (double)width_t/(double)width;
+    double y = (double)height_t/(double)height;    
+
+    cairo_surface_t *getsvg = cairo_image_surface_create ( CAIRO_FORMAT_ARGB32, width, height);
+    cairo_t *cris = cairo_create (getsvg);
+    draw_svg_image(cris, image, width, height);
+
     cairo_surface_destroy(w->image);
     w->image = NULL;
-    
     w->image = cairo_surface_create_similar (w->surface, 
                         CAIRO_CONTENT_COLOR_ALPHA, width_t, height_t);
     cairo_t *cri = cairo_create (w->image);
-    draw_svg_image(cri, image, width_t, height_t);
+
+    cairo_scale(cri, x,y);    
+    cairo_set_source_surface (cri, getsvg,0,0);
+    cairo_paint (cri);
+
+    cairo_destroy(cris);
+    cairo_surface_destroy(getsvg);
     nsvgDelete(image);
     free(b64dst);
     cairo_destroy(cri);
