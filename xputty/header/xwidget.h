@@ -90,6 +90,7 @@ typedef struct {
     xevfunc unmap_notify_callback;
     xevfunc dialog_callback;
     xevfunc dnd_notify_callback;
+    xevfunc visibiliy_change_callback;
 
     evfunc button_press_callback;
     evfunc button_release_callback;

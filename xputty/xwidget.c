@@ -158,7 +158,7 @@ Widget_t *create_window(Xputty *app, Window win,
 
     long event_mask = StructureNotifyMask|ExposureMask|KeyPressMask 
                     |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask
-                    |ButtonPressMask|Button1MotionMask;
+                    |ButtonPressMask|Button1MotionMask|VisibilityChangeMask;
 
 
 
@@ -265,6 +265,7 @@ Widget_t *create_window(Xputty *app, Window win,
     w->func.configure_notify_callback = _dummy_callback;
     w->func.map_notify_callback = _dummy_callback;
     w->func.unmap_notify_callback = _dummy_callback;
+    w->func.visibiliy_change_callback = _dummy_callback;
     w->func.dialog_callback = _dummy_callback;
     w->func.dnd_notify_callback = _dummy_callback;
     w->xpaste_callback = _dummy_callback;
@@ -287,7 +288,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
 
     long event_mask = StructureNotifyMask|ExposureMask|KeyPressMask 
                     |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask
-                    |ButtonPressMask|Button1MotionMask;
+                    |ButtonPressMask|Button1MotionMask|VisibilityChangeMask;
 
 
 
@@ -383,6 +384,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     w->func.configure_notify_callback = _dummy_callback;
     w->func.map_notify_callback = _dummy_callback;
     w->func.unmap_notify_callback = _dummy_callback;
+    w->func.visibiliy_change_callback = _dummy_callback;
     w->func.dialog_callback = _dummy_callback;
     w->func.dnd_notify_callback = _dummy_callback;
     w->xpaste_callback = _dummy_callback;
@@ -542,6 +544,11 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
             wid->func.configure_callback(w_, user_data);
             //transparent_draw(w_, user_data);
             debug_print("Widget_t ConfigureNotify \n");
+        break;
+
+        case VisibilityNotify:
+            wid->func.visibiliy_change_callback(w_, user_data);
+            debug_print("Widget_t VisibilityNotify \n");
         break;
 
         case Expose:
