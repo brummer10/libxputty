@@ -107,12 +107,12 @@ $(RESOURCEHEADER): $(RESOURCES_OBJ)
 	done
 
 $(XDG_OBJ): $(XDG_SOURCES)
-	$(CC) -MMD -Wall -DHAVE_MMAP -c $(addprefix $(XDG_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
+	$(CC) $(CFLAGS) -MMD -Wall -DHAVE_MMAP -c $(addprefix $(XDG_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
 
 ifdef USE_XXD
 $(RESOURCES_OBJ): $(RESOURCES)
 	cd $(RESOURCES_DIR) && xxd -i $(patsubst %.o,%.png,$@) > ../../Build/$(patsubst %.o,%.c,$@)
-	$(CC) -c $(patsubst %.o,%.c,$@) -o $@
+	$(CC) $(CFLAGS) -c $(patsubst %.o,%.c,$@) -o $@
 else ifdef USE_LDD
 $(RESOURCES_OBJ): $(RESOURCES)
 	cd $(RESOURCES_DIR) && $(LD) -r -b binary -m $(LDEMULATION) -z noexecstack $(patsubst %.o,%.png,$@) -o ../../Build/$@
@@ -127,16 +127,16 @@ $(SVGRESOURCES_OBJ): $(SVGRESOURCES)
 	@cd $(RESOURCES_DIR) && echo "const char* $(patsubst %.o,%_svg,$@) = \""| tr -d '\r\n' > ../../Build/$(patsubst %.o,%.c,$@)
 	@cd $(RESOURCES_DIR) && base64  $(patsubst %.o,%.svg,$@) | tr -d '\r\n' >> ../../Build/$(patsubst %.o,%.c,$@)
 	@cd $(RESOURCES_DIR) && echo "\";" >> ../../Build/$(patsubst %.o,%.c,$@)
-	$(CC) -c $(patsubst %.o,%.c,$@) -o $@
+	$(CC) $(CFLAGS) -c $(patsubst %.o,%.c,$@) -o $@
 
 $(DIALOG_OBJ): $(DIALOG_SOURCES)
-	$(CC) -MMD -Wall -c $(addprefix $(DIALOG_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
+	$(CC) $(CFLAGS) -MMD -Wall -c $(addprefix $(DIALOG_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
 
 $(WIDGET_OBJ): $(WIDGET_SOURCES)
-	$(CC) -MMD -Wall -c $(addprefix $(WIDGET_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
+	$(CC) $(CFLAGS) -MMD -Wall -c $(addprefix $(WIDGET_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
 
 $(LIB_OBJ): $(LIB_SOURCES)
-	$(CC) -MMD -Wall -c $(addprefix $(LIB_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
+	$(CC) $(CFLAGS) -MMD -Wall -c $(addprefix $(LIB_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
 
 -include $(DEP)
 
