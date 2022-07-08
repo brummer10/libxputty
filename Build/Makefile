@@ -159,8 +159,8 @@ libxputty.so: xputty.pc libxputty.a
 	cp libxputty.so.1.0 $(RELEASE_DIR)
 	ln -sf libxputty.so.1.0 libxputty.so.1
 	ln -sf libxputty.so.1 libxputty.so
-	cp -df libxputty.so.1 $(RELEASE_DIR)
-	cp -df libxputty.so $(RELEASE_DIR)
+	cp -Pf libxputty.so.1 $(RELEASE_DIR)
+	cp -Pf libxputty.so $(RELEASE_DIR)
 	cp xputty.pc $(RELEASE_DIR)
 
 shared: libxputty.so
@@ -176,8 +176,8 @@ ifneq ("$(wildcard $(RELEASE_DIR))","")
 	mkdir -p $(DESTDIR)$(SHARE_DIR)pkgconfig/
 	cp $(RELEASE_DIR)include/*.h $(DESTDIR)$(INCLUDE_DIR)xputty/
 	cp $(RELEASE_DIR)*.so.1.0 $(DESTDIR)$(INSTALL_DIR)
-	cp -df $(RELEASE_DIR)*.so.1 $(DESTDIR)$(INSTALL_DIR)
-	cp -df $(RELEASE_DIR)*.so $(DESTDIR)$(INSTALL_DIR)
+	cp -Pf $(RELEASE_DIR)*.so.1 $(DESTDIR)$(INSTALL_DIR)
+	cp -Pf $(RELEASE_DIR)*.so $(DESTDIR)$(INSTALL_DIR)
 	cp $(RELEASE_DIR)libxputty.a $(DESTDIR)$(INSTALL_DIR)
 	cp $(RELEASE_DIR)xputty.pc $(DESTDIR)$(SHARE_DIR)pkgconfig/
 else
