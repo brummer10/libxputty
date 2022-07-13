@@ -68,7 +68,9 @@ static inline void draw_stroke(struct NSVGshape* const shape, cairo_t* const cr)
                 break;
 
             default:
-                assert(0);
+                cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
+                break;
+                //assert(0);
         }
 
         switch (shape->strokeLineJoin) {
@@ -86,14 +88,18 @@ static inline void draw_stroke(struct NSVGshape* const shape, cairo_t* const cr)
                 break;
 
             default:
-                assert(0);
+                cairo_set_line_join(cr, CAIRO_LINE_JOIN_MITER);
+                cairo_set_miter_limit(cr, shape->miterLimit);
+                break;
+                //assert(0);
         }
         cairo_set_line_width(cr, shape->strokeWidth);
         cairo_stroke_preserve(cr);
         break;
 
         default:
-            assert(0);
+            break;
+            //assert(0);
     }
 }
 
