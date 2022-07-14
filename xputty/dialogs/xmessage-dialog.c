@@ -26,7 +26,13 @@ void hyperlink_pressed(void *w_, void* button_, void* user_data) {
     if (xbutton->button == Button1) {
         char *command;
         asprintf(&command, "xdg-open '%s'",w->label);
-        if (system(NULL)) system(command);
+        if (system(NULL)) {
+            int ret = system(command);
+            if (ret) {
+                open_message_dialog(w, ERROR_BOX, "",
+                    "Fail to open link", NULL);
+            }
+        }     
         free(command);
     }
 }

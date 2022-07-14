@@ -56,7 +56,7 @@ void _draw_menu_label(void *w_, void* user_data) {
     if (strstr(w->label, "_")) {
         cairo_text_extents(w->crb, "--", &extents);
         double underline = extents.width;
-        strncpy(w->input_label,w->label, sizeof(w->input_label));
+        strncpy(w->input_label,w->label, sizeof(w->input_label)-1);
         int pos = _menu_remove_low_dash(w->input_label);
         int len = strlen(w->input_label);
         cairo_text_extents(w->crb,w->input_label , &extents);
@@ -183,7 +183,7 @@ void _draw_submenu(void *w_, void* user_data) {
     if (strstr(w->label, "_")) {
         cairo_text_extents(w->crb, "--", &extents);
         double underline = extents.width;
-        strncpy(w->input_label,w->label, sizeof(w->input_label));
+        strncpy(w->input_label,w->label, sizeof(w->input_label)-1);
         int pos = _menu_remove_low_dash(w->input_label);
         int len = strlen(w->input_label);
         cairo_text_extents(w->crb,w->input_label , &extents);
@@ -322,7 +322,7 @@ void _draw_accel_item(void *w_, void* user_data) {
     if (strstr(w->label, "_")) {
         cairo_text_extents(w->crb, "--", &extents);
         double underline = extents.width;
-        strncpy(w->input_label,w->label, sizeof(w->input_label));
+        strncpy(w->input_label,w->label, sizeof(w->input_label)-1);
         int pos = _menu_remove_low_dash(w->input_label);
         int len = strlen(w->input_label);
         cairo_text_extents(w->crb,w->input_label , &extents);
