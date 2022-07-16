@@ -425,6 +425,15 @@ void widget_hide(Widget_t *w) {
     XUnmapWindow(w->app->dpy, w->widget);
 }
 
+void widget_hide_all(Widget_t *w) {
+    int i=0;
+    for(;i<w->app->childlist->elem;i++) {
+        widget_hide(w->app->childlist->childs[i]);
+    }
+    w->func.unmap_notify_callback(w, NULL);
+    XUnmapWindow(w->app->dpy, w->widget);
+}
+
 void widget_show_all(Widget_t *w) {
     if (w->flags & IS_POPUP || w->flags & IS_TOOLTIP ||
         w->flags & IS_SUBMENU) {

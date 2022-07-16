@@ -459,6 +459,14 @@ void submenu_widget_show_all(Widget_t *w);
 void widget_hide(Widget_t *w);
 
 /**
+ * @brief widget_hide_all   - unmap/hide all Widget_t from app
+ * @param *w                - pointer to the Widget_t which send the unmap request
+ * @return void 
+ */
+
+void widget_hide_all(Widget_t *w);
+
+/**
  * @brief widget_show_all   - map/show Widget_t with all childs
  * @param *w                - pointer to the Widget_t to map
  * @return void 
