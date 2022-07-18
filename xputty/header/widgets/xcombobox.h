@@ -53,7 +53,7 @@ typedef struct {
 } ComboBox_t;
 
 
-void pop_combobox_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above);
+void pop_combobox_menu_show(Widget_t *parent, Widget_t *menu, bool above);
 
 /**
  * @brief add_combobox        - add a combobox
@@ -108,6 +108,15 @@ void combobox_mem_free(void *w_, void* user_data);
  */
 
 void combobox_delete_entrys(Widget_t *combobox);
+
+/**
+ * @brief combobox_set_menu_size     - set the number of entrys shown in the pop menu
+ * @param *combobox                  - pointer to the Widget_t combobox
+ * @param v                          - the max entry count (int)
+ * @return void
+ */
+
+void combobox_set_menu_size(Widget_t *combobox, int v);
 
 #ifdef __cplusplus
 }

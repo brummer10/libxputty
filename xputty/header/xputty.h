@@ -212,6 +212,8 @@ struct Xputty{
     Widget_t *submenu;
 /** bool to quit the main loop */
     bool run;
+/** bool to indicate if button is pressed on grab window */
+    bool is_grab;
 /** small fontsize for all Widget_t*/
     int small_font;
 /** normal fontsize  for all Widget_t*/

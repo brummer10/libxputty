@@ -33,6 +33,7 @@ void main_init(Xputty *main) {
     main->hold_grab = NULL;
     main->submenu = NULL;
     main->run = true;
+    main->is_grab = false;
     main->small_font = 10;
     main->normal_font = 12;
     main->big_font = 16;

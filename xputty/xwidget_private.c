@@ -83,6 +83,15 @@ void _check_enum(Widget_t * wid, XButtonEvent *xbutton) {
 }
 
 void _button_press(Widget_t * wid, XButtonEvent *xbutton, void* user_data) {
+    if(wid->app->hold_grab != NULL) {
+        if (childlist_has_child(wid->app->hold_grab->childlist)) {
+            if (xbutton->window == wid->app->hold_grab->childlist->childs[1]->widget) {
+                wid->app->is_grab = true;
+            } else {
+                wid->app->is_grab = false;
+            }
+        }
+    }
     switch(xbutton->button) {
         case Button1:
             wid->state = 2;
@@ -115,6 +124,10 @@ void _button_press(Widget_t * wid, XButtonEvent *xbutton, void* user_data) {
 
 void _check_grab(Widget_t * wid, XButtonEvent *xbutton, Xputty *main) {
     if(main->hold_grab != NULL) {
+        if (main->is_grab) {
+            main->is_grab = false;
+            return;
+        }
         if (childlist_has_child(main->hold_grab->childlist)) {
             Widget_t *slider = main->hold_grab->childlist->childs[1];
             if (xbutton->window == slider->widget) {

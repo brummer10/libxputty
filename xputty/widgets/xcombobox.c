@@ -42,6 +42,14 @@ void combobox_mem_free(void *w_, void* user_data) {
     free(comboboxlist);
 }
 
+void combobox_set_menu_size(Widget_t *combobox, int v) {
+    Widget_t * menu = combobox->childlist->childs[1];
+    Widget_t* view_port =  menu->childlist->childs[0];
+    ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
+    comboboxlist->show_items = v;
+    _configure_combobox_menu(combobox, menu, comboboxlist->show_items, true);
+}
+
 void combobox_delete_entrys(Widget_t *combobox) {
     Widget_t * menu = combobox->childlist->childs[1];
     Widget_t* view_port =  menu->childlist->childs[0];
@@ -57,12 +65,12 @@ void combobox_delete_entrys(Widget_t *combobox) {
     set_adjustment(comboboxlist->slider->adj,0.0, 0.0, 0.0, 1.0,0.0085, CL_VIEWPORTSLIDER);
 }
 
-void pop_combobox_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above) {
+void pop_combobox_menu_show(Widget_t *parent, Widget_t *menu, bool above) {
     if (!childlist_has_child(menu->childlist)) return;
     Widget_t* view_port =  menu->childlist->childs[0];
     ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
     if (!comboboxlist->list_size) return;
-    _configure_combobox_menu(parent, menu, elem, above);
+    _configure_combobox_menu(parent, menu, comboboxlist->show_items, above);
     pop_widget_show_all(menu);
     int err = XGrabPointer(menu->app->dpy, DefaultRootWindow(parent->app->dpy), True,
                  ButtonPressMask|ButtonReleaseMask|PointerMotionMask,
