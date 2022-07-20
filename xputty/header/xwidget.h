@@ -528,6 +528,14 @@ void quit_widget(Widget_t *w);
 
 void transparent_draw(void * wid, void* user_data);
 
+/**
+ * @brief widget_draw       - redraw only the widget,not the child widgets
+ * @param *wid              - pointer to the Widget_t receiving the event
+ * @param *user_data        - void pointer to attached user_data
+ * @return void 
+ */
+
+void widget_draw(void * w_, void* user_data);
 
 /**
  * @brief resize_childs      - intern check if child widgets needs resizing

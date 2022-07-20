@@ -544,6 +544,33 @@ void transparent_draw(void * w_, void* user_data) {
     _propagate_child_expose(wid);
 }
 
+void widget_draw(void * w_, void* user_data) {
+    Widget_t *wid = (Widget_t*)w_;
+
+    cairo_push_group (wid->cr);
+
+    if (wid->flags & USE_TRANSPARENCY) {
+        Widget_t *parent = (Widget_t*)wid->parent;
+        XWindowAttributes attrs;
+        XGetWindowAttributes(wid->app->dpy, wid->widget, &attrs);
+
+        debug_print("Widget_t draw widget \n");
+        cairo_set_source_surface (wid->crb, parent->buffer, -attrs.x, -attrs.y);
+        cairo_paint (wid->crb);
+    }
+
+    cairo_push_group (wid->crb);
+    wid->func.expose_callback(wid, user_data);
+    cairo_pop_group_to_source (wid->crb);
+    cairo_paint (wid->crb);
+
+    cairo_set_source_surface (wid->cr, wid->buffer,0,0);
+    cairo_paint (wid->cr);
+
+    cairo_pop_group_to_source (wid->cr);
+    cairo_paint (wid->cr);
+}
+
 void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
     Widget_t *wid = (Widget_t*)w_;
     XEvent *xev = (XEvent*)event;
