@@ -274,6 +274,8 @@ enum {
     NO_PROPAGATE      = 1<<14,
     /** Widget_t is a sub Widget_t from a Popup Widget_t  */
     IS_SUBMENU        = 1<<15,
+    /** Widget_t didn't send redraw events to child widgets  */
+    DONT_PROPAGATE    = 1<<16,
 
 };
 

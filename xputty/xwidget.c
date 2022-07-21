@@ -216,6 +216,7 @@ Widget_t *create_window(Xputty *app, Window win,
     w->flags &= ~REUSE_IMAGE;
     w->flags &= ~NO_PROPAGATE;
     w->flags &= ~IS_SUBMENU;
+    w->flags &= ~DONT_PROPAGATE;
     w->app = app;
     w->parent = &win;
     w->parent_struct = NULL;
@@ -334,6 +335,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     w->flags &= ~REUSE_IMAGE;
     w->flags &= ~NO_PROPAGATE;
     w->flags &= ~IS_SUBMENU;
+    w->flags &= ~DONT_PROPAGATE;
     w->app = app;
     w->parent = parent;
     w->parent_struct = NULL;
@@ -541,6 +543,7 @@ void transparent_draw(void * w_, void* user_data) {
 
     cairo_pop_group_to_source (wid->cr);
     cairo_paint (wid->cr);
+    if ( wid->flags & DONT_PROPAGATE) return;
     _propagate_child_expose(wid);
 }
 
