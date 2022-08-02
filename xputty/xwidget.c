@@ -592,6 +592,8 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
 
         case Expose:
             if (xev->xexpose.count == 0) {
+                XEvent ev;
+                while (XCheckTypedWindowEvent(main->dpy, wid->widget, Expose, &ev)) {}
                 transparent_draw(w_, user_data);
                 debug_print("Widget_t Expose \n");
             }
