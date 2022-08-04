@@ -183,6 +183,7 @@ Widget_t *menu_add_submenu(Widget_t *w, const char  * label) {
     set_adjustment(view_port->adj,0.0, 0.0, 0.0, max_value1,1.0, CL_VIEWPORT);
     wid->scale.gravity = MENUITEM;
     wid->flags &= ~USE_TRANSPARENCY;
+    wid->flags |= FAST_REDRAW;
     wid->label = label;
     wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, -1.0,1.0, CL_NONE);
     wid->adj = wid->adj_y;
@@ -212,6 +213,7 @@ Widget_t *cmenu_add_submenu(Widget_t *w, const char  * label) {
     set_adjustment(view_port->adj,0.0, 0.0, 0.0, max_value1,1.0, CL_VIEWPORT);
     wid->scale.gravity = MENUITEM;
     wid->flags &= ~USE_TRANSPARENCY;
+    wid->flags |= FAST_REDRAW;
     wid->label = label;
     wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, -1.0,1.0, CL_NONE);
     wid->adj = wid->adj_y;
@@ -280,6 +282,7 @@ Widget_t* menu_add_item(Widget_t *menu,const char * label) {
     set_adjustment(view_port->adj,0.0, 0.0, 0.0, max_value,1.0, CL_VIEWPORT);
     wid->scale.gravity = MENUITEM;
     wid->flags &= ~USE_TRANSPARENCY;
+    wid->flags |= FAST_REDRAW;
     wid->label = label;
     wid->func.expose_callback = _draw_item;
     wid->func.enter_callback = transparent_draw;
@@ -354,6 +357,7 @@ void menu_add_numeric_items(Widget_t *menu, int *imin, int *imax) {
         set_adjustment(view_port->adj,0.0, 0.0, 0.0, max_value,1.0, CL_VIEWPORT);
         wid->scale.gravity = MENUITEM;
         wid->flags &= ~USE_TRANSPARENCY;
+        wid->flags |= FAST_REDRAW;
         snprintf(wid->input_label, 31, "%i",i);
         wid->label = wid->input_label;
         wid->func.expose_callback = _draw_item;
