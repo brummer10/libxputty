@@ -48,7 +48,7 @@ typedef struct {
     int prelight_item;
     int active_item;
     int show_items;
-    int list_size;
+    unsigned int list_size;
     char **list_names;
 } ComboBox_t;
 
