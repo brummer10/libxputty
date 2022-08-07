@@ -160,6 +160,33 @@ float adj_get_value(Adjustment_t *adj) {
     return (adj->value);
 }
 
+float adj_get_std_value(Adjustment_t *adj) {
+    if (!adj) return 0.0;
+    if (adj->type == CL_LOGSCALE)
+        return log10(adj->std_value)*adj->log_scale;
+    else if (adj->type == CL_LOGARITHMIC)
+        return powf(10,adj->std_value);
+    return (adj->std_value);
+}
+
+float adj_get_min_value(Adjustment_t *adj) {
+    if (!adj) return 0.0;
+    if (adj->type == CL_LOGSCALE)
+        return log10(adj->min_value)*adj->log_scale;
+    else if (adj->type == CL_LOGARITHMIC)
+        return powf(10,adj->min_value);
+    return (adj->min_value);
+}
+
+float adj_get_max_value(Adjustment_t *adj) {
+    if (!adj) return 0.0;
+    if (adj->type == CL_LOGSCALE)
+        return log10(adj->max_value)*adj->log_scale;
+    else if (adj->type == CL_LOGARITHMIC)
+        return powf(10,adj->max_value);
+    return (adj->max_value);
+}
+
 void adj_set_value(Adjustment_t *adj, float v) {
     if (!adj) return;
     if (adj->type == CL_LOGSCALE)
@@ -168,6 +195,33 @@ void adj_set_value(Adjustment_t *adj, float v) {
         v = log10(v);
     v = min(adj->max_value,max(adj->min_value, v));
     check_value_changed(adj, &v);
+}
+
+void adj_set_min_value(Adjustment_t *adj, float v) {
+    if (!adj) return;
+    if (adj->type == CL_LOGSCALE)
+        v = powf(10,(v/adj->log_scale));
+    else if (adj->type == CL_LOGARITHMIC)
+        v = log10(v);
+    adj->min_value = v;
+}
+
+void adj_set_max_value(Adjustment_t *adj, float v) {
+    if (!adj) return;
+    if (adj->type == CL_LOGSCALE)
+        v = powf(10,(v/adj->log_scale));
+    else if (adj->type == CL_LOGARITHMIC)
+        v = log10(v);
+    adj->max_value = v;
+}
+
+void adj_set_std_value(Adjustment_t *adj, float v) {
+    if (!adj) return;
+    if (adj->type == CL_LOGSCALE)
+        v = powf(10,(v/adj->log_scale));
+    else if (adj->type == CL_LOGARITHMIC)
+        v = log10(v);
+    adj->std_value = v;
 }
 
 void adj_set_start_value(void *w) {

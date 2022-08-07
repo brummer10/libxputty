@@ -168,6 +168,30 @@ void adj_set_state(Adjustment_t *adj, float state);
 float adj_get_value(Adjustment_t *adj);
 
 /**
+ * @brief adj_get_std_value  - get the standart value of the Adjustment_t
+ * @param *adj               - pointer to the Adjustment_t
+ * @return float             - return the Adjustment_t value
+ */
+
+float adj_get_std_value(Adjustment_t *adj);
+
+/**
+ * @brief adj_get_min_value  - get the minimal value of the Adjustment_t
+ * @param *adj               - pointer to the Adjustment_t
+ * @return float             - return the Adjustment_t value
+ */
+
+float adj_get_min_value(Adjustment_t *adj);
+
+/**
+ * @brief adj_get_max_value  - get the maximal value of the Adjustment_t
+ * @param *adj               - pointer to the Adjustment_t
+ * @return float             - return the Adjustment_t value
+ */
+
+float adj_get_max_value(Adjustment_t *adj);
+
+/**
  * @brief adj_set_value      - set the current value to the Adjustment_t
  * @param *adj               - pointer to the Adjustment_t
  * @param value              - value to set the Adjustment_t to 
@@ -175,6 +199,33 @@ float adj_get_value(Adjustment_t *adj);
  */
 
 void adj_set_value(Adjustment_t *adj, float value);
+
+/**
+ * @brief adj_set_min_value  - set the minimal value to the Adjustment_t
+ * @param *adj               - pointer to the Adjustment_t
+ * @param value              - value to set the Adjustment_t to 
+ * @return void
+ */
+
+void adj_set_min_value(Adjustment_t *adj, float value);
+
+/**
+ * @brief adj_set_max_value  - set the maximal value to the Adjustment_t
+ * @param *adj               - pointer to the Adjustment_t
+ * @param value              - value to set the Adjustment_t to 
+ * @return void
+ */
+
+void adj_set_max_value(Adjustment_t *adj, float value);
+
+/**
+ * @brief adj_set_std_value  - set the standart value to the Adjustment_t
+ * @param *adj               - pointer to the Adjustment_t
+ * @param value              - value to set the Adjustment_t to 
+ * @return void
+ */
+
+void adj_set_std_value(Adjustment_t *adj, float value);
 
 /**
  * @brief adj_set_start_value - internal use to store the value when pointer movment starts
