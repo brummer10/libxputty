@@ -586,8 +586,7 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
         break;
 
         case VisibilityNotify:
-            if (xev->xvisibility.state == VisibilityFullyObscured)
-                wid->func.visibiliy_change_callback(w_, user_data);
+            wid->func.visibiliy_change_callback(w_, user_data);
             debug_print("Widget_t VisibilityNotify \n");
         break;
 
