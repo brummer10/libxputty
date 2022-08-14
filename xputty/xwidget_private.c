@@ -123,7 +123,7 @@ void _button_press(Widget_t * wid, XButtonEvent *xbutton, void* user_data) {
 }
 
 void _check_grab(Widget_t * wid, XButtonEvent *xbutton, Xputty *main) {
-    if(main->hold_grab != NULL) {
+    if(main->hold_grab != NULL && main->hold_grab->flags & IS_POPUP) {
         if (main->is_grab) {
             main->is_grab = false;
             return;
@@ -156,6 +156,8 @@ void _check_grab(Widget_t * wid, XButtonEvent *xbutton, Xputty *main) {
         } else if(xbutton->button == Button5) {
             _scroll_event(view_port, -1);
         }*/ // done in  _button_press() anyway
+    } else if(main->hold_grab != NULL) {
+        main->hold_grab->func.button_release_callback(main->hold_grab, xbutton, NULL);
     }
 }
 

@@ -102,7 +102,7 @@ void main_run(Xputty *main) {
                         }
                     }
                 }
-                if(main->hold_grab != NULL) {
+                if(main->hold_grab != NULL && main->hold_grab->flags & IS_POPUP) {
                     if (childlist_has_child(main->hold_grab->childlist)) {
                         Widget_t *slider = main->hold_grab->childlist->childs[1];
                         if (xev.xbutton.window == slider->widget) {
@@ -124,6 +124,8 @@ void main_run(Xputty *main) {
                         widget_hide(main->hold_grab);
                         main->hold_grab = NULL;
                     }
+                } else if(main->hold_grab != NULL) {
+                    main->hold_grab->func.button_release_callback(main->hold_grab, &xev.xbutton, NULL);
                 }
             }
             break;
