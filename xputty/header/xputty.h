@@ -208,6 +208,8 @@ struct Xputty{
     XColor_t *color_scheme;
 /** pointer to a modal Widget_t */
     Widget_t *hold_grab;
+/** pointer to a Widget_t snooping keys*/
+    Widget_t *key_snooper;
 /** pointer to a modal sub Widget_t */
     Widget_t *submenu;
 /** bool to quit the main loop */

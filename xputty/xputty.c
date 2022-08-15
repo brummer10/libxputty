@@ -31,6 +31,7 @@ void main_init(Xputty *main) {
     assert(main->color_scheme);
     set_dark_theme(main);
     main->hold_grab = NULL;
+    main->key_snooper = NULL;
     main->submenu = NULL;
     main->run = true;
     main->is_grab = false;
@@ -72,12 +73,13 @@ void main_run(Xputty *main) {
 
     XEvent xev;
     int ew;
+    Widget_t * w = NULL;
 
     while (main->run && (XNextEvent(main->dpy, &xev)>=0)) {
         if (XFilterEvent(&xev, None)) continue;
         ew = childlist_find_widget(main->childlist, xev.xany.window);
         if(ew  >= 0) {
-            Widget_t * w = main->childlist->childs[ew];
+            w = main->childlist->childs[ew];
             w->event_callback(w, &xev, main, NULL);
         }
 
@@ -124,8 +126,29 @@ void main_run(Xputty *main) {
                         widget_hide(main->hold_grab);
                         main->hold_grab = NULL;
                     }
-                } else if(main->hold_grab != NULL) {
+                } else if(main->hold_grab != NULL && ((main->hold_grab->flags & IS_POPUP) == 0)) {
+                    main->hold_grab->func.button_press_callback(main->hold_grab, &xev.xbutton, NULL);
+                }
+            }
+            break;
+            case ButtonRelease:
+            {
+                if(main->hold_grab != NULL && ((main->hold_grab->flags & IS_POPUP) == 0)) {
                     main->hold_grab->func.button_release_callback(main->hold_grab, &xev.xbutton, NULL);
+                }
+            }
+            break;
+            case KeyPress:
+            {
+                if (main->key_snooper != NULL) {
+                    main->key_snooper->func.key_press_callback(main->key_snooper, &xev.xkey, NULL);
+                }
+            }
+            break;
+            case KeyRelease:
+            {
+                if (main->key_snooper != NULL) {
+                    main->key_snooper->func.key_release_callback(main->key_snooper, &xev.xkey, NULL);
                 }
             }
             break;
