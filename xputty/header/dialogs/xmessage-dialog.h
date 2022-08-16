@@ -39,16 +39,16 @@ enum {
 };
 
 typedef struct {
+    Widget_t *text_entry;
+    char **message;
+    char **choices;
+    Pixmap *icon;
     int response;
     int message_type;
     unsigned int width;
     unsigned int height;
     unsigned int lin;
-    Widget_t *text_entry;
-    Pixmap *icon;
-    char **message;
     unsigned int sel;
-    char **choices;
 } MessageBox;
 
 /**

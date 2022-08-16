@@ -170,6 +170,8 @@ typedef enum {
     EASTWEST     ,
 /** Widget_t adjust east/north */
     EASTNORTH     ,
+/** Widget_t adjust east/south */
+    EASTSOUTH     ,
 /** Widget_t adjust west/north */
     WESTNORTH     ,
 /** Widget_t adjust west/south */
@@ -313,6 +315,12 @@ enum {
  */
 
 struct Widget_t {
+/** char array to hold user input */
+    char input_label[32];
+/** int to hold Widget_t flags */
+    long long flags;
+/** pointer to the widget label */
+    const char* label;
 /** pointer to the main struct */
     Xputty *app;
 /** the X11 newly created Window */
@@ -337,14 +345,6 @@ struct Widget_t {
     cairo_t *crb;
 /** pointer to the cairo image surface used to load a png */
     cairo_surface_t *image;
-/** int to hold user data */
-    int data;
-/** int to hold Widget_t flags */
-    long long flags;
-/** pointer to the widget label */
-    const char* label;
-/** char array to hold user input */
-    char input_label[32];
 /** pointer to the x axis adjustment */
     Adjustment_t *adj_x;
 /** pointer to the y axis adjustment */
@@ -359,6 +359,8 @@ struct Widget_t {
     XIM xim;
 /** int to hold the widget state default = 0 */
     Time double_click;
+/** int to hold user data */
+    int data;
 /** time of the last button press */
     int state;
 /** mouse pointer x position on button press */

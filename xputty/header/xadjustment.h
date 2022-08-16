@@ -100,6 +100,8 @@ struct  Adjustment_t {
     CL_type type;
 /** scale factor for logarithmic adjustment **/
     float log_scale;
+/** padding struct to align clean **/
+    char pad[4];
 };
 
 /**

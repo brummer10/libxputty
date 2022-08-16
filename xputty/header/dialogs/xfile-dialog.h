@@ -48,11 +48,12 @@ typedef struct {
     Widget_t *scale_size;
     Pixmap *icon;
     FilePicker *fp;
-    bool list_view;
-    bool send_clear_func;
-    unsigned int xdg_dir_counter;
     char **xdg_user_dirs;
     const char *home_dir;
+    unsigned int xdg_dir_counter;
+    bool list_view;
+    bool send_clear_func;
+    char pad[2];
 } FileDialog;
 
 typedef struct {
@@ -61,6 +62,7 @@ typedef struct {
     const char *path;
     const char *filter;
     bool is_active;
+    char pad[7];
 } FileButton;
 
 Widget_t *open_directory_dialog(Widget_t *w, const char *path);

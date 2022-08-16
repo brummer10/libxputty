@@ -33,6 +33,7 @@ extern "C" {
 typedef struct {
     float* wave;
     int size;
+    char pad[4];
 } WaveView_t;
 
 

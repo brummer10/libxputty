@@ -59,15 +59,16 @@ extern "C" {
 #endif
 
 typedef struct {
-    int use_filter;
-    bool show_hidden;
-    unsigned int file_counter;
-    unsigned int dir_counter;
     char *filter;
     char *path;
     char *selected_file;
     char **file_names;
     char **dir_names;
+    unsigned int file_counter;
+    unsigned int dir_counter;
+    int use_filter;
+    bool show_hidden;
+    char pad[3];
 } FilePicker;
 
 

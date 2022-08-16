@@ -40,6 +40,7 @@ extern "C" {
  */
 
 typedef struct {
+    char **list_names;
     Widget_t *slider;
     cairo_surface_t *folder;
     cairo_surface_t *file;
@@ -50,7 +51,7 @@ typedef struct {
     int show_items;
     int list_size;
     int check_dir;
-    char **list_names;
+    char pad[4];
 } ViewList_t;
 
 /**

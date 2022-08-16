@@ -212,10 +212,8 @@ struct Xputty{
     Widget_t *key_snooper;
 /** pointer to a modal sub Widget_t */
     Widget_t *submenu;
-/** bool to quit the main loop */
-    bool run;
-/** bool to indicate if button is pressed on grab window */
-    bool is_grab;
+/** pointer to the textbuffer for copy/paste */
+    unsigned char *ctext;
 /** small fontsize for all Widget_t*/
     int small_font;
 /** normal fontsize  for all Widget_t*/
@@ -224,10 +222,14 @@ struct Xputty{
     int big_font;
 /** size of the textbuffer for copy/paste */
     int csize;
-/** pointer to the textbuffer for copy/paste */
-    unsigned char *ctext;
 /** Atoms for handling drag and drop */
     int dnd_version;
+/** bool to quit the main loop */
+    bool run;
+/** bool to indicate if button is pressed on grab window */
+    bool is_grab;
+/** padding struct to align clean **/
+    char pad[2];
     Window dnd_source_window;
     Atom XdndAware;
     Atom XdndTypeList;
