@@ -112,9 +112,7 @@ void widget_set_icon_from_surface(Widget_t *w, cairo_surface_t *image) {
     for (y = 0; y < height_t; y++) {
         uint32_t *row = (uint32_t*) (data + y * stride);
         for (x = 0; x < width_t; x++) {
-            output_pixel[0] |= ((row[x] >> 24) && 0xff) |
-                                ((row[x] >> 16) && 0xff) |
-                                ((row[x] >> 8) && 0xff) | row[x];
+            output_pixel[0] |= row[x];
             output_pixel ++;
         }
     }
@@ -145,9 +143,7 @@ void widget_set_icon_from_png(Widget_t *w, const unsigned char* name) {
     for (y = 0; y < height_t; y++) {
         uint32_t *row = (uint32_t*) (data + y * stride);
         for (x = 0; x < width_t; x++) {
-            output_pixel[0] |= ((row[x] >> 24) && 0xff) |
-                                ((row[x] >> 16) && 0xff) |
-                                ((row[x] >> 8) && 0xff) | row[x];
+            output_pixel[0] |= row[x];
             output_pixel ++;
         }
     }
