@@ -427,10 +427,6 @@ static void entry_get_text(void *w_, void *key_, void *user_data) {
 static void fd_mem_free(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
-    if(file_dialog->icon) {
-        XFreePixmap(w->app->dpy, (*file_dialog->icon));
-        file_dialog->icon = NULL;
-    }
     if(file_dialog->send_clear_func)
         file_dialog->parent->func.dialog_callback(file_dialog->parent,NULL);
     fp_free(file_dialog->fp);
@@ -560,7 +556,6 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
 
     file_dialog->parent = w;
     file_dialog->send_clear_func = true;
-    file_dialog->icon = NULL;
 
     file_dialog->w = create_window(w->app, DefaultRootWindow(w->app->dpy), 0, 0, 660, 420);
     file_dialog->w->flags |= HAS_MEM;
@@ -569,7 +564,7 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->w->func.expose_callback = draw_window;
     file_dialog->w->func.key_press_callback = forward_key_press;
     file_dialog->w->func.mem_free_callback = fd_mem_free;
-    widget_set_icon_from_png(file_dialog->w,file_dialog->icon,LDVAR(directory_png));
+    widget_set_icon_from_png(file_dialog->w,LDVAR(directory_png));
 
     XSizeHints* win_size_hints;
     win_size_hints = XAllocSizeHints();

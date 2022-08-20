@@ -162,7 +162,7 @@ cairo_surface_t * surface_get_png(Widget_t *w, cairo_surface_t *sf, const unsign
  * @return void
  */
 
-void widget_set_icon_from_surface(Widget_t *w, Pixmap *icon_, cairo_surface_t *image);
+void widget_set_icon_from_surface(Widget_t *w,  cairo_surface_t *image);
 
 /**
  * @brief widget_set_icon_from_png   - set icon image from png binary to Widget_t 
@@ -172,7 +172,7 @@ void widget_set_icon_from_surface(Widget_t *w, Pixmap *icon_, cairo_surface_t *i
  * @return void
  */
 
-void widget_set_icon_from_png(Widget_t *w, Pixmap *icon_, const unsigned char* name);
+void widget_set_icon_from_png(Widget_t *w, const unsigned char* name);
 
 #ifdef __cplusplus
 }

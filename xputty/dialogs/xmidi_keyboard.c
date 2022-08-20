@@ -749,10 +749,6 @@ static void wheel_key_press(void *w_, void *key_, void *user_data) {
 static void keyboard_mem_free(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
-    if(keys->icon) {
-        XFreePixmap(w->app->dpy, (*keys->icon));
-        keys->icon = NULL;
-    }
     free(keys);
 }
 
@@ -804,7 +800,6 @@ Widget_t *open_midi_keyboard(Widget_t *w) {
     keys->send_key = -1;
     keys->octave = 12*2;
     keys->layout = 0;
-    keys->icon = NULL;
     int j = 0;
     for(;j<4;j++) {
         keys->key_matrix[j] = 0;
@@ -819,7 +814,7 @@ Widget_t *open_midi_keyboard(Widget_t *w) {
     wid->func.key_release_callback = key_release;
     wid->func.mem_free_callback = keyboard_mem_free;
     wid->func.map_notify_callback = map_keyboard;
-    widget_set_icon_from_png(wid,keys->icon,LDVAR(midikeyboard_png));
+    widget_set_icon_from_png(wid, LDVAR(midikeyboard_png));
     widget_set_title(wid, "Midi Keyboard");
     keys->mk_send_note = key_dummy;
     keys->mk_send_pitch = wheel_dummy;

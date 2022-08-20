@@ -370,10 +370,6 @@ static void check_for_style(MessageBox *mb, int style) {
 static void mg_mem_free(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     MessageBox *mb = (MessageBox *)w->parent_struct;
-    if(mb->icon) {
-        XFreePixmap(w->app->dpy, (*mb->icon));
-        mb->icon = NULL;
-    }
     int i = 0;
     for(;i<(int)mb->lin;i++) {
         free(mb->message[i]);
@@ -398,7 +394,6 @@ Widget_t *open_message_dialog(Widget_t *w, int style, const char *title,
     mb->message = NULL;
     mb->sel = 0;
     mb->choices = NULL;
-    mb->icon = NULL;
     check_for_message(mb, message);
     check_for_choices(mb, choices);
     check_for_style(mb, style);
@@ -419,19 +414,19 @@ Widget_t *open_message_dialog(Widget_t *w, int style, const char *title,
             widget_get_png(wid, LDVAR(info_png));
             alternate_title = (char*)_("INFO");
             mb->message_type = INFO_BOX;
-            widget_set_icon_from_surface(wid,mb->icon,wid->image);
+            widget_set_icon_from_surface(wid, wid->image);
         break;
         case WARNING_BOX:
             widget_get_png(wid, LDVAR(warning_png));
             alternate_title = (char*)_("WARNING");
             mb->message_type = WARNING_BOX;
-            widget_set_icon_from_surface(wid,mb->icon,wid->image);
+            widget_set_icon_from_surface(wid, wid->image);
         break;
         case ERROR_BOX:
             widget_get_png(wid, LDVAR(error_png));
             alternate_title = (char*)_("ERROR");
             mb->message_type = ERROR_BOX;
-            widget_set_icon_from_surface(wid,mb->icon,wid->image);
+            widget_set_icon_from_surface(wid, wid->image);
         break;
         case QUESTION_BOX:
             widget_get_png(wid, LDVAR(question_png));
@@ -441,21 +436,21 @@ Widget_t *open_message_dialog(Widget_t *w, int style, const char *title,
             no->func.value_changed_callback = message_no_callback;
             mb->message_type = QUESTION_BOX;
             button_title = (char*)_("YES");
-            widget_set_icon_from_surface(wid,mb->icon,wid->image);
+            widget_set_icon_from_surface(wid, wid->image);
         break;
         case SELECTION_BOX:
             widget_get_png(wid, LDVAR(choice_png));
             alternate_title = (char*)_("SELECTION");
             mb->message_type = SELECTION_BOX;
             create_checkboxes(wid);
-            widget_set_icon_from_surface(wid,mb->icon,wid->image);
+            widget_set_icon_from_surface(wid, wid->image);
         break;
         case ENTRY_BOX:
             widget_get_png(wid, LDVAR(message_png));
             alternate_title = (char*)_("TEXT ENTRY");
             mb->message_type = ENTRY_BOX;
             create_entry_box(wid);
-            widget_set_icon_from_surface(wid,mb->icon,wid->image);
+            widget_set_icon_from_surface(wid, wid->image);
         break;
     }
     widget_set_title(wid, (title)? title : alternate_title);

@@ -19,6 +19,7 @@
  */
 
 #include "xpngloader.h"
+#include <stdint.h>
 
 /* 
  * @brief      load png data from binary blob into cairo surface
@@ -95,58 +96,69 @@ cairo_surface_t * surface_get_png(Widget_t *w, cairo_surface_t *sf, const unsign
     return sf;
 }
 
-void widget_set_icon_from_surface(Widget_t *w, Pixmap *icon_, cairo_surface_t *image) {
-    int width = cairo_xlib_surface_get_width(image);
-    int height = cairo_xlib_surface_get_height(image);
-    XWindowAttributes atr;
-    XGetWindowAttributes (w->app->dpy, w->widget, &atr);
-    Pixmap icon = XCreatePixmap(w->app->dpy, w->widget, width, height, atr.depth);
-    cairo_surface_t *surface = cairo_xlib_surface_create (w->app->dpy, icon,  
-                  DefaultVisual(w->app->dpy, DefaultScreen(w->app->dpy)), width, height);
-    cairo_t *cri = cairo_create (surface);
-    Colors *c = get_color_scheme(w->app, PRELIGHT_);
-    cairo_set_source_rgba(cri, c->bg[0],  c->bg[1], c->bg[2],  c->bg[3]);
-    cairo_paint(cri);
-    cairo_set_source_surface (cri, image,0,0);
-    cairo_paint(cri);
-    cairo_surface_destroy(surface);
-    cairo_destroy(cri);
-    icon_ = &icon;
+void widget_set_icon_from_surface(Widget_t *w, cairo_surface_t *image) {
+    int width_t = cairo_xlib_surface_get_width(image);
+    int height_t = cairo_xlib_surface_get_height(image);
+    int stride = cairo_image_surface_get_stride (image);
+    unsigned long* icon_data = malloc(2+width_t*height_t * sizeof(unsigned long));
+    memset(icon_data, 0, 2+width_t*height_t * sizeof(unsigned long));
+    const unsigned char *data = cairo_image_surface_get_data(image);
+    icon_data[0] = width_t;
+    icon_data[1] = height_t;
+    int x = 0;
+    int y = 0;
+    unsigned long* output_pixel = icon_data;
+    output_pixel += 2;
+    for (y = 0; y < height_t; y++) {
+        uint32_t *row = (uint32_t*) (data + y * stride);
+        for (x = 0; x < width_t; x++) {
+            output_pixel[0] |= ((row[x] >> 24) && 0xff) |
+                                ((row[x] >> 16) && 0xff) |
+                                ((row[x] >> 8) && 0xff) | row[x];
+            output_pixel ++;
+        }
+    }
     
-    XWMHints* win_hints = XAllocWMHints();
-    assert(win_hints);
-    win_hints->flags = IconPixmapHint;
-    win_hints->icon_pixmap = icon;
-    XSetWMHints(w->app->dpy, w->widget, win_hints);
-    XFree(win_hints);
+    Atom net_wm_icon = XInternAtom(w->app->dpy, "_NET_WM_ICON", False);
+    Atom cardinal = XInternAtom(w->app->dpy, "CARDINAL", False);
+    XChangeProperty(w->app->dpy, w->widget, net_wm_icon, cardinal, 32, PropModeReplace,
+                                    (const unsigned char*) icon_data, 2+width_t*height_t);
+
+    cairo_surface_destroy(image);
+    free(icon_data);
 }
 
-void widget_set_icon_from_png(Widget_t *w, Pixmap *icon_, const unsigned char* name) {
+void widget_set_icon_from_png(Widget_t *w, const unsigned char* name) {
     cairo_surface_t *image = cairo_image_surface_create_from_stream (name);
-    int width = cairo_image_surface_get_width(image);
-    int height = cairo_image_surface_get_height(image);
-    XWindowAttributes atr;
-    XGetWindowAttributes (w->app->dpy, w->widget, &atr);
-    Pixmap icon = XCreatePixmap(w->app->dpy, w->widget, width, height, atr.depth);
-    cairo_surface_t *surface = cairo_xlib_surface_create (w->app->dpy, icon,  
-                  DefaultVisual(w->app->dpy, DefaultScreen(w->app->dpy)), width, height);
-    cairo_t *cri = cairo_create (surface);
-    Colors *c = get_color_scheme(w->app, PRELIGHT_);
-    cairo_set_source_rgba(cri, c->bg[0],  c->bg[1], c->bg[2],  c->bg[3]);
-    cairo_paint(cri);
-    cairo_set_source_surface (cri, image,0,0);
-    cairo_paint(cri);
-    cairo_surface_destroy(image);
-    cairo_surface_destroy(surface);
-    cairo_destroy(cri);
-    icon_ = &icon;
+    int width_t = cairo_image_surface_get_width(image);
+    int height_t = cairo_image_surface_get_height(image);
+    int stride = cairo_image_surface_get_stride (image);
+    unsigned long* icon_data = malloc(2+width_t*height_t * sizeof(unsigned long));
+    memset(icon_data, 0, 2+width_t*height_t * sizeof(unsigned long));
+    const unsigned char *data = cairo_image_surface_get_data(image);
+    icon_data[0] = width_t;
+    icon_data[1] = height_t;
+    int x = 0;
+    int y = 0;
+    unsigned long* output_pixel = icon_data;
+    output_pixel += 2;
+    for (y = 0; y < height_t; y++) {
+        uint32_t *row = (uint32_t*) (data + y * stride);
+        for (x = 0; x < width_t; x++) {
+            output_pixel[0] |= ((row[x] >> 24) && 0xff) |
+                                ((row[x] >> 16) && 0xff) |
+                                ((row[x] >> 8) && 0xff) | row[x];
+            output_pixel ++;
+        }
+    }
     
-    XWMHints* win_hints = XAllocWMHints();
-    assert(win_hints);
-    win_hints->flags = IconPixmapHint;
-    win_hints->icon_pixmap = icon;
-    XSetWMHints(w->app->dpy, w->widget, win_hints);
-    XFree(win_hints);
+    Atom net_wm_icon = XInternAtom(w->app->dpy, "_NET_WM_ICON", False);
+    Atom cardinal = XInternAtom(w->app->dpy, "CARDINAL", False);
+    XChangeProperty(w->app->dpy, w->widget, net_wm_icon, cardinal, 32, PropModeReplace,
+                                    (const unsigned char*) icon_data, 2+width_t*height_t);
+
+    cairo_surface_destroy(image);
+    free(icon_data);
 }
 
 /*

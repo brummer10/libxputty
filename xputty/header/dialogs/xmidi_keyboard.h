@@ -33,8 +33,6 @@ typedef void (*midikeyfunc)(Widget_t *w,int *key, bool on_off);
 typedef void (*midiwheelfunc)(Widget_t *w,int *value);
 
 typedef struct {
-    Pixmap *icon;
-
     int octave;
     int layout;
     int modwheel;

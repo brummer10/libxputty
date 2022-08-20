@@ -46,7 +46,6 @@ typedef struct {
     Widget_t *xdg_dirs;
     Widget_t *view;
     Widget_t *scale_size;
-    Pixmap *icon;
     FilePicker *fp;
     char **xdg_user_dirs;
     const char *home_dir;
