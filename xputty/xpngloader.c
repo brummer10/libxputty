@@ -99,10 +99,15 @@ cairo_surface_t * surface_get_png(Widget_t *w, cairo_surface_t *sf, const unsign
 void widget_set_icon_from_surface(Widget_t *w, cairo_surface_t *image) {
     int width_t = cairo_xlib_surface_get_width(image);
     int height_t = cairo_xlib_surface_get_height(image);
-    int stride = cairo_image_surface_get_stride (image);
+    cairo_surface_t *icon = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width_t, height_t);
+    cairo_t *cri = cairo_create (icon);
+    cairo_set_source_surface (cri, image,0,0);
+    cairo_paint (cri);
+    
+    int stride = cairo_image_surface_get_stride (icon);
     unsigned long* icon_data = malloc(2+width_t*height_t * sizeof(unsigned long));
     memset(icon_data, 0, 2+width_t*height_t * sizeof(unsigned long));
-    const unsigned char *data = cairo_image_surface_get_data(image);
+    const unsigned char *data = cairo_image_surface_get_data(icon);
     icon_data[0] = width_t;
     icon_data[1] = height_t;
     int x = 0;
@@ -122,7 +127,7 @@ void widget_set_icon_from_surface(Widget_t *w, cairo_surface_t *image) {
     XChangeProperty(w->app->dpy, w->widget, net_wm_icon, cardinal, 32, PropModeReplace,
                                     (const unsigned char*) icon_data, 2+width_t*height_t);
 
-    cairo_surface_destroy(image);
+    cairo_surface_destroy(icon);
     free(icon_data);
 }
 
