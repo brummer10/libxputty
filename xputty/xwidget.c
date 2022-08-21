@@ -1037,8 +1037,23 @@ void send_systray_message(Widget_t *w) {
     XChangeProperty(w->app->dpy, w->widget, visualatom, XA_VISUALID, 32,
             PropModeReplace, (unsigned char*)&value, 1);
 
-    if ( tray != None)
+    if ( tray != None) {
         XSelectInput (w->app->dpy,tray,StructureNotifyMask);
+        /* get tray color and set as background */
+        XColor c;
+        XWindowAttributes attrs;
+        XGetWindowAttributes(w->app->dpy, DefaultRootWindow(w->app->dpy), &attrs);
+        
+        XImage *image = XGetImage(w->app->dpy, DefaultRootWindow(w->app->dpy),
+                        attrs.width -2, attrs.height -2, 1, 1, AllPlanes, XYPixmap);
+        c.pixel = XGetPixel(image, 0, 0);
+        XQueryColor (w->app->dpy, DefaultColormap(w->app->dpy, DefaultScreen (w->app->dpy)), &c);
+        double r = (double)c.red/65535.0;
+        double g = (double)c.green/65535.0;
+        double b = (double)c.blue/65535.0;
+        set_systray_color(w->app, r, g, b, 1.0);
+        XFree(image);
+    }
 
     memset(&event, 0, sizeof(event));
     event.xclient.type = ClientMessage;

@@ -224,6 +224,20 @@ void use_light_color_scheme(Widget_t *w, Color_state st) {
     cairo_set_source_rgba(w->crb, c->light[0],  c->light[1], c->light[2],  c->light[3]);
 }
 
+void use_systray_color(Widget_t *w) {
+    SystrayColor_t *c = w->app->systray_color;
+    cairo_set_source_rgba(w->cr, c->r,  c->g, c->b,  c->a);
+    cairo_set_source_rgba(w->crb, c->r,  c->g, c->b,  c->a);
+}
+
+void set_systray_color(Xputty *main, double r, double g, double b, double a) {
+    SystrayColor_t *c = main->systray_color;
+    c->r = r;
+    c->g = g;
+    c->b = b;
+    c->a = a;
+}
+
 void set_pattern(Widget_t *w, Colors *from, Colors *to, Color_mod mod) {
     double *col_from = NULL;
     double *col_to = NULL;

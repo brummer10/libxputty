@@ -30,6 +30,9 @@ void main_init(Xputty *main) {
     main->color_scheme = (XColor_t*)malloc(sizeof(XColor_t));
     assert(main->color_scheme);
     set_dark_theme(main);
+    main->systray_color = (SystrayColor_t*)malloc(sizeof(SystrayColor_t));
+    assert(main->systray_color);
+    set_systray_color(main, 0.3, 0.3, 0.3, 1.0);
     main->hold_grab = NULL;
     main->key_snooper = NULL;
     main->submenu = NULL;
@@ -237,6 +240,7 @@ void main_quit(Xputty *main) {
     childlist_destroy(main->childlist);
     free(main->childlist);
     free(main->color_scheme);
+    free(main->systray_color);
     XCloseDisplay(main->dpy);
     free(main->ctext);
     debug_print("quit\n");

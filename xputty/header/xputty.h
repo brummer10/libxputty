@@ -144,6 +144,12 @@ typedef struct Widget_t Widget_t;
 typedef struct XColor_t XColor_t;
 
 /**
+ * @brief SystrayColor_t     - the Systray Icon background Color
+ */
+
+typedef struct SystrayColor_t SystrayColor_t;
+
+/**
  * @brief  Xputty          - the main struct.It should be declared
  * before any other call to a Xputty function.
  */
@@ -206,6 +212,8 @@ struct Xputty{
     Display *dpy;
 /** theming scheme for all Widget_t */
     XColor_t *color_scheme;
+/** background color for Sytray Icon */
+    SystrayColor_t *systray_color;
 /** pointer to a modal Widget_t */
     Widget_t *hold_grab;
 /** pointer to a Widget_t snooping keys*/

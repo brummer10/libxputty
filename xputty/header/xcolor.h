@@ -94,6 +94,18 @@ struct XColor_t {
 };
 
 /**
+ * @brief SystrayColor         - the Systray Color struct
+ * \n SystrayColor could be used for the backgroung color of the SystrayIcon
+ */
+
+struct SystrayColor_t{
+    double r;
+    double g;
+    double b;
+    double a;
+};
+
+/**
  * @brief set_dark_theme    - init the XColor_t struct to the default 
  * dark theme 
  * @param *main             - pointer to the main Xputty struct
@@ -191,6 +203,26 @@ void use_frame_color_scheme(Widget_t *w, Color_state st);
  */
 
 void use_light_color_scheme(Widget_t *w, Color_state st);
+
+/**
+ * @brief use_systray_color        - use systray Colors to paint on Widget_t
+ * @param w                        - the Widget_t to set the Colors
+ * @return void
+ */
+
+void use_systray_color(Widget_t *w);
+
+/**
+ * @brief set_systray_color        - set the systray background color
+ * @param main                     - pointer to the main Xputty struct
+ * @param r                        - the red Color to use
+ * @param g                        - the green Color to use
+ * @param b                        - the blue Color to use
+ * @param a                        - the alpha Cannel to use
+ * @return void
+ */
+
+void set_systray_color(Xputty *main, double r, double g, double b, double a);
 
 /**
  * @brief set_pattern       - set pattern for the selected Colors
