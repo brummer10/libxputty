@@ -143,14 +143,14 @@ void main_run(Xputty *main) {
             break;
             case KeyPress:
             {
-                if (main->key_snooper != NULL) {
+                if (main->key_snooper != NULL && xev.xkey.window != main->key_snooper->widget) {
                     main->key_snooper->func.key_press_callback(main->key_snooper, &xev.xkey, NULL);
                 }
             }
             break;
             case KeyRelease:
             {
-                if (main->key_snooper != NULL) {
+                if (main->key_snooper != NULL && xev.xkey.window != main->key_snooper->widget) {
                     main->key_snooper->func.key_release_callback(main->key_snooper, &xev.xkey, NULL);
                 }
             }
