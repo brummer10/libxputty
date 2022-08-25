@@ -350,10 +350,10 @@ void _draw_combobox_menu_slider(void *w_, void* user_data) {
     if (comboboxlist->list_size > show_items)
         slidersize = (float)((float)show_items/(float)comboboxlist->list_size);
     float sliderstate = adj_get_state(w->adj);
-    use_bg_color_scheme(w, get_color_state(w));
+    use_frame_color_scheme(w, PRELIGHT_);
     cairo_rectangle(w->crb, 0,0,width,height);
     cairo_fill_preserve(w->crb);
-    use_shadow_color_scheme(w, NORMAL_);
+    use_shadow_color_scheme(w, get_color_state(w));
     cairo_fill(w->crb);
     use_bg_color_scheme(w, NORMAL_);
     cairo_rectangle(w->crb, 0,((float)height-
