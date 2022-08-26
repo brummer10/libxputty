@@ -50,6 +50,16 @@ void _pattern_vslider(Widget_t *w, Color_state st, int width);
 void _pattern_hslider(Widget_t *w, Color_state st, int width);
 
 /**
+ * @brief _draw_image_slider  - draw slider from a horizontal sprite image
+ * @param *w                  - pointer to the Widget_t button
+ * @param width_t             - the width of the base
+ * @param height_t            - the height of the base
+ * @return void
+ */
+
+void _draw_image_slider(Widget_t *w, int width_t, int height_t);
+
+/**
  * @brief _draw_vslider          - internal draw the slider to the buffer
  * @param *w_                    - void pointer to the Widget_t button
  * @param *user_data             - void pointer to attached user_data

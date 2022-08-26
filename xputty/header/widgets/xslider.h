@@ -29,6 +29,19 @@
 extern "C" {
 #endif
 
+typedef struct {
+    int frames;
+} Slider_t;
+
+/**
+ * @brief set_slider_image_frame_count  - set the number of sprites
+ *  in the Slider Image
+ * @param *w                            - pointer to the Slider Widget_t 
+ * @param count                         - frames in the image
+ * @return void
+ */
+
+void set_slider_image_frame_count(Widget_t *w, int count);
 
 /**
  * @brief add_vslider          - add a vertical slider to a Widget_t
@@ -55,6 +68,9 @@ Widget_t* add_vslider(Widget_t *parent, const char * label,
 
 Widget_t* add_hslider(Widget_t *parent, const char * label,
                 int x, int y, int width, int height);
+
+
+void slider_mem_free(void *w_, void* user_data);
 
 #ifdef __cplusplus
 }

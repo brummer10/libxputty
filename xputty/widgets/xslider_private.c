@@ -44,6 +44,24 @@ void _pattern_hslider(Widget_t *w, Color_state st, int height) {
     cairo_pattern_destroy (pat);
 }
 
+void _draw_image_slider(Widget_t *w, int width_t, int height_t) {
+    Slider_t *slider = (Slider_t*)w->private_struct;
+    int width = cairo_xlib_surface_get_width(w->image);
+    int height = cairo_xlib_surface_get_height(w->image);
+    int size = width/slider->frames;
+    double x = (double)width_t/(double)size;
+    double y = (double)height_t/(double)height;
+    double x1 = (double)size/(double)width_t;
+    double y1 = (double)height/(double)height_t;
+    double sliderstate = adj_get_state(w->adj);
+    int findex = (int)(((slider->frames)-1) * sliderstate);
+    cairo_scale(w->crb, x,y);
+    cairo_set_source_surface (w->crb, w->image, -size*findex, 0);
+    cairo_rectangle(w->crb,0, 0, size, height);
+    cairo_fill(w->crb);
+    cairo_scale(w->crb, x1,y1);
+}
+
 void _draw_vslider(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     XWindowAttributes attrs;
@@ -55,41 +73,42 @@ void _draw_vslider(void *w_, void* user_data) {
     
     if (attrs.map_state != IsViewable) return;
 
-    float sliderstate = adj_get_state(w->adj_y);
+    if (w->image) {
+        _draw_image_slider(w, width, height);
+    } else {
+        float sliderstate = adj_get_state(w->adj_y);
+        _pattern_vslider(w, get_color_state(w), width);
+        cairo_move_to (w->crb, center, center);
+        cairo_line_to(w->crb,center,height-center-10);
+        cairo_set_line_cap (w->crb,CAIRO_LINE_CAP_ROUND);
+        cairo_set_line_width(w->crb,center);
+        cairo_stroke(w->crb);
 
-    _pattern_vslider(w, get_color_state(w), width);
-    cairo_move_to (w->crb, center, center);
-    cairo_line_to(w->crb,center,height-center-10);
-    cairo_set_line_cap (w->crb,CAIRO_LINE_CAP_ROUND);
-    cairo_set_line_width(w->crb,center);
-    cairo_stroke(w->crb);
+        use_shadow_color_scheme(w, get_color_state(w));
+        cairo_move_to (w->crb, center, center);
+        cairo_line_to(w->crb,center,height-center-10);
+        cairo_set_line_width(w->crb,center/10);
+        cairo_stroke(w->crb);
 
-    use_shadow_color_scheme(w, get_color_state(w));
-    cairo_move_to (w->crb, center, center);
-    cairo_line_to(w->crb,center,height-center-10);
-    cairo_set_line_width(w->crb,center/10);
-    cairo_stroke(w->crb);
-
-    use_shadow_color_scheme(w, get_color_state(w));
-    cairo_arc(w->crb,center, (height-center-10) -
-        ((height-10-upcenter) * sliderstate), center/2, 0, 2 * M_PI );
-    cairo_fill_preserve(w->crb);
-    cairo_set_line_width(w->crb,1);
-    cairo_stroke(w->crb);
+        use_shadow_color_scheme(w, get_color_state(w));
+        cairo_arc(w->crb,center, (height-center-10) -
+            ((height-10-upcenter) * sliderstate), center/2, 0, 2 * M_PI );
+        cairo_fill_preserve(w->crb);
+        cairo_set_line_width(w->crb,1);
+        cairo_stroke(w->crb);
 
 
-    use_bg_color_scheme(w, get_color_state(w));
-    cairo_arc(w->crb,center, (height-center-10) -
-        ((height-10-upcenter) * sliderstate), center/3, 0, 2 * M_PI );
-    cairo_fill_preserve(w->crb);
-    use_fg_color_scheme(w, NORMAL_);
-    cairo_set_line_width(w->crb,center/15);
-    cairo_stroke(w->crb);
-    cairo_new_path (w->crb);
+        use_bg_color_scheme(w, get_color_state(w));
+        cairo_arc(w->crb,center, (height-center-10) -
+            ((height-10-upcenter) * sliderstate), center/3, 0, 2 * M_PI );
+        cairo_fill_preserve(w->crb);
+        use_fg_color_scheme(w, NORMAL_);
+        cairo_set_line_width(w->crb,center/15);
+        cairo_stroke(w->crb);
+        cairo_new_path (w->crb);
+    }
 
     cairo_text_extents_t extents;
-
-
     use_text_color_scheme(w, get_color_state(w));
     cairo_set_font_size (w->crb, center/1.8);
     cairo_text_extents(w->crb,w->label , &extents);
@@ -124,41 +143,40 @@ void _draw_hslider(void *w_, void* user_data) {
     float upcenter = (float)height;
     
     if (attrs.map_state != IsViewable) return;
+    if (w->image) {
+        _draw_image_slider(w, width, height);
+    } else {
+        float sliderstate = adj_get_state(w->adj_x);
+        _pattern_hslider(w, get_color_state(w), height);
+        cairo_move_to (w->crb, center, center);
+        cairo_line_to(w->crb,width-center-10,center);
+        cairo_set_line_cap (w->crb,CAIRO_LINE_CAP_ROUND);
+        cairo_set_line_width(w->crb,center);
+        cairo_stroke(w->crb);
 
-    float sliderstate = adj_get_state(w->adj_x);
+        use_shadow_color_scheme(w, get_color_state(w));
+        cairo_move_to (w->crb, center, center);
+        cairo_line_to(w->crb,width-center-10,center);
+        cairo_set_line_width(w->crb,center/10);
+        cairo_stroke(w->crb);
 
-    _pattern_hslider(w, get_color_state(w), height);
-    cairo_move_to (w->crb, center, center);
-    cairo_line_to(w->crb,width-center-10,center);
-    cairo_set_line_cap (w->crb,CAIRO_LINE_CAP_ROUND);
-    cairo_set_line_width(w->crb,center);
-    cairo_stroke(w->crb);
+        use_shadow_color_scheme(w, get_color_state(w));
+        cairo_arc(w->crb, (center) +
+            ((width-10-upcenter) * sliderstate),center, center/2, 0, 2 * M_PI );
+        cairo_fill_preserve(w->crb);
+        cairo_set_line_width(w->crb,1);
+        cairo_stroke(w->crb);
 
-    use_shadow_color_scheme(w, get_color_state(w));
-    cairo_move_to (w->crb, center, center);
-    cairo_line_to(w->crb,width-center-10,center);
-    cairo_set_line_width(w->crb,center/10);
-    cairo_stroke(w->crb);
-
-    use_shadow_color_scheme(w, get_color_state(w));
-    cairo_arc(w->crb, (center) +
-        ((width-10-upcenter) * sliderstate),center, center/2, 0, 2 * M_PI );
-    cairo_fill_preserve(w->crb);
-    cairo_set_line_width(w->crb,1);
-    cairo_stroke(w->crb);
-
-    use_bg_color_scheme(w, get_color_state(w));
-    cairo_arc(w->crb, (center) +
-        ((width-10-upcenter) * sliderstate),center, center/3, 0, 2 * M_PI );
-    cairo_fill_preserve(w->crb);
-    use_fg_color_scheme(w, NORMAL_);
-    cairo_set_line_width(w->crb,center/15);
-    cairo_stroke(w->crb);
-    cairo_new_path (w->crb);
-
+        use_bg_color_scheme(w, get_color_state(w));
+        cairo_arc(w->crb, (center) +
+            ((width-10-upcenter) * sliderstate),center, center/3, 0, 2 * M_PI );
+        cairo_fill_preserve(w->crb);
+        use_fg_color_scheme(w, NORMAL_);
+        cairo_set_line_width(w->crb,center/15);
+        cairo_stroke(w->crb);
+        cairo_new_path (w->crb);
+    }
     cairo_text_extents_t extents;
-
-
     use_text_color_scheme(w, get_color_state(w));
     cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
     cairo_text_extents(w->crb,w->label , &extents);

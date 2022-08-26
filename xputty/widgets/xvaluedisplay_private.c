@@ -69,9 +69,15 @@ void _draw_valuedisplay(void *w_, void* user_data) {
     cairo_text_extents_t extents;
 
     char s[64];
-    const char* format[] = {"%.1f ", "%.2f ", "%. Hz"};
+    const char* format[] = {"%.1f", "%.2f", "%.3f"};
     float value = adj_get_value(w->adj);
-    snprintf(s, 63, format[2-1], value);
+    if (fabs(w->adj->step)>0.99) {
+        snprintf(s, 63,"%d",  (int) value);
+    } else if (fabs(w->adj->step)>0.09) {
+        snprintf(s, 63, format[1-1], value);
+    } else {
+        snprintf(s, 63, format[2-1], value);
+    }
 
     
     use_text_color_scheme(w, get_color_state(w));
@@ -104,9 +110,15 @@ void _draw_spinbox(void *w_, void* user_data) {
     cairo_text_extents_t extents;
 
     char s[64];
-    const char* format[] = {"%.1f ", "%.2f ", "%. Hz"};
+    const char* format[] = {"%.1f", "%.2f", "%.3f"};
     float value = adj_get_value(parent->adj);
-    snprintf(s, 63, format[2-1], value);
+    if (fabs(parent->adj->step)>0.99) {
+        snprintf(s, 63,"%d",  (int) value);
+    } else if (fabs(parent->adj->step)>0.09) {
+        snprintf(s, 63, format[1-1], value);
+    } else {
+        snprintf(s, 63, format[2-1], value);
+    }
 
     
     use_text_color_scheme(w, get_color_state(w));
