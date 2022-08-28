@@ -323,6 +323,8 @@ struct Widget_t {
     const char* label;
 /** pointer to the main struct */
     Xputty *app;
+/** pointer to the widget color scheme */
+    XColor_t *color_scheme;
 /** the X11 newly created Window */
     Window widget;
 /** pointer to the Parent Window or Widget_t */

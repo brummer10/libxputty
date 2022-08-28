@@ -124,13 +124,22 @@ void set_dark_theme(Xputty *main);
 void set_light_theme(Xputty *main);
 
 /**
+ * @brief color_scheme_to_childs    - copy a colorscheme to all childs 
+ * light theme 
+ * @param *wid                      - pointer to the Widget_t take the colorscheme from
+ * @return void
+ */
+
+void color_scheme_to_childs(Widget_t *wid);
+
+/**
  * @brief get_color_scheme  - get pointer to the Colors struct to use
  * in relation to the Color_state
  * @param *st               - the Color state to use
  * @return void
  */
 
-Colors *get_color_scheme(Xputty *main, Color_state st);
+Colors *get_color_scheme(Widget_t *wid, Color_state st);
 
 /**
  * @brief get_color_state   - get the Color_state to use in relation to the

@@ -26,7 +26,7 @@ void _create_playhead_image(Widget_t *w, int width, int height) {
     w->image = cairo_surface_create_similar (w->surface, 
                         CAIRO_CONTENT_COLOR_ALPHA, width, height*2);
     cairo_t *cri = cairo_create (w->image);
-    Colors *c = get_color_scheme(w->app, NORMAL_);
+    Colors *c = get_color_scheme(w, NORMAL_);
 
     //cairo_rectangle(cri,0.0, 0.0, width, height*2);
     //cairo_set_source_rgba (cri, c->bg[0],  c->bg[1], c->bg[2],  c->bg[3]); 

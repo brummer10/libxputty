@@ -33,7 +33,7 @@ void _rounded_rectangle(cairo_t *cr,float x, float y, float width, float height)
 }
 
 void _pattern_out(Widget_t *w, Color_state st, int height) {
-    Colors *c = get_color_scheme(w->app,st);
+    Colors *c = get_color_scheme(w,st);
     if (!c) return;
     cairo_pattern_t *pat = cairo_pattern_create_linear (2, 2, 2, height);
     cairo_pattern_add_color_stop_rgba(pat, 0.0, c->light[0],  c->light[1], c->light[2],  c->light[3]);
@@ -44,7 +44,7 @@ void _pattern_out(Widget_t *w, Color_state st, int height) {
 }
 
 void _pattern_in(Widget_t *w, Color_state st, int height) {
-    Colors *c = get_color_scheme(w->app,st);
+    Colors *c = get_color_scheme(w,st);
     if (!c) return;
     cairo_pattern_t *pat = cairo_pattern_create_linear (2, 2, 2, height);
     cairo_pattern_add_color_stop_rgba(pat, 0.0, 0.0, 0.0, 0.0, 0.0);

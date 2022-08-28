@@ -127,25 +127,34 @@ void set_light_theme(Xputty *main) {
     };
 }
 
-Colors *get_color_scheme(Xputty *main, Color_state st) {
+void color_scheme_to_childs(Widget_t *wid) {
+    int i=0;
+    for(;i<wid->childlist->elem;i++) {
+        Widget_t* w = wid->childlist->childs[i];
+        memcpy(w->color_scheme, wid->color_scheme, sizeof (struct XColor_t));
+        color_scheme_to_childs(w);
+    }
+}
+
+Colors *get_color_scheme(Widget_t *wid, Color_state st) {
     switch(st) {
         case NORMAL_:
-            return &main->color_scheme->normal;
+            return &wid->color_scheme->normal;
         break;
         case PRELIGHT_:
-            return &main->color_scheme->prelight;
+            return &wid->color_scheme->prelight;
         break;
         case SELECTED_:
-            return &main->color_scheme->selected;
+            return &wid->color_scheme->selected;
         break;
         case ACTIVE_:
-            return &main->color_scheme->active;
+            return &wid->color_scheme->active;
         break;
         case INSENSITIVE_:
-            return &main->color_scheme->insensitive;
+            return &wid->color_scheme->insensitive;
         break;
         default:
-            return &main->color_scheme->normal;
+            return &wid->color_scheme->normal;
         break;
     }
     return NULL;
@@ -176,49 +185,49 @@ Color_state get_color_state(Widget_t *wid) {
 }
 
 void use_fg_color_scheme(Widget_t *w, Color_state st) {
-    Colors *c = get_color_scheme(w->app, st);
+    Colors *c = get_color_scheme(w, st);
     if (!c) return;
     cairo_set_source_rgba(w->cr, c->fg[0],  c->fg[1], c->fg[2],  c->fg[3]);
     cairo_set_source_rgba(w->crb, c->fg[0],  c->fg[1], c->fg[2],  c->fg[3]);
 }
 
 void use_bg_color_scheme(Widget_t *w, Color_state st) {
-    Colors *c = get_color_scheme(w->app, st);
+    Colors *c = get_color_scheme(w, st);
     if (!c) return;
     cairo_set_source_rgba(w->cr, c->bg[0],  c->bg[1], c->bg[2],  c->bg[3]);
     cairo_set_source_rgba(w->crb, c->bg[0],  c->bg[1], c->bg[2],  c->bg[3]);
 }
 
 void use_base_color_scheme(Widget_t *w, Color_state st) {
-    Colors *c = get_color_scheme(w->app, st);
+    Colors *c = get_color_scheme(w, st);
     if (!c) return;
     cairo_set_source_rgba(w->cr, c->base[0],  c->base[1], c->base[2],  c->base[3]);
     cairo_set_source_rgba(w->crb, c->base[0],  c->base[1], c->base[2],  c->base[3]);
 }
 
 void use_text_color_scheme(Widget_t *w, Color_state st) {
-    Colors *c = get_color_scheme(w->app, st);
+    Colors *c = get_color_scheme(w, st);
     if (!c) return;
     cairo_set_source_rgba(w->cr, c->text[0],  c->text[1], c->text[2],  c->text[3]);
     cairo_set_source_rgba(w->crb, c->text[0],  c->text[1], c->text[2],  c->text[3]);
 }
 
 void use_shadow_color_scheme(Widget_t *w, Color_state st) {
-    Colors *c = get_color_scheme(w->app, st);
+    Colors *c = get_color_scheme(w, st);
     if (!c) return;
     cairo_set_source_rgba(w->cr, c->shadow[0],  c->shadow[1], c->shadow[2],  c->shadow[3]);
     cairo_set_source_rgba(w->crb, c->shadow[0],  c->shadow[1], c->shadow[2],  c->shadow[3]);
 }
 
 void use_frame_color_scheme(Widget_t *w, Color_state st) {
-    Colors *c = get_color_scheme(w->app, st);
+    Colors *c = get_color_scheme(w, st);
     if (!c) return;
     cairo_set_source_rgba(w->cr, c->frame[0],  c->frame[1], c->frame[2],  c->frame[3]);
     cairo_set_source_rgba(w->crb, c->frame[0],  c->frame[1], c->frame[2],  c->frame[3]);
 }
 
 void use_light_color_scheme(Widget_t *w, Color_state st) {
-    Colors *c = get_color_scheme(w->app, st);
+    Colors *c = get_color_scheme(w, st);
     if (!c) return;
     cairo_set_source_rgba(w->cr, c->light[0],  c->light[1], c->light[2],  c->light[3]);
     cairo_set_source_rgba(w->crb, c->light[0],  c->light[1], c->light[2],  c->light[3]);

@@ -23,7 +23,7 @@
 
 
 void _pattern_vslider(Widget_t *w, Color_state st, int width) {
-    Colors *c = get_color_scheme(w->app,st);
+    Colors *c = get_color_scheme(w,st);
     if (!c) return;
     cairo_pattern_t *pat = cairo_pattern_create_linear (2, 2, width, 2);
     cairo_pattern_add_color_stop_rgba(pat, 0.0, c->base[0],  c->base[1], c->base[2],  c->base[3]);
@@ -34,7 +34,7 @@ void _pattern_vslider(Widget_t *w, Color_state st, int width) {
 }
 
 void _pattern_hslider(Widget_t *w, Color_state st, int height) {
-    Colors *c = get_color_scheme(w->app,st);
+    Colors *c = get_color_scheme(w,st);
     if (!c) return;
     cairo_pattern_t *pat = cairo_pattern_create_linear (2, 2, 2, height);
     cairo_pattern_add_color_stop_rgba(pat, 0.0, c->base[0],  c->base[1], c->base[2],  c->base[3]);

@@ -84,8 +84,11 @@ void destroy_widget(Widget_t * w, Xputty *main) {
         if (ch) {
             int i = ch;
             for(;i>0;i--) {
+                free(w->childlist->childs[i-1]->color_scheme);
                 destroy_widget(w->childlist->childs[i-1],main);
+                
             }
+            free(w->color_scheme);
             destroy_widget(w,main);
         }
         if(w->flags & IS_WIDGET) {
@@ -245,6 +248,8 @@ Widget_t *create_window(Xputty *app, Window win,
     w->adj_x = NULL;
     w->adj_y = NULL;
     w->adj   = NULL;
+    w->color_scheme = (XColor_t*)malloc(sizeof(XColor_t));
+    memcpy(w->color_scheme, app->color_scheme, sizeof (struct XColor_t));
     w->childlist = (Childlist_t*)malloc(sizeof(Childlist_t));
     assert(w->childlist != NULL);
     childlist_init(w->childlist);
@@ -364,6 +369,8 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     w->adj_x = NULL;
     w->adj_y = NULL;
     w->adj   = NULL;
+    w->color_scheme = (XColor_t*)malloc(sizeof(XColor_t));
+    memcpy(w->color_scheme, parent->color_scheme, sizeof (struct XColor_t));
     w->childlist = (Childlist_t*)malloc(sizeof(Childlist_t));
     assert(w->childlist != NULL);
     childlist_init(w->childlist);
