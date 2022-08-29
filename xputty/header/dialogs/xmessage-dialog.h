@@ -76,6 +76,8 @@ typedef struct {
 Widget_t *open_message_dialog(Widget_t *w, int style, const char *title,
                               const char *message, const char *choices);
 
+void radio_box_set_active(Widget_t *w);
+
 #ifdef __cplusplus
 }
 #endif

@@ -230,7 +230,7 @@ static void message_no_callback(void *w_, void* user_data) {
     }
 }
 
-static void radio_box_set_active(Widget_t *w) {
+void radio_box_set_active(Widget_t *w) {
     Widget_t * p = (Widget_t*)w->parent;
     MessageBox *mb = (MessageBox *)p->parent_struct;
     int response = 0;
