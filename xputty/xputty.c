@@ -244,4 +244,7 @@ void main_quit(Xputty *main) {
     XCloseDisplay(main->dpy);
     free(main->ctext);
     debug_print("quit\n");
+#ifdef DEBUG
+    cairo_debug_reset_static_data ();
+#endif
 }

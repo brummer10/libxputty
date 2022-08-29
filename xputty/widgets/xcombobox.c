@@ -39,6 +39,7 @@ void combobox_mem_free(void *w_, void* user_data) {
         free(comboboxlist->list_names[j]);
         comboboxlist->list_names[j] = NULL;
     }
+    free(comboboxlist->list_names);
     free(comboboxlist);
 }
 
@@ -90,6 +91,8 @@ Widget_t* create_combobox_viewport(Widget_t *parent, int elem, int width, int he
     ComboBox_t *comboboxlist;
     comboboxlist = (ComboBox_t*)malloc(sizeof(ComboBox_t));
     comboboxlist->show_items = elem;
+    comboboxlist->prelight_item = 0;
+    comboboxlist->active_item = 0;
     comboboxlist->list_names = NULL;
     comboboxlist->list_size = 0;
     wid->flags |= HAS_MEM;
@@ -140,7 +143,7 @@ Widget_t* create_combobox_menu(Widget_t *parent, int height) {
 
     comboboxlist->slider = add_vslider(wid, "", 0, 0, 10, height);
     comboboxlist->slider->func.expose_callback = _draw_combobox_menu_slider;
-    comboboxlist->slider->adj_y = add_adjustment(comboboxlist->slider,0.0, 0.0, 0.0, 1.0,0.0085, CL_VIEWPORTSLIDER);
+    set_adjustment(comboboxlist->slider->adj_y,0.0, 0.0, 0.0, 1.0,0.0085, CL_VIEWPORTSLIDER);
     comboboxlist->slider->adj = comboboxlist->slider->adj_y;
     comboboxlist->slider->func.value_changed_callback = _set_combobox_menu_viewport;
     comboboxlist->slider->scale.gravity = NORTHWEST;
@@ -178,9 +181,10 @@ void combobox_add_entry(Widget_t *wid, const char  * label) {
     Widget_t *menu = wid->childlist->childs[1];
     Widget_t* view_port =  menu->childlist->childs[0];
     ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
+    comboboxlist->list_size++;
     comboboxlist->list_names = (char **)realloc(comboboxlist->list_names,
-      (comboboxlist->list_size + 1) * sizeof(char *));
-    asprintf(&comboboxlist->list_names[comboboxlist->list_size++],"%s",label);
+      comboboxlist->list_size * sizeof(char *));
+    asprintf(&comboboxlist->list_names[comboboxlist->list_size-1],"%s",label);
     assert(comboboxlist->list_names != NULL);
     float max_value = wid->adj->max_value+1.0;
     set_adjustment(wid->adj,0.0, max_value, 0.0, max_value,1.0, CL_ENUM);

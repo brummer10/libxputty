@@ -136,8 +136,8 @@ void widget_set_icon_from_png(Widget_t *w, const unsigned char* name) {
     int width_t = cairo_image_surface_get_width(image);
     int height_t = cairo_image_surface_get_height(image);
     int stride = cairo_image_surface_get_stride (image);
-    unsigned long* icon_data = malloc(2+width_t*height_t * sizeof(unsigned long));
-    memset(icon_data, 0, 2+width_t*height_t * sizeof(unsigned long));
+    unsigned long* icon_data = malloc(16+width_t*height_t * sizeof(unsigned long));
+    memset(icon_data, 0, 16+width_t*height_t * sizeof(unsigned long));
     const unsigned char *data = cairo_image_surface_get_data(image);
     icon_data[0] = width_t;
     icon_data[1] = height_t;

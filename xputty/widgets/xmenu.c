@@ -260,7 +260,7 @@ Widget_t* create_menu(Widget_t *parent, int height) {
 
     Widget_t *slider = add_vslider(wid, "", 0, 0, 10, height);
     slider->func.expose_callback = _draw_menu_slider;
-    slider->adj_y = add_adjustment(slider,0.0, 0.0, 0.0, 1.0,0.0085, CL_VIEWPORTSLIDER);
+    set_adjustment(slider->adj_y,0.0, 0.0, 0.0, 1.0,0.0085, CL_VIEWPORTSLIDER);
     slider->adj = slider->adj_y;
     slider->func.value_changed_callback = _set_menu_viewpoint;
     slider->scale.gravity = NORTHWEST;

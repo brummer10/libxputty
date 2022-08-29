@@ -84,11 +84,9 @@ void destroy_widget(Widget_t * w, Xputty *main) {
         if (ch) {
             int i = ch;
             for(;i>0;i--) {
-                free(w->childlist->childs[i-1]->color_scheme);
                 destroy_widget(w->childlist->childs[i-1],main);
                 
             }
-            free(w->color_scheme);
             destroy_widget(w,main);
         }
         if(w->flags & IS_WIDGET) {
@@ -108,6 +106,7 @@ void destroy_widget(Widget_t * w, Xputty *main) {
         XCloseIM(w->xim);
         XUnmapWindow(w->app->dpy, w->widget);
         XDestroyWindow(w->app->dpy, w->widget);
+        free(w->color_scheme);
         free(w->childlist);
         free(w);
         w = NULL;
@@ -1059,7 +1058,7 @@ void send_systray_message(Widget_t *w) {
         double g = (double)c.green/65535.0;
         double b = (double)c.blue/65535.0;
         set_systray_color(w->app, r, g, b, 1.0);
-        XFree(image);
+        XDestroyImage(image);
     }
 
     memset(&event, 0, sizeof(event));
