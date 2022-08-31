@@ -85,7 +85,7 @@ void _check_enum(Widget_t * wid, XButtonEvent *xbutton) {
 void _button_press(Widget_t * wid, XButtonEvent *xbutton, void* user_data) {
     if(wid->app->hold_grab != NULL) {
         int ch = childlist_has_child(wid->childlist);
-        if (ch>1) {
+        if (ch>1 && wid->app->key_snooper == NULL) {
             if (xbutton->window == wid->app->hold_grab->childlist->childs[1]->widget) {
                 wid->app->is_grab = true;
             } else {
