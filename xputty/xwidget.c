@@ -44,6 +44,8 @@ int key_mapping(Display *dpy, XKeyEvent *xkey) {
         return 10;
     else if (xkey->keycode == XKeysymToKeycode(dpy,XK_BackSpace))
         return 11;
+    else if (xkey->keycode == XKeysymToKeycode(dpy,XK_Delete))
+        return 12;
     // keypad
     else if (xkey->keycode == XKeysymToKeycode(dpy,XK_KP_Subtract))
         return 1;
@@ -65,6 +67,8 @@ int key_mapping(Display *dpy, XKeyEvent *xkey) {
         return 9;
     else if (xkey->keycode == XKeysymToKeycode(dpy,XK_KP_Enter))
         return 10;
+    else if (xkey->keycode == XKeysymToKeycode(dpy,XK_KP_Delete))
+        return 12;
     else return 0;
 }
 
