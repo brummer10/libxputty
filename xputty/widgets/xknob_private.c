@@ -39,13 +39,22 @@ void _draw_image_knob(Widget_t *w, int width_t, int height_t) {
     double y = (double)height/(double)width_t;
     double knobstate = adj_get_state(w->adj_y);
     int findex = (int)(((width/height)-1) * knobstate);
+    int posx = 0;
+    int posy = (height_t/2 - ((height*x)/2));
+    if (width_t > height_t) {
+        x = (double)height_t/(double)height;
+        y = (double)height/(double)height_t;
+        posx = (width_t/2 -((height*x)/2));
+        posy = 0;
+    }
+    cairo_save(w->crb);
     cairo_scale(w->crb, x,x);
-    //widget_set_scale(w);
-    cairo_set_source_surface (w->crb, w->image, -height*findex, 0);
-    cairo_rectangle(w->crb,0, 0, height, height);
+    cairo_translate(w->crb, posx * ((1-x)/x), posy * ((1-x)/x));
+    cairo_set_source_surface (w->crb, w->image, -height*findex + posx, posy);
+    cairo_rectangle(w->crb, posx, posy, height, height);
     cairo_fill(w->crb);
-    //widget_reset_scale(w);
     cairo_scale(w->crb, y,y);
+    cairo_restore(w->crb);
 }
 
 void _draw_knob_image(void *w_, void* user_data) {
@@ -87,8 +96,8 @@ void _draw_knob(void *w_, void* user_data) {
         double radius = min(knob_x-pointer_off, knob_y-pointer_off) / 2;
         double lengh_x = (knobx+radius+pointer_off/2) - radius * sin(angle);
         double lengh_y = (knoby+radius+pointer_off/2) + radius * cos(angle);
-        double radius_x = (knobx+radius+pointer_off/2) - radius/ 1.18 * sin(angle);
-        double radius_y = (knoby+radius+pointer_off/2) + radius/ 1.18 * cos(angle);
+        double radius_x = (knobx+radius+pointer_off/2) - radius/ 1.24 * sin(angle);
+        double radius_y = (knoby+radius+pointer_off/2) + radius/ 1.24 * cos(angle);
 
         cairo_arc(w->crb,knobx1+arc_offset, knoby1+arc_offset, knob_x/2.1, 0, 2 * M_PI );
 
@@ -100,7 +109,7 @@ void _draw_knob(void *w_, void* user_data) {
         cairo_arc(w->crb,knobx1+arc_offset, knoby1+arc_offset, knob_x/3.1, 0, 2 * M_PI );
         cairo_fill_preserve(w->crb);
         use_fg_color_scheme(w, NORMAL_);
-        cairo_set_line_width(w->crb, knobx1/15);
+        cairo_set_line_width(w->crb, min(3.0, knobx1/15));
         cairo_stroke(w->crb);
         cairo_new_path (w->crb);
 
@@ -109,7 +118,7 @@ void _draw_knob(void *w_, void* user_data) {
         cairo_set_line_join(w->crb, CAIRO_LINE_JOIN_BEVEL);
         cairo_move_to(w->crb, radius_x, radius_y);
         cairo_line_to(w->crb,lengh_x,lengh_y);
-        cairo_set_line_width(w->crb,knobx1/7);
+        cairo_set_line_width(w->crb,min(6.0, knobx1/7));
         use_fg_color_scheme(w, NORMAL_);
         cairo_stroke(w->crb);
         cairo_new_path (w->crb);
