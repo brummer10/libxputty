@@ -136,6 +136,64 @@ void color_scheme_to_childs(Widget_t *wid) {
     }
 }
 
+void widget_set_color(double *c, double r, double g, double b, double a) {
+    c[0] = r;
+    c[1] = g;
+    c[2] = b;
+    c[3] = a;
+}
+
+void set_widget_color(Widget_t *w, Color_state st, Color_mod mod,
+                            double r, double g, double b, double a) {
+    Colors *c = get_color_scheme(w, st);
+    switch(mod) {
+        case FORGROUND_:
+           c->fg[0] = r;
+           c->fg[1] = g;
+           c->fg[2] = b;
+           c->fg[3] = a;
+        break;
+        case BACKGROUND_:
+           c->bg[0] = r;
+           c->bg[1] = g;
+           c->bg[2] = b;
+           c->bg[3] = a;
+        break;
+        case BASE_:
+           c->base[0] = r;
+           c->base[1] = g;
+           c->base[2] = b;
+           c->base[3] = a;
+        break;
+        case TEXT_:
+           c->text[0] = r;
+           c->text[1] = g;
+           c->text[2] = b;
+           c->text[3] = a;
+        break;
+        case SHADOW_:
+           c->shadow[0] = r;
+           c->shadow[1] = g;
+           c->shadow[2] = b;
+           c->shadow[3] = a;
+        break;
+        case FRAME_:
+           c->frame[0] = r;
+           c->frame[1] = g;
+           c->frame[2] = b;
+           c->frame[3] = a;
+        break;
+        case LIGHT_:
+           c->light[0] = r;
+           c->light[1] = g;
+           c->light[2] = b;
+           c->light[3] = a;
+        break;
+        default:
+        break;
+    }
+}
+
 Colors *get_color_scheme(Widget_t *wid, Color_state st) {
     switch(st) {
         case NORMAL_:

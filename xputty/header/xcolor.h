@@ -132,6 +132,34 @@ void set_light_theme(Xputty *main);
 
 void color_scheme_to_childs(Widget_t *wid);
 
+
+/**
+ * @brief set_widget_color  - set a individual Widget_t color
+ * @param *w                - the Widget_t the color belong to
+ * @param st                - the state the color belong to
+ * @param *mod              - the Color mod to set
+ * @param r                 - the red color
+ * @param g                 - the green color
+ * @param b                 - the blue color
+ * @param a                 - the alpha channel
+ * @return void
+ */
+
+void set_widget_color(Widget_t *w, Color_state st, Color_mod mod,
+                            double r, double g, double b, double a);
+
+/**
+ * @brief widget_set_color  - set a individual Widget_t color
+ * @param *c                - direct pointer to the color array
+ * @param r                 - the red color
+ * @param g                 - the green color
+ * @param b                 - the blue color
+ * @param a                 - the alpha channel
+ * @return void
+ */
+
+void widget_set_color(double *c, double r, double g, double b, double a);
+
 /**
  * @brief get_color_scheme  - get pointer to the Colors struct to use
  * in relation to the Color_state
