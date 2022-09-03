@@ -27,7 +27,7 @@
 void _draw_listview(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
-    set_pattern(w,&w->app->color_scheme->normal,&w->app->color_scheme->active,BACKGROUND_);
+    set_pattern(w,&w->color_scheme->normal,&w->color_scheme->active,BACKGROUND_);
     cairo_paint (w->cr);
 }
 

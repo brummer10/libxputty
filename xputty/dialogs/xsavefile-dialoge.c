@@ -52,7 +52,7 @@ static void draw_window(void *w_, void* user_data) {
     if (attrs.map_state != IsViewable) return;
 
     cairo_rectangle(w->crb,0,0,width,height);
-    set_pattern(w,&w->app->color_scheme->selected,&w->app->color_scheme->normal,BACKGROUND_);
+    set_pattern(w,&w->color_scheme->selected,&w->color_scheme->normal,BACKGROUND_);
     cairo_fill (w->crb);
 
     use_fg_color_scheme(w, NORMAL_);

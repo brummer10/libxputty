@@ -342,9 +342,9 @@ static void draw_keyboard(void *w_, void* user_data) {
     MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
     
     cairo_rectangle(w->crb,0,0,width_t,height_t*0.4);
-    set_pattern(w,&w->app->color_scheme->selected,&w->app->color_scheme->normal,BACKGROUND_);
+    set_pattern(w,&w->color_scheme->selected,&w->color_scheme->normal,BACKGROUND_);
     cairo_fill (w->crb);
-    //set_pattern(w,&w->app->color_scheme->normal,&w->app->color_scheme->selected,BACKGROUND_);
+    //set_pattern(w,&w->color_scheme->normal,&w->color_scheme->selected,BACKGROUND_);
     use_bg_color_scheme(w, SELECTED_);
     cairo_rectangle(w->crb,0,height_t*0.38,width_t,height_t*0.02);
     cairo_fill_preserve (w->crb);
