@@ -23,6 +23,12 @@
 #include "xwidget_private.h"
 
 
+int (*default_error_handler) (Display *dpy, XErrorEvent *e);
+
+int intern_error_handler(Display *dpy, XErrorEvent *e) {
+    return 0;
+}
+
 int key_mapping(Display *dpy, XKeyEvent *xkey) {
     if (xkey->keycode == XKeysymToKeycode(dpy,XK_Tab))
         return (xkey->state & ShiftMask) ? 1 : 2;
@@ -1054,15 +1060,20 @@ void send_systray_message(Widget_t *w) {
         XWindowAttributes attrs;
         XGetWindowAttributes(w->app->dpy, DefaultRootWindow(w->app->dpy), &attrs);
         
-        XImage *image = XGetImage(w->app->dpy, DefaultRootWindow(w->app->dpy),
+        XImage *image = NULL;
+        default_error_handler = XSetErrorHandler(intern_error_handler);
+        image = XGetImage(w->app->dpy, DefaultRootWindow(w->app->dpy),
                         attrs.width -2, attrs.height -2, 1, 1, AllPlanes, XYPixmap);
-        c.pixel = XGetPixel(image, 0, 0);
-        XQueryColor (w->app->dpy, DefaultColormap(w->app->dpy, DefaultScreen (w->app->dpy)), &c);
-        double r = (double)c.red/65535.0;
-        double g = (double)c.green/65535.0;
-        double b = (double)c.blue/65535.0;
-        set_systray_color(w->app, r, g, b, 1.0);
-        XDestroyImage(image);
+        XSetErrorHandler(default_error_handler);
+        if (image) {
+            c.pixel = XGetPixel(image, 0, 0);
+            XQueryColor (w->app->dpy, DefaultColormap(w->app->dpy, DefaultScreen (w->app->dpy)), &c);
+            double r = (double)c.red/65535.0;
+            double g = (double)c.green/65535.0;
+            double b = (double)c.blue/65535.0;
+            set_systray_color(w->app, r, g, b, 1.0);
+            XDestroyImage(image);
+        }
     }
 
     memset(&event, 0, sizeof(event));
