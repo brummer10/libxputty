@@ -80,6 +80,15 @@ void _draw_switch_image_button(void *w_, void* user_data);
 void _draw_button(void *w_, void* user_data);
 
 /**
+ * @brief _draw_base_button   - internal draw the button with base to the buffer
+ * @param *w_                 - void pointer to the Widget_t button
+ * @param *user_data          - void pointer to attached user_data
+ * @return void
+ */
+
+void _draw_base_button(void *w_, void* user_data);
+
+/**
  * @brief _draw_on_off_button    - internal draw the on/off button to the buffer
  * @param *w_                    - void pointer to the Widget_t button
  * @param *user_data             - void pointer to attached user_data

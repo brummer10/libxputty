@@ -196,6 +196,35 @@ void _draw_button(void *w_, void* user_data) {
     int width = attrs.width-2;
     int height = attrs.height-2;
     if (attrs.map_state != IsViewable) return;
+
+    float offset = 0.0;
+    if(w->state==1 && ! (int)w->adj_y->value) {
+        offset = 1.0;
+    } else if(w->state==1) {
+        offset = 2.0;
+    } else if(w->state==2) {
+        offset = 2.0;
+    } else if(w->state==3) {
+        offset = 1.0;
+    }
+
+    if (w->image) {
+        if(strlen(w->label)) {
+            _draw_image_button_with_label(w, width, height);
+        } else {
+            _draw_image_button(w, width, height,offset);
+        }
+    }
+}
+
+void _draw_base_button(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    if (!w) return;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    int width = attrs.width-2;
+    int height = attrs.height-2;
+    if (attrs.map_state != IsViewable) return;
     _draw_button_base(w, width, height);
 
     float offset = 0.0;

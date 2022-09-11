@@ -42,7 +42,17 @@ extern "C" {
 
 Widget_t* add_button(Widget_t *parent, const char * label,
                 int x, int y, int width, int height);
+/**
+ * @brief add_image_button    - add a image button to a Widget_t
+ * connect to func.value_changed_callback to implement your actions
+ * @param *parent             - pointer to the Widget_t request the button
+ * @param *label              - Label to show on the button
+ * @param x,y,width,height    - the position/geometry to create the button
+ * @return Widget_t*          - pointer to the Widget_t button struct
+ */
 
+Widget_t* add_image_button(Widget_t *parent, const char * label,
+                int x, int y, int width, int height);
 /**
  * @brief add_on_off_button    - add a button with default on/off label to a Widget_t
  * connect to func.value_changed_callback to implement your actions
