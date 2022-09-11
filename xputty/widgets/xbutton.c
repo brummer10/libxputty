@@ -78,7 +78,7 @@ Widget_t* add_toggle_button(Widget_t *parent, const char * label,
     wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, 1.0,1.0, CL_TOGGLE);
     wid->adj = wid->adj_y;
     wid->scale.gravity = CENTER;
-    wid->func.expose_callback = _draw_button;
+    wid->func.expose_callback = _draw_base_button;
     wid->func.enter_callback = transparent_draw;
     wid->func.leave_callback = transparent_draw;
     wid->func.button_press_callback = _toggle_button_pressed;
