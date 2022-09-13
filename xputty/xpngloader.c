@@ -128,6 +128,7 @@ void widget_set_icon_from_surface(Widget_t *w, cairo_surface_t *image) {
                                     (const unsigned char*) icon_data, 2+width_t*height_t);
 
     cairo_surface_destroy(icon);
+    cairo_destroy(cri);
     free(icon_data);
 }
 
