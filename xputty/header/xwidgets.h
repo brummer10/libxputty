@@ -48,6 +48,7 @@
 #include "xwaveview.h"
 #include "xtabbox.h"
 #include "xdrawing_area.h"
+#include "xkeyboard.h"
 
 
 #endif //XWIDGETS_H_

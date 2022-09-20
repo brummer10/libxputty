@@ -21,7 +21,7 @@
 #include "xmidi_keyboard.h"
 
 
-void keysym_azerty_to_midi_key(long inkey, float *midi_key) {
+void mk_keysym_azerty_to_midi_key(long inkey, float *midi_key) {
     switch(inkey) {
         case(XK_w) : (*midi_key) = 12.0; /* w = C0 */
         break;
@@ -87,7 +87,7 @@ void keysym_azerty_to_midi_key(long inkey, float *midi_key) {
     }
 }
 
-void keysym_qwertz_to_midi_key(long inkey, float *midi_key) {
+void mk_keysym_qwertz_to_midi_key(long inkey, float *midi_key) {
     switch(inkey) {
         case(XK_y) : (*midi_key) = 12.0; /* y = C0 */
         break;
@@ -154,8 +154,8 @@ void keysym_qwertz_to_midi_key(long inkey, float *midi_key) {
     }
 }
 
-void keysym_qwerty_to_midi_key(unsigned int inkey, float *midi_key) {
-    keysym_qwertz_to_midi_key(inkey,midi_key);
+void mk_keysym_qwerty_to_midi_key(unsigned int inkey, float *midi_key) {
+    mk_keysym_qwertz_to_midi_key(inkey,midi_key);
     if ((*midi_key) == 12) (*midi_key) = 33;
     else if ((*midi_key) == 33) (*midi_key) = 12;
 }
@@ -180,7 +180,7 @@ static void set_key_in_matrix(unsigned long *key_matrix, int key, bool set) {
     }
 }
 
-bool is_key_in_matrix(unsigned long *key_matrix, int key) {
+bool mk_is_key_in_matrix(unsigned long *key_matrix, int key) {
     unsigned long *use_matrix = &key_matrix[0];
     
     
@@ -201,7 +201,7 @@ bool is_key_in_matrix(unsigned long *key_matrix, int key) {
     return ret;
 }
 
-bool have_key_in_matrix(unsigned long *key_matrix) {
+bool mk_have_key_in_matrix(unsigned long *key_matrix) {
     
     bool ret = false;
     int i = 0;
@@ -218,7 +218,7 @@ bool have_key_in_matrix(unsigned long *key_matrix) {
     return ret;
 }
 
-void clear_key_matrix(unsigned long *key_matrix) {
+void mk_clear_key_matrix(unsigned long *key_matrix) {
     int i = 0;
     int j = 0;
     for(;j<4;j++) {
@@ -339,7 +339,7 @@ static void draw_keyboard(void *w_, void* user_data) {
     int width_t = attrs.width;
     int height_t = attrs.height;
     if (attrs.map_state != IsViewable) return;
-    MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)w->parent_struct;
     
     cairo_rectangle(w->crb,0,0,width_t,height_t*0.4);
     set_pattern(w,&w->color_scheme->selected,&w->color_scheme->normal,BACKGROUND_);
@@ -359,7 +359,7 @@ static void draw_keyboard(void *w_, void* user_data) {
 
     for(;i<width_t;i++) {
         cairo_rectangle(w->crb,i,height_t*0.4,25,height_t*0.6);
-        if ( k+keys->octave == keys->active_key || is_key_in_matrix(keys->key_matrix,k+keys->octave)) {
+        if ( k+keys->octave == keys->active_key || mk_is_key_in_matrix(keys->key_matrix,k+keys->octave)) {
             use_base_color_scheme(w, ACTIVE_);
             cairo_set_line_width(w->crb, 1.0);
         } else if ( k+keys->octave == keys->prelight_key) {
@@ -403,7 +403,7 @@ static void draw_keyboard(void *w_, void* user_data) {
        if (space!=3) {
             cairo_set_line_width(w->crb, 1.0);
             cairo_rectangle(w->crb,i+15,height_t*0.4,20,height_t*0.39);
-            if ( k+keys->octave == keys->active_key || is_key_in_matrix(keys->key_matrix,k+keys->octave)) {
+            if ( k+keys->octave == keys->active_key || mk_is_key_in_matrix(keys->key_matrix,k+keys->octave)) {
                 use_base_color_scheme(w, ACTIVE_);
                 cairo_set_line_width(w->crb, 1.0);
             } else if ( k+keys->octave == keys->prelight_key) {
@@ -443,7 +443,7 @@ static void draw_keyboard(void *w_, void* user_data) {
 static void keyboard_motion(void *w_, void* xmotion_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
-    MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)w->parent_struct;
     XMotionEvent *xmotion = (XMotionEvent*)xmotion_;
     XWindowAttributes attrs;
     XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
@@ -540,15 +540,15 @@ static void keyboard_motion(void *w_, void* xmotion_, void* user_data) {
     }
 }
 
-static void get_outkey(MidiKeyboard *keys, KeySym sym, float *outkey) {
+static void get_outkey(MidiKeyboard_mk *keys, KeySym sym, float *outkey) {
     switch(keys->layout) {
-        case(0):keysym_qwertz_to_midi_key(sym, outkey);
+        case(0):mk_keysym_qwertz_to_midi_key(sym, outkey);
         break;
-        case(1):keysym_qwerty_to_midi_key(sym, outkey);
+        case(1):mk_keysym_qwerty_to_midi_key(sym, outkey);
         break;
-        case(2):keysym_azerty_to_midi_key(sym, outkey);
+        case(2):mk_keysym_azerty_to_midi_key(sym, outkey);
         break;
-        default:keysym_qwertz_to_midi_key(sym, outkey);
+        default:mk_keysym_qwertz_to_midi_key(sym, outkey);
         break;
     }
 }
@@ -557,21 +557,21 @@ static void key_press(void *w_, void *key_, void *user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
     if (!w) return;
-    MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)w->parent_struct;
     XKeyEvent *key = (XKeyEvent*)key_;
     if (!key) return;
     float outkey = 0.0;
     KeySym sym = XLookupKeysym (key, 0);
     get_outkey(keys, sym, &outkey);
 
-    if ((int)outkey && !is_key_in_matrix(keys->key_matrix, (int)outkey+keys->octave)) {
+    if ((int)outkey && !mk_is_key_in_matrix(keys->key_matrix, (int)outkey+keys->octave)) {
         set_key_in_matrix(keys->key_matrix,(int)outkey+keys->octave,true);
         keys->send_key = (int)outkey+keys->octave;
         keys->mk_send_note(p, &keys->send_key,true);
         expose_widget(w);
     } 
     if (sym == XK_space) {
-        clear_key_matrix(&keys->key_matrix[0]);
+        mk_clear_key_matrix(&keys->key_matrix[0]);
         keys->mk_send_all_sound_off(p, NULL);
         expose_widget(w);
     } 
@@ -581,13 +581,13 @@ static void key_release(void *w_, void *key_, void *user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
     if (!w) return;
-    MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)w->parent_struct;
     XKeyEvent *key = (XKeyEvent*)key_;
     if (!key) return;
     float outkey = 0.0;
     KeySym sym = XLookupKeysym (key, 0);
     get_outkey(keys, sym, &outkey);
-    if ((int)outkey && is_key_in_matrix(keys->key_matrix, (int)outkey+keys->octave)) {
+    if ((int)outkey && mk_is_key_in_matrix(keys->key_matrix, (int)outkey+keys->octave)) {
         set_key_in_matrix(keys->key_matrix,(int)outkey+keys->octave,false);
         keys->send_key = (int)outkey+keys->octave;
         keys->mk_send_note(p,&keys->send_key,false);
@@ -597,7 +597,7 @@ static void key_release(void *w_, void *key_, void *user_data) {
 
 static void leave_keyboard(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)w->parent_struct;
     keys->prelight_key = -1;
     expose_widget(w);
 }
@@ -606,7 +606,7 @@ static void button_pressed_keyboard(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
     if (w->flags & HAS_POINTER) {
-        MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
+        MidiKeyboard_mk *keys = (MidiKeyboard_mk*)w->parent_struct;
         XButtonEvent *xbutton = (XButtonEvent*)button_;
         if(xbutton->button == Button1) {
             keys->active_key = keys->prelight_key;
@@ -621,7 +621,7 @@ static void button_released_keyboard(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
     if (w->flags & HAS_POINTER) {
-        MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
+        MidiKeyboard_mk *keys = (MidiKeyboard_mk*)w->parent_struct;
         XButtonEvent *xbutton = (XButtonEvent*)button_;
         if(xbutton->button == Button1) {
             keys->send_key = keys->active_key;
@@ -635,14 +635,14 @@ static void button_released_keyboard(void *w_, void* button_, void* user_data) {
 static void octave_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
-    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)p->parent_struct;
     keys->octave = (int)12*adj_get_value(w->adj);
 }
 
 static void layout_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
-    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)p->parent_struct;
     keys->layout = (int)adj_get_value(w->adj);
 }
 
@@ -650,7 +650,7 @@ static void modwheel_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
     Widget_t *pa = (Widget_t *)p->parent;
-    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)p->parent_struct;
     keys->modwheel = (int)adj_get_value(w->adj);
     keys->mk_send_mod(pa, &keys->modwheel);
 }
@@ -659,7 +659,7 @@ static void detune_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
     Widget_t *pa = (Widget_t *)p->parent;
-    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)p->parent_struct;
     keys->detune = (int)adj_get_value(w->adj);
     keys->mk_send_detune(pa, &keys->detune);
 }
@@ -668,7 +668,7 @@ static void attack_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
     Widget_t *pa = (Widget_t *)p->parent;
-    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)p->parent_struct;
     keys->attack = (int)adj_get_value(w->adj);
     keys->mk_send_attack(pa, &keys->attack);
 }
@@ -677,7 +677,7 @@ static void sustain_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
     Widget_t *pa = (Widget_t *)p->parent;
-    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)p->parent_struct;
     keys->sustain = (int)adj_get_value(w->adj);
     keys->mk_send_sustain(pa, &keys->sustain);
 }
@@ -686,7 +686,7 @@ static void release_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
     Widget_t *pa = (Widget_t *)p->parent;
-    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)p->parent_struct;
     keys->release = (int)adj_get_value(w->adj);
     keys->mk_send_release(pa, &keys->release);
 }
@@ -695,7 +695,7 @@ static void volume_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
     Widget_t *pa = (Widget_t *)p->parent;
-    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)p->parent_struct;
     keys->volume = (int)adj_get_value(w->adj);
     keys->mk_send_volume(pa, &keys->volume);
 }
@@ -704,7 +704,7 @@ static void velocity_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
     Widget_t *pa = (Widget_t *)p->parent;
-    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)p->parent_struct;
     keys->velocity = (int)adj_get_value(w->adj);
     keys->mk_send_velocity(pa, &keys->velocity);
 }
@@ -713,7 +713,7 @@ static void pitchwheel_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
     Widget_t *pa = (Widget_t *)p->parent;
-    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)p->parent_struct;
     keys->pitchwheel = (int)adj_get_value(w->adj);
     keys->mk_send_pitch(pa,&keys->pitchwheel);
 }
@@ -722,7 +722,7 @@ static void pitchsensity_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
     Widget_t *pa = (Widget_t *)p->parent;
-    MidiKeyboard *keys = (MidiKeyboard*)p->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)p->parent_struct;
     keys->pitchsensity = (int)adj_get_value(w->adj);
     keys->mk_send_pitchsensity(pa,&keys->pitchsensity);
 }
@@ -748,14 +748,14 @@ static void wheel_key_press(void *w_, void *key_, void *user_data) {
 
 static void keyboard_mem_free(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)w->parent_struct;
     free(keys);
 }
 
 static void map_keyboard(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *pa = (Widget_t*)w->parent;
-    MidiKeyboard *keys = (MidiKeyboard*)w->parent_struct;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)w->parent_struct;
     keys->mk_send_pitchsensity(pa,&keys->pitchsensity);
     keys->mk_send_pitch(pa,&keys->pitchwheel);
     keys->mk_send_velocity(pa, &keys->velocity);
@@ -786,12 +786,12 @@ Widget_t *add_keyboard_knob(Widget_t *parent, const char * label,
     return wid;
 }
 
-Widget_t *open_midi_keyboard(Widget_t *w) {
+Widget_t *mk_open_midi_keyboard(Widget_t *w) {
     Widget_t *wid = create_window(w->app, DefaultRootWindow(w->app->dpy), 0, 0, 700, 200);
     XSelectInput(wid->app->dpy, wid->widget,StructureNotifyMask|ExposureMask|KeyPressMask 
                     |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask|KeyReleaseMask
                     |ButtonPressMask|Button1MotionMask|PointerMotionMask);
-    MidiKeyboard *keys = (MidiKeyboard*)malloc(sizeof(MidiKeyboard));
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)malloc(sizeof(MidiKeyboard_mk));
     wid->parent_struct = keys;
     wid->parent = w;
     wid->flags |= HAS_MEM | NO_AUTOREPEAT;

@@ -29,8 +29,8 @@
 extern "C" {
 #endif
 
-typedef void (*midikeyfunc)(Widget_t *w,int *key, bool on_off);
-typedef void (*midiwheelfunc)(Widget_t *w,int *value);
+typedef void (*mk_midikeyfunc)(Widget_t *w,int *key, bool on_off);
+typedef void (*mk_midiwheelfunc)(Widget_t *w,int *value);
 
 typedef struct {
     int octave;
@@ -49,32 +49,32 @@ typedef struct {
     int send_key;
     unsigned long key_matrix[4];
 
-    midikeyfunc mk_send_note;
-    midiwheelfunc mk_send_pitch;
-    midiwheelfunc mk_send_pitchsensity;
-    midiwheelfunc mk_send_mod;
-    midiwheelfunc mk_send_detune;
-    midiwheelfunc mk_send_attack;
-    midiwheelfunc mk_send_sustain;
-    midiwheelfunc mk_send_release;
-    midiwheelfunc mk_send_volume;
-    midiwheelfunc mk_send_velocity;
-    midiwheelfunc mk_send_all_sound_off;
-} MidiKeyboard;
+    mk_midikeyfunc mk_send_note;
+    mk_midiwheelfunc mk_send_pitch;
+    mk_midiwheelfunc mk_send_pitchsensity;
+    mk_midiwheelfunc mk_send_mod;
+    mk_midiwheelfunc mk_send_detune;
+    mk_midiwheelfunc mk_send_attack;
+    mk_midiwheelfunc mk_send_sustain;
+    mk_midiwheelfunc mk_send_release;
+    mk_midiwheelfunc mk_send_volume;
+    mk_midiwheelfunc mk_send_velocity;
+    mk_midiwheelfunc mk_send_all_sound_off;
+} MidiKeyboard_mk;
 
-void keysym_azerty_to_midi_key(long inkey, float *midi_key);
+void mk_keysym_azerty_to_midi_key(long inkey, float *midi_key);
 
-void keysym_qwertz_to_midi_key(long inkey, float *midi_key);
+void mk_keysym_qwertz_to_midi_key(long inkey, float *midi_key);
 
-void keysym_qwerty_to_midi_key(unsigned int inkey, float *midi_key);
+void mk_keysym_qwerty_to_midi_key(unsigned int inkey, float *midi_key);
 
-bool is_key_in_matrix(unsigned long *key_matrix, int key);
+bool mk_is_key_in_matrix(unsigned long *key_matrix, int key);
 
-bool have_key_in_matrix(unsigned long *key_matrix);
+bool mk_have_key_in_matrix(unsigned long *key_matrix);
 
-void clear_key_matrix(unsigned long *key_matrix);
+void mk_clear_key_matrix(unsigned long *key_matrix);
 
-Widget_t *open_midi_keyboard(Widget_t *w);
+Widget_t *mk_open_midi_keyboard(Widget_t *w);
 
 #ifdef __cplusplus
 }
