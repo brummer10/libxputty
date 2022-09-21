@@ -53,13 +53,20 @@ void _draw_image_slider(Widget_t *w, int width_t, int height_t) {
     double y = (double)height_t/(double)height;
     double x1 = (double)size/(double)width_t;
     double y1 = (double)height/(double)height_t;
+    double s = x>y ? y : x;
+    double s1 = x1>y1 ? y1 : x1;
+    int posx = (width_t/2 -(size*s)/2);
+    int posy = (height_t/2 - ((height*s)/2));
     double sliderstate = adj_get_state(w->adj);
     int findex = (int)(((slider->frames)-1) * sliderstate);
-    cairo_scale(w->crb, x,y);
-    cairo_set_source_surface (w->crb, w->image, -size*findex, 0);
-    cairo_rectangle(w->crb,0, 0, size, height);
+    cairo_save(w->crb);
+    cairo_scale(w->crb, s,s);
+    cairo_translate(w->crb, posx * ((1-s)/s), posy * ((1-s)/s));
+    cairo_set_source_surface (w->crb, w->image, -size*findex + posx, posy);
+    cairo_rectangle(w->crb, posx, posy, size, height);
     cairo_fill(w->crb);
-    cairo_scale(w->crb, x1,y1);
+    cairo_scale(w->crb, s1,s1);
+    cairo_restore(w->crb);
 }
 
 void _draw_vslider(void *w_, void* user_data) {
@@ -110,10 +117,10 @@ void _draw_vslider(void *w_, void* user_data) {
 
     cairo_text_extents_t extents;
     use_text_color_scheme(w, get_color_state(w));
-    cairo_set_font_size (w->crb, center/1.8);
+    cairo_set_font_size (w->crb, min(w->app->normal_font/w->scale.ascale, center/1.8));
     cairo_text_extents(w->crb,w->label , &extents);
 
-    cairo_move_to (w->crb, center-extents.width/2, height-center/2.1);
+    cairo_move_to (w->crb, center-extents.width/2, height);
     cairo_show_text(w->crb, w->label);
     cairo_new_path (w->crb);
 
@@ -127,6 +134,7 @@ void _draw_vslider(void *w_, void* user_data) {
     } else {
         snprintf(s, 63, format[2-1], value);
     }
+    cairo_set_font_size (w->crb, min(w->app->small_font/w->scale.ascale, center/1.8));
     cairo_text_extents(w->crb,s , &extents);
     cairo_move_to (w->crb, center-extents.width/2, extents.height );
     cairo_show_text(w->crb, s);
