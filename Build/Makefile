@@ -10,6 +10,9 @@
 			LDEMULATION := elf_x86_64
 		else ifneq ($(shell uname -a | grep i386), )
 			LDEMULATION := elf_i386
+		else ifeq ($(shell uname -m),aarch64)
+			LDEMULATION := aarch64elf
+		endif
 		endif
 		USE_LDD = 1
 	else ifneq ($(shell gold --version 2>&1 | head -n 1 | grep gold),)
