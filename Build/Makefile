@@ -1,9 +1,21 @@
+# check if we need LD to implement images
+# in order of preference: xxd -i, xxdi.pl, ld, ld.gold
 
-
-	# check if we need LD to implement images
+# check for xxd (tool from vim)
+ifeq ($(shell which xxd 2>&1 >/dev/null; echo $$?),0)
 	ifneq ($(shell xxd --version 2>&1 | head -n 1 | grep xxd),)
-		USE_XXD = 1
-	else ifneq ($(shell $(LD) --version 2>&1 | head -n 1 | grep LLD),)
+		HAVE_XXD = 1
+	endif
+endif
+
+# check for xxdi.pl, a simple alternative to vim's 'xxd -i' mode
+# https://github.com/gregkh/xxdi
+#
+ifeq ($(shell which xxdi.pl 2>&1 >/dev/null; echo $$?),0)
+	HAVE_XXDI_PL = 1
+endif
+
+	ifneq ($(shell $(LD) --version 2>&1 | head -n 1 | grep LLD),)
 		ifneq ($(shell uname -a | grep  x86_64), )
 			LDEMULATION := elf_x86_64
 		else ifneq ($(shell uname -a | grep amd64), )
@@ -13,11 +25,35 @@
 		else ifeq ($(shell uname -m),aarch64)
 			LDEMULATION := aarch64elf
 		endif
+		ifneq ($(LDEMULATION),)
+			HAVE_KNOWN_LDEMULATION = 1
 		endif
-		USE_LDD = 1
-	else ifneq ($(shell gold --version 2>&1 | head -n 1 | grep gold),)
+	endif
+	ifneq ($(shell gold --version 2>&1 | head -n 1 | grep gold),)
+		HAVE_LD_GOLD = 1
 		LD = gold
 	endif
+
+$(info HAVE_XXD="$(HAVE_XXD)")
+$(info HAVE_XXDI_PL="$(HAVE_XXDI_PL)")
+$(info HAVE_KNOWN_LDEMULATION="$(HAVE_KNOWN_LDEMULATION)")
+$(info LDEMULATION="$(LDEMULATION)")
+$(info HAVE_LD_GOLD="$(HAVE_LD_GOLD)")
+
+ifeq ($(HAVE_XXD),1)
+$(info Using xxd -i)
+XXDI = xxd -i
+else ifeq ($(HAVE_XXDI_PL),1)
+$(info Using xxdi.pl)
+XXDI = xxdi.pl
+else ifeq ($(HAVE_KNOWN_LDEMULATION),1)
+$(info Using $(LD) with LDEMULATION=$(LDEMULATION))
+USE_LDD = 1
+else ifeq ($(HAVE_LD_GOLD),1)
+$(info Using $(LD) (gold))
+else
+$(error Neither xxd, nor xxdi.pl, nor suitable ld found)
+endif
 
 	# set  name
 	NAME = Xputty
@@ -112,9 +148,9 @@ $(RESOURCEHEADER): $(RESOURCES_OBJ)
 $(XDG_OBJ): $(XDG_SOURCES)
 	$(CC) $(CFLAGS) -MMD -Wall -DHAVE_MMAP -c $(addprefix $(XDG_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
 
-ifdef USE_XXD
+ifdef XXDI
 $(RESOURCES_OBJ): $(RESOURCES)
-	cd $(RESOURCES_DIR) && xxd -i $(patsubst %.o,%.png,$@) > ../../Build/$(patsubst %.o,%.c,$@)
+	cd $(RESOURCES_DIR) && $(XXDI) $(patsubst %.o,%.png,$@) > ../../Build/$(patsubst %.o,%.c,$@)
 	$(CC) $(CFLAGS) -c $(patsubst %.o,%.c,$@) -o $@
 else ifdef USE_LDD
 $(RESOURCES_OBJ): $(RESOURCES)
