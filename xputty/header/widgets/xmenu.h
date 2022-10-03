@@ -124,6 +124,16 @@ Widget_t *menu_add_check_entry(Widget_t *wid, const char  * label);
  */
 
 Widget_t *menu_add_accel_check_entry(Widget_t *wid, const char  * label);
+
+/**
+ * @brief menu_add_value_entry- add a value entry to menu
+ * @param *wid                - pointer to the Widget_t menu
+ * @param *label              - Label to show on the menu
+ * @return Widget_t*          - pointer to the Widget_t menu_item struct
+ */
+
+Widget_t* menu_add_value_entry(Widget_t *wid,const char * label);
+
 /**
  * @brief menu_add_submenu    - add a submenu to a Widget_t
  * @param *parent             - pointer to the Widget_t the menu should pop over
@@ -186,6 +196,15 @@ Widget_t* menu_add_accel_item(Widget_t *menu, const char * label);
  */
 
 Widget_t* menu_add_check_item(Widget_t *menu, const char * label);
+
+/**
+ * @brief menu_add_value_item - add a item to menu
+ * @param *menu               - pointer to the Widget_t menu
+ * @param *label              - Label to show on the menu
+ * @return Widget_t*          - pointer to the Widget_t menu_item struct
+ */
+
+Widget_t* menu_add_value_item(Widget_t *menu,const char * label);
 
 /**
  * @brief radio_item_set_active       - activate selected radio item

@@ -81,7 +81,7 @@ void _draw_vslider(void *w_, void* user_data) {
     if (attrs.map_state != IsViewable) return;
 
     if (w->image) {
-        _draw_image_slider(w, width, height);
+        _draw_image_slider(w, width, height-10);
     } else {
         float sliderstate = adj_get_state(w->adj_y);
         _pattern_vslider(w, get_color_state(w), width);

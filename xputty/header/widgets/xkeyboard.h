@@ -34,7 +34,8 @@ typedef void (*midikeyfunc)(Widget_t *w, const int *key, const int on_off);
 typedef void (*midiwheelfunc)(Widget_t *w, const int *value);
 
 typedef struct {
-
+    Widget_t* context_menu;
+    Widget_t* keyboard;
     int channel;
     int octave;
     int layout;

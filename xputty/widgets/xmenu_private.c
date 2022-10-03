@@ -279,7 +279,7 @@ void _draw_item(void *w_, void* user_data) {
     cairo_fill_preserve(w->crb);
     cairo_set_line_width(w->crb, 1.0);
     use_frame_color_scheme(w, PRELIGHT_);
-    cairo_stroke(w->crb); 
+    cairo_stroke(w->crb);
 
     cairo_text_extents_t extents;
     /** show label **/
@@ -288,6 +288,48 @@ void _draw_item(void *w_, void* user_data) {
     cairo_text_extents(w->crb,w->label , &extents);
     cairo_move_to (w->crb, 20, (height+extents.height)*0.5);
     cairo_show_text(w->crb, w->label);
+    cairo_new_path (w->crb);
+}
+
+void _draw_value_item(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    if (!w) return;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    int width = attrs.width;
+    int height = attrs.height;
+    if (attrs.map_state != IsViewable) return;
+
+    use_base_color_scheme(w, NORMAL_);
+    cairo_rectangle(w->crb, 0, 0, width , height);
+    if(w->state==1) {
+        use_base_color_scheme(w, PRELIGHT_);
+    } else if(w->state==2) {
+        use_base_color_scheme(w, SELECTED_);
+    } else if(w->state==3) {
+        use_base_color_scheme(w, ACTIVE_);
+    }
+    cairo_fill_preserve(w->crb);
+    cairo_set_line_width(w->crb, 1.0);
+    use_frame_color_scheme(w, PRELIGHT_);
+    cairo_stroke(w->crb);
+    use_text_color_scheme(w, get_color_state(w));
+    cairo_text_extents_t extents;
+    /** show value on the item**/
+    char s[64];
+    const char* format[] = {"%.1f", "%.2f", "%.3f"};
+    float value = adj_get_value(w->adj);
+    if (fabs(w->adj->step)>0.99) {
+        snprintf(s, 63,"%d",  (int) value);
+    } else if (fabs(w->adj->step)>0.09) {
+        snprintf(s, 63, format[1-1], value);
+    } else {
+        snprintf(s, 63, format[2-1], value);
+    }
+    cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
+    cairo_text_extents(w->crb, s, &extents);
+    cairo_move_to (w->crb, 20, (height+extents.height)*0.5);
+    cairo_show_text(w->crb, s);
     cairo_new_path (w->crb);
 }
 
@@ -423,6 +465,11 @@ void _radio_item_button_pressed(void *w_, void* button_, void* user_data) {
     }
 }
 
+void _value_item_released(void *w_, void* button_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    expose_widget(w);
+}
+
 void _configure_menu(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     Widget_t* view_port =  menu->childlist->childs[0];
     Widget_t *slider =  menu->childlist->childs[1];
@@ -466,4 +513,3 @@ void _configure_menu(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     XResizeWindow(menu->app->dpy,slider->widget,10,height*elem);
     XMoveWindow(menu->app->dpy,menu->widget,x1, y1);
 }
-

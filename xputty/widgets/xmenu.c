@@ -168,6 +168,16 @@ Widget_t *menu_add_accel_check_entry(Widget_t *wid, const char  * label) {
     return item;
 }
 
+Widget_t* menu_add_value_entry(Widget_t *wid,const char * label) {
+    Widget_t *menu = wid->childlist->childs[0];
+    Widget_t *item = menu_add_item(menu, label);
+    item->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, 1.0,0.01, CL_CONTINUOS);
+    item->adj = item->adj_y;
+    item->func.expose_callback = _draw_value_item;
+    item->func.button_release_callback = _value_item_released;
+    return item;
+}
+
 Widget_t *menu_add_submenu(Widget_t *w, const char  * label) {
     float max_value2 = w->adj->max_value+1.0;
     set_adjustment(w->adj,0.0, max_value2, 0.0, max_value2,1.0, CL_NONE);
@@ -338,6 +348,14 @@ Widget_t* menu_add_radio_item(Widget_t *menu, const char * label) {
     return wid;
 }
 
+Widget_t* menu_add_value_item(Widget_t *menu,const char * label) {
+    Widget_t *wid = menu_add_item(menu, label);
+    wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, 1.0,0.01, CL_CONTINUOS);
+    wid->adj = wid->adj_y;
+    wid->func.expose_callback = _draw_value_item;
+    wid->func.button_release_callback = _value_item_released;
+    return wid;
+}
 
 void menu_add_numeric_items(Widget_t *menu, int *imin, int *imax) {
     Widget_t* view_port =  menu->childlist->childs[0];

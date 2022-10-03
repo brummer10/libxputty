@@ -122,6 +122,15 @@ void _leave_submenu(void *w_, void* user_data);
 void _draw_item(void *w_, void* user_data);
 
 /**
+ * @brief _draw_value_item     - draw item on expose call
+ * @param *w_                  - the item to draw
+ * @param *user_data           - attached user_data
+ * @return void
+ */
+
+void _draw_value_item(void *w_, void* user_data);
+
+/**
  * @brief _draw_accel_item     - draw accel item on expose call
  * @param *w_                  - the item to draw
  * @param *user_data           - attached user_data
@@ -168,6 +177,7 @@ void _set_menu_viewpoint(void *w_, void* user_data);
 
 /**
  * @brief _check_item_button_pressed  - redraw item on button press
+ * @param *w_                         - void pointer to view_port
  * @param *button                     - the xbutton which is pressed
  * @param *user_data                  - attached user_data
  * @return void
@@ -177,12 +187,23 @@ void _check_item_button_pressed(void *w_, void* button_, void* user_data);
 
 /**
  * @brief _radio_item_button_pressed  - redraw item on button press
+ * @param *w_                         - void pointer to view_port
  * @param *button                     - the xbutton which is pressed
  * @param *user_data                  - attached user_data
  * @return void
  */
 
 void _radio_item_button_pressed(void *w_, void* button_, void* user_data);
+
+/**
+ * @brief _value_item_released        - redraw item on button released
+ * @param *w_                         - void pointer to view_port
+ * @param *button                     - the xbutton which is pressed
+ * @param *user_data                  - attached user_data
+ * @return void
+ */
+
+void _value_item_released(void *w_, void* button_, void* user_data);
 
 /**
  * @brief _configure_menu     - set final size and position of menu to a Widget_t

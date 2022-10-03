@@ -784,6 +784,8 @@ static void button_released_keyboard(void *w_, void* button_, void* user_data) {
             }
             keys->active_key = -1;
             expose_widget(w);
+        } else if (xbutton->button == Button2) {
+            pop_menu_show(w, keys->context_menu, 4, false);
         }
     } else {
         if(xbutton->button == Button1) {
@@ -818,6 +820,25 @@ bool need_redraw(MidiKeyboard *keys) {
     have;
 }
 
+static void octave_callback(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
+    keys->octave = (int)12*adj_get_value(w->adj);
+    expose_widget(keys->keyboard);
+}
+
+static void layout_callback(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
+    keys->layout = (int)adj_get_value(w->adj);
+}
+
+static void velocity_changed(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
+    keys->velocity = (int)adj_get_value(w->adj);
+}
+
 void read_keymap(const char* keymapfile, long keys[128][2]) {
     if( access(keymapfile, F_OK ) != -1 ) {
         FILE *fp;
@@ -837,13 +858,13 @@ void read_keymap(const char* keymapfile, long keys[128][2]) {
 
 static void key_dummy(Widget_t *w, const int *key, const int on_off) {
     if (on_off == 0x90)
-    fprintf(stderr, "send note on %i\n",(*key));
+    fprintf(stderr, "Send note on %i\n",(*key));
     else
-    fprintf(stderr, "send note off %i\n",(*key));
+    fprintf(stderr, "Send note off %i\n",(*key));
 }
 
 static void wheel_dummy(Widget_t *w, const int *value) {
-    fprintf(stderr, "send all sound off value %i\n",(*value));
+    fprintf(stderr, "send all sound off\n");
 }
 
 Widget_t *add_midi_keyboard(Widget_t *parent, const char * label,
@@ -885,6 +906,7 @@ void add_keyboard(Widget_t *wid, const char * label) {
     keys->velocity = 64;
     keys->key_size = 20;
     keys->key_offset = 15;
+    keys->keyboard = wid;
     memset(keys->custom_keys, 0, 128*2*sizeof keys->custom_keys[0][0]);
     int j = 0;
     for(;j<4;j++) {
@@ -911,5 +933,33 @@ void add_keyboard(Widget_t *wid, const char * label) {
 
     keys->mk_send_note = key_dummy;
     keys->mk_send_all_sound_off = wheel_dummy;
+
+    keys->context_menu = create_menu(wid,25);
+    Widget_t* keymap = cmenu_add_submenu(keys->context_menu,_("Keyboard"));
+    keymap->private_struct = keys;
+    menu_add_radio_entry(keymap,_("qwertz"));
+    menu_add_radio_entry(keymap,_("qwerty"));
+    menu_add_radio_entry(keymap,_("azerty (fr)"));
+    menu_add_radio_entry(keymap,_("azerty (be)"));
+    set_active_radio_entry_num(keymap, keys->layout);
+    keymap->func.value_changed_callback = layout_callback;
+    
+    Widget_t* octavemap = cmenu_add_submenu(keys->context_menu,_("Octave"));
+    octavemap->private_struct = keys;
+    menu_add_radio_entry(octavemap,_("C 0"));
+    menu_add_radio_entry(octavemap,_("C 1"));
+    menu_add_radio_entry(octavemap,_("C 2"));
+    menu_add_radio_entry(octavemap,_("C 3"));
+    menu_add_radio_entry(octavemap,_("C 4"));
+    set_active_radio_entry_num(octavemap, keys->octave/12);
+    octavemap->func.value_changed_callback = octave_callback;
+
+    Widget_t* velocity = cmenu_add_submenu(keys->context_menu,_("Velocity"));
+    velocity->private_struct = keys;
+    Widget_t* vel = menu_add_value_entry(velocity, "128");
+    vel->private_struct = keys;
+    set_adjustment(vel->adj, 0.0, 0.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
+    adj_set_value(vel->adj, keys->velocity);
+    vel->func.value_changed_callback = velocity_changed;
 
 }
