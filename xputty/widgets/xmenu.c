@@ -170,7 +170,22 @@ Widget_t *menu_add_accel_check_entry(Widget_t *wid, const char  * label) {
 
 Widget_t* menu_add_value_entry(Widget_t *wid,const char * label) {
     Widget_t *menu = wid->childlist->childs[0];
-    Widget_t *item = menu_add_item(menu, label);
+    Widget_t* view_port =  menu->childlist->childs[0];
+    XWindowAttributes attrs;
+    XGetWindowAttributes(menu->app->dpy, (Window)menu->widget, &attrs);
+    int width = attrs.width;
+    int height = 40;
+    int si = childlist_has_child(view_port->childlist);
+    Widget_t *item = create_widget(menu->app, view_port, 0, height*si, width, height);
+    float max_value = view_port->adj->max_value+1.0;
+    set_adjustment(view_port->adj,0.0, 0.0, 0.0, max_value,1.0, CL_VIEWPORT);
+    item->scale.gravity = MENUITEM;
+    item->flags &= ~USE_TRANSPARENCY;
+    item->flags |= FAST_REDRAW;
+    item->label = label;
+    item->func.expose_callback = _draw_item;
+    item->func.enter_callback = transparent_draw;
+    item->func.leave_callback = transparent_draw;
     item->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, 1.0,0.01, CL_CONTINUOS);
     item->adj = item->adj_y;
     item->func.expose_callback = _draw_value_item;
