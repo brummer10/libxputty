@@ -193,7 +193,24 @@ void run_embedded(Xputty *main) {
         case ButtonPress:
         {
             bool is_item = False;
-            if(main->hold_grab != NULL) {
+            if(main->submenu != NULL) {
+                if (childlist_has_child(main->submenu->childlist)) {
+                    Widget_t *slider = main->submenu->childlist->childs[1];
+                    if (xev.xbutton.window == slider->widget) {
+                        break;
+                    }
+                    Widget_t *view_port = main->submenu->childlist->childs[0];
+                    int i = view_port->childlist->elem-1;
+                    for(;i>-1;i--) {
+                        Widget_t *w = view_port->childlist->childs[i];
+                        if (xev.xbutton.window == w->widget) {
+                            is_item = True;
+                            break;
+                        }
+                    }
+                }
+            }
+            if(main->hold_grab != NULL && main->hold_grab->flags & IS_POPUP) {
                 if (childlist_has_child(main->hold_grab->childlist)) {
                     Widget_t *slider = main->hold_grab->childlist->childs[1];
                     if (xev.xbutton.window == slider->widget) {
@@ -215,6 +232,29 @@ void run_embedded(Xputty *main) {
                     widget_hide(main->hold_grab);
                     main->hold_grab = NULL;
                 }
+            } else if(main->hold_grab != NULL && ((main->hold_grab->flags & IS_POPUP) == 0)) {
+                main->hold_grab->func.button_press_callback(main->hold_grab, &xev.xbutton, NULL);
+            }
+        }
+        break;
+        case ButtonRelease:
+        {
+            if(main->hold_grab != NULL && ((main->hold_grab->flags & IS_POPUP) == 0)) {
+                main->hold_grab->func.button_release_callback(main->hold_grab, &xev.xbutton, NULL);
+            }
+        }
+        break;
+        case KeyPress:
+        {
+            if (main->key_snooper != NULL && xev.xkey.window != main->key_snooper->widget) {
+                main->key_snooper->func.key_press_callback(main->key_snooper, &xev.xkey, NULL);
+            }
+        }
+        break;
+        case KeyRelease:
+        {
+            if (main->key_snooper != NULL && xev.xkey.window != main->key_snooper->widget) {
+                main->key_snooper->func.key_release_callback(main->key_snooper, &xev.xkey, NULL);
             }
         }
         break;

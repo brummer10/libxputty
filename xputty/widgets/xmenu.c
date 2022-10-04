@@ -186,7 +186,7 @@ Widget_t* menu_add_value_entry(Widget_t *wid,const char * label) {
     item->func.expose_callback = _draw_item;
     item->func.enter_callback = transparent_draw;
     item->func.leave_callback = transparent_draw;
-    item->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, 1.0,0.01, CL_CONTINUOS);
+    item->adj_y = add_adjustment(item,0.0, 0.0, 0.0, 1.0,0.01, CL_CONTINUOS);
     item->adj = item->adj_y;
     item->func.expose_callback = _draw_value_item;
     item->func.button_release_callback = _value_item_released;
@@ -261,6 +261,7 @@ Widget_t* create_menu(Widget_t *parent, int height) {
     Window child;
     XTranslateCoordinates( parent->app->dpy, parent->widget, DefaultRootWindow(parent->app->dpy), 0, 0, &x1, &y1, &child );
     Widget_t *wid = create_window(parent->app, DefaultRootWindow(parent->app->dpy), x1, y1, 10, height);
+    memcpy(wid->color_scheme, parent->color_scheme, sizeof (struct XColor_t));
     create_viewport(wid, 10, 5*height);
 
     XSetWindowAttributes attributes;
