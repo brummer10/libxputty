@@ -839,6 +839,17 @@ static void velocity_changed(void *w_, void* user_data) {
     keys->velocity = (int)adj_get_value(w->adj);
 }
 
+static void grab_callback(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
+    if (adj_get_value(w->adj)) {
+        XGrabKeyboard(w->app->dpy, keys->keyboard->widget, true, 
+                    GrabModeAsync, GrabModeAsync, CurrentTime); 
+    } else {
+        XUngrabKeyboard(w->app->dpy, CurrentTime); 
+    }
+}
+
 void read_keymap(const char* keymapfile, long keys[128][2]) {
     if( access(keymapfile, F_OK ) != -1 ) {
         FILE *fp;
@@ -962,4 +973,7 @@ void add_keyboard(Widget_t *wid, const char * label) {
     adj_set_value(vel->adj, keys->velocity);
     vel->func.value_changed_callback = velocity_changed;
 
+    Widget_t* grab_keyboard = menu_add_check_item(keys->context_menu,_("Grab Keyboard"));
+    grab_keyboard->private_struct = keys;
+    grab_keyboard->func.value_changed_callback = grab_callback;
 }
