@@ -399,7 +399,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     w->func.leave_callback = _dummy_callback;
     w->func.user_callback = _dummy_callback;
     w->func.mem_free_callback = _dummy_callback;
-    w->func.configure_notify_callback = _dummy_callback;
+    w->func.configure_notify_callback = transparent_draw;
     w->func.map_notify_callback = _dummy_callback;
     w->func.unmap_notify_callback = _dummy_callback;
     w->func.visibiliy_change_callback = _dummy_callback;
