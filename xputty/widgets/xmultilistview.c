@@ -87,7 +87,7 @@ Widget_t* add_multi_listview(Widget_t *parent, const char * label,
     ViewMultiList_t *filelist = (ViewMultiList_t*)viewport->parent_struct;
     filelist->folder = surface_get_png(wid, filelist->folder, LDVAR(directory_png));
     filelist->folder_select = surface_get_png(wid, filelist->folder_select, LDVAR(directory_select_png));
-    filelist->file = surface_get_png(wid, filelist->folder, LDVAR(file_png));
+    filelist->file = surface_get_png(wid, filelist->file, LDVAR(file_png));
     filelist->folder_scaled = NULL;
     filelist->folder_select_scaled = NULL;
     filelist->file_scaled = NULL;

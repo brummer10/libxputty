@@ -405,6 +405,7 @@ static void button_view_callback(void *w_, void* user_data) {
         } else {
             listview_unset_active_entry(file_dialog->ft);
         }
+        resize_childs(file_dialog->w);
         widget_show_all(file_dialog->ft);
     } else {
         destroy_widget(file_dialog->ft, w->app);
@@ -422,9 +423,10 @@ static void button_view_callback(void *w_, void* user_data) {
             multi_listview_unset_active_entry(file_dialog->ft);
         }
         multi_listview_set_item_size(file_dialog->ft,adj_get_value(file_dialog->scale_size->adj));
+        resize_childs(file_dialog->w);
         widget_show_all(file_dialog->ft);
     }
-    resize_childs(file_dialog->w);
+    
 }
 
 static void set_filter_callback(void *w_, void* user_data) {
