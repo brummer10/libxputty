@@ -15,24 +15,23 @@ ifeq ($(shell which xxdi.pl 2>&1 >/dev/null; echo $$?),0)
 	HAVE_XXDI_PL = 1
 endif
 
-	ifneq ($(shell $(LD) --version 2>&1 | head -n 1 | grep LLD),)
-		ifneq ($(shell uname -a | grep  x86_64), )
-			LDEMULATION := elf_x86_64
-		else ifneq ($(shell uname -a | grep amd64), )
-			LDEMULATION := elf_x86_64
-		else ifneq ($(shell uname -a | grep i386), )
-			LDEMULATION := elf_i386
-		else ifeq ($(shell uname -m),aarch64)
-			LDEMULATION := aarch64elf
-		endif
-		ifneq ($(LDEMULATION),)
-			HAVE_KNOWN_LDEMULATION = 1
-		endif
+ifneq ($(shell $(LD) --version 2>&1 | head -n 1 | grep ld),)
+	ifneq ($(shell uname -a | grep  x86_64), )
+		LDEMULATION := elf_x86_64
+	else ifneq ($(shell uname -a | grep amd64), )
+		LDEMULATION := elf_x86_64
+	else ifneq ($(shell uname -a | grep i386), )
+		LDEMULATION := elf_i386
+	else ifeq ($(shell uname -m),aarch64)
+		LDEMULATION := aarch64elf
 	endif
-	ifneq ($(shell gold --version 2>&1 | head -n 1 | grep gold),)
-		HAVE_LD_GOLD = 1
-		LD = gold
+	ifneq ($(LDEMULATION),)
+		HAVE_KNOWN_LDEMULATION = 1
 	endif
+else ifneq ($(shell gold --version 2>&1 | head -n 1 | grep gold),)
+	HAVE_LD_GOLD = 1
+	LD = gold
+endif
 
 $(info HAVE_XXD="$(HAVE_XXD)")
 $(info HAVE_XXDI_PL="$(HAVE_XXDI_PL)")
@@ -153,13 +152,13 @@ $(RESOURCES_OBJ): $(RESOURCES)
 	cd $(RESOURCES_DIR) && $(XXDI) $(patsubst %.o,%.png,$@) > ../../Build/$(patsubst %.o,%.c,$@)
 	$(CC) $(CFLAGS) -c $(patsubst %.o,%.c,$@) -o $@
 else ifdef USE_LDD
+LDFLAGS += -DUSE_LD=1
 $(RESOURCES_OBJ): $(RESOURCES)
 	cd $(RESOURCES_DIR) && $(LD) -r -b binary -m $(LDEMULATION) -z noexecstack $(patsubst %.o,%.png,$@) -o ../../Build/$@
-	LDFLAGS += -DUSE_LD=1
 else
+LDFLAGS += -DUSE_LD=1
 $(RESOURCES_OBJ): $(RESOURCES)
 	cd $(RESOURCES_DIR) && $(LD) -r -b binary -z noexecstack $(patsubst %.o,%.png,$@) -o ../../Build/$@
-	LDFLAGS += -DUSE_LD=1
 endif
 
 $(SVGRESOURCES_OBJ): $(SVGRESOURCES)
