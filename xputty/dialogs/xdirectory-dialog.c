@@ -53,20 +53,20 @@ static void draw_window(void *w_, void* user_data) {
     set_pattern(w,&w->color_scheme->selected,&w->color_scheme->normal,BACKGROUND_);
     cairo_fill (w->crb);
 
-    widget_set_scale(w);
+    //widget_set_scale(w);
     use_fg_color_scheme(w, NORMAL_);
     cairo_set_font_size (w->crb, 12.0);
     cairo_move_to (w->crb, 20, 35);
     cairo_show_text(w->crb, _("Directory"));
     cairo_move_to (w->crb, 20, 85);
     cairo_show_text(w->crb, _("Directories"));
-    cairo_move_to (w->crb, 20, 340);
+    cairo_move_to (w->crb, 20, 340-w->scale.scale_y);
     cairo_show_text(w->crb, _("Select: "));
-    cairo_move_to (w->crb, 45, 380);
+    cairo_move_to (w->crb, 45, 380-w->scale.scale_y);
     cairo_show_text(w->crb, _("Show hidden Directories")); 
-    cairo_move_to (w->crb, 70, 340);
+    cairo_move_to (w->crb, 70, 340-w->scale.scale_y);
     cairo_show_text(w->crb, w->label);
-    widget_reset_scale(w);
+    //widget_reset_scale(w);
 }
 
 static void button_quit_callback(void *w_, void* user_data) {
@@ -444,18 +444,20 @@ Widget_t *open_directory_dialog(Widget_t *w, const char *path) {
 
     file_dialog->ct = add_combobox(file_dialog->w, "", 20, 40, 550, 30);
     file_dialog->ct->parent_struct = file_dialog;
+    file_dialog->ct->scale.gravity = NORTHEAST;
     file_dialog->ct->func.key_press_callback = forward_key_press;
     file_dialog->ct->func.value_changed_callback = combo_response;
 
     file_dialog->sel_dir = add_button(file_dialog->w, _("Add"), 580, 40, 60, 30);
     file_dialog->sel_dir->parent_struct = file_dialog;
-    file_dialog->sel_dir->scale.gravity = CENTER;
+    file_dialog->sel_dir->scale.gravity = WESTNORTH;
     add_tooltip(file_dialog->sel_dir,_("Add new Directory"));
     file_dialog->sel_dir->func.key_press_callback = forward_key_press;
     file_dialog->sel_dir->func.value_changed_callback = add_dir_callback;
 
     file_dialog->ft = add_listview(file_dialog->w, "", 20, 90, 620, 225);
     file_dialog->ft->parent_struct = file_dialog;
+    file_dialog->ft->scale.gravity = NORTHWEST;
     //file_dialog->ft->func.value_changed_callback = file_released_callback;
     file_dialog->ft->func.key_press_callback = forward_key_press;
     file_dialog->ft->func.button_release_callback = file_released_callback;
@@ -470,21 +472,21 @@ Widget_t *open_directory_dialog(Widget_t *w, const char *path) {
 
     file_dialog->w_quit = add_button(file_dialog->w, _("Cancel"), 580, 350, 60, 60);
     file_dialog->w_quit->parent_struct = file_dialog;
-    file_dialog->w_quit->scale.gravity = CENTER;
+    file_dialog->w_quit->scale.gravity = SOUTHWEST;
     add_tooltip(file_dialog->w_quit,_("Exit Directory selector"));
     file_dialog->w_quit->func.key_press_callback = forward_key_press;
     file_dialog->w_quit->func.value_changed_callback = button_quit_callback;
 
     file_dialog->w_okay = add_button(file_dialog->w, _("Select"), 510, 350, 60, 60);
     file_dialog->w_okay->parent_struct = file_dialog;
-    file_dialog->w_okay->scale.gravity = CENTER;
+    file_dialog->w_okay->scale.gravity = SOUTHWEST;
     add_tooltip(file_dialog->w_okay,_("Selected Directory"));
     file_dialog->w_okay->func.key_press_callback = forward_key_press;
     file_dialog->w_okay->func.value_changed_callback = button_ok_callback;
 
     file_dialog->w_hidden = add_check_button(file_dialog->w, "", 20, 365, 20, 20);
     file_dialog->w_hidden->parent_struct = file_dialog;
-    file_dialog->w_hidden->scale.gravity = CENTER;
+    file_dialog->w_hidden->scale.gravity = EASTWEST;
     add_tooltip(file_dialog->w_hidden,_("Show hidden Directories"));
     file_dialog->w_hidden->func.key_press_callback = forward_key_press;
     file_dialog->w_hidden->func.value_changed_callback = button_hidden_callback;
