@@ -689,6 +689,11 @@ static void key_press(void *w_, void *key_, void *user_data) {
     MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
     XKeyEvent *key = (XKeyEvent*)key_;
     if (!key) return;
+    if (adj_get_value(keys->grab_keyboard->adj)) {
+        char xkeys[32];
+        XQueryKeymap(w->app->dpy, xkeys);
+        if (!(xkeys[key->keycode>>3] & (0x1 << (key->keycode % 8)))) return;
+    }
     if (key->state & ControlMask) {
         p->func.key_press_callback(p, key_, user_data);
     } else {
@@ -720,6 +725,11 @@ static void key_release(void *w_, void *key_, void *user_data) {
     MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
     XKeyEvent *key = (XKeyEvent*)key_;
     if (!key) return;
+    if (adj_get_value(keys->grab_keyboard->adj)) {
+        char xkeys[32];
+        XQueryKeymap(w->app->dpy, xkeys);
+        if ((xkeys[key->keycode>>3] & (0x1 << (key->keycode % 8)))) return;
+    }
     float outkey = 0.0;
     KeySym sym = XLookupKeysym (key, 0);
     get_outkey(keys, sym, &outkey);
@@ -973,7 +983,7 @@ void add_keyboard(Widget_t *wid, const char * label) {
     adj_set_value(vel->adj, keys->velocity);
     vel->func.value_changed_callback = velocity_changed;
 
-    Widget_t* grab_keyboard = menu_add_check_item(keys->context_menu,_("Grab Keyboard"));
-    grab_keyboard->private_struct = keys;
-    grab_keyboard->func.value_changed_callback = grab_callback;
+    keys->grab_keyboard = menu_add_check_item(keys->context_menu,_("Grab Keyboard"));
+    keys->grab_keyboard->private_struct = keys;
+    keys->grab_keyboard->func.value_changed_callback = grab_callback;
 }

@@ -405,6 +405,9 @@ void _set_entry(void *w_, void* user_data) {
     ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
     if(v>=0 && comboboxlist->list_size) {
         w->label = comboboxlist->list_names[v];
+        comboboxlist->active_item = v;
+        adj_set_value(w->adj,comboboxlist->active_item + w->adj->min_value);
+        adj_set_state(comboboxlist->slider->adj,adj_get_state(w->adj));
         transparent_draw(w, user_data);
     }
 }
