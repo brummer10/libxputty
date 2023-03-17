@@ -39,8 +39,7 @@ cairo_surface_t *cairo_image_surface_create_from_stream ( const unsigned char* n
     return cairo_image_surface_create_from_png_stream(&png_stream_reader, (void *)&png_stream);
 }
 
-void widget_get_png(Widget_t *w, const unsigned char* name) {
-    cairo_surface_t *getpng = cairo_image_surface_create_from_stream (name);
+void _copy_surface_to_widget(Widget_t *w, cairo_surface_t *getpng) {
     int width = cairo_image_surface_get_width(getpng);
     int height = cairo_image_surface_get_height(getpng);
     cairo_surface_destroy(w->image);
@@ -51,12 +50,10 @@ void widget_get_png(Widget_t *w, const unsigned char* name) {
     cairo_t *cri = cairo_create (w->image);
     cairo_set_source_surface (cri, getpng,0,0);
     cairo_paint (cri);
-    cairo_surface_destroy(getpng);
     cairo_destroy(cri);
 }
 
-void widget_get_scaled_png(Widget_t *w, const unsigned char* name) {
-    cairo_surface_t *getpng = cairo_image_surface_create_from_stream (name);
+void _copy_scaled_surface_to_widget(Widget_t *w, cairo_surface_t *getpng) {
     int width = cairo_image_surface_get_width(getpng);
     int height = cairo_image_surface_get_height(getpng);
     int width_t = w->scale.init_width;
@@ -72,8 +69,31 @@ void widget_get_scaled_png(Widget_t *w, const unsigned char* name) {
     cairo_scale(cri, x,y);    
     cairo_set_source_surface (cri, getpng,0,0);
     cairo_paint (cri);
-    cairo_surface_destroy(getpng);
     cairo_destroy(cri);
+}
+
+void widget_get_png(Widget_t *w, const unsigned char* name) {
+    cairo_surface_t *getpng = cairo_image_surface_create_from_stream (name);
+    _copy_surface_to_widget(w, getpng);
+    cairo_surface_destroy(getpng);
+}
+
+void widget_get_scaled_png(Widget_t *w, const unsigned char* name) {
+    cairo_surface_t *getpng = cairo_image_surface_create_from_stream (name);
+    _copy_scaled_surface_to_widget(w, getpng);
+    cairo_surface_destroy(getpng);
+}
+
+void widget_get_png_from_file(Widget_t *w, const char* filename) {
+    cairo_surface_t *getpng = cairo_image_surface_create_from_png (filename);
+    _copy_surface_to_widget(w, getpng);
+    cairo_surface_destroy(getpng);
+}
+
+void widget_get_scaled_png_from_file(Widget_t *w, const char* filename) {
+    cairo_surface_t *getpng = cairo_image_surface_create_from_png (filename);
+    _copy_scaled_surface_to_widget(w, getpng);
+    cairo_surface_destroy(getpng);
 }
 
 void widget_get_surface_ptr(Widget_t *w, Widget_t *wid) {
