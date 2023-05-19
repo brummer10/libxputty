@@ -70,14 +70,16 @@ extern "C" {
 #define NDEBUG // switch of assertion checks
 #endif
 #endif
-
+#ifndef LIBDEBUG
+#define LIBDEBUG 0
+#endif
 /**
  * @brief debug_print         - print out state messages when compiled with
- * the -DDEBUG flag
+ * the -DLIBDEBUG flag
  */
 
 #define debug_print(...) \
-            ((void)((DEBUG) ? fprintf(stderr, __VA_ARGS__) : 0))
+            ((void)((LIBDEBUG) ? fprintf(stderr, __VA_ARGS__) : 0))
 
 /*---------------------------------------------------------------------
 -----------------------------------------------------------------------    

@@ -631,11 +631,13 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) {
             _check_submenu(wid, xbutton, main);
             if (wid->state == 4) break;
             if (xbutton->button == Button1) {
-                if (xbutton->time < wid->double_click+300) {
-                    wid->func.double_click_callback(wid, xbutton, user_data);
-                    break;
+                if ((wid->flags & IS_POPUP) == 0) {
+                    if (xbutton->time < wid->double_click+300) {
+                        wid->func.double_click_callback(wid, xbutton, user_data);
+                        break;
+                    }
+                    wid->double_click = xbutton->time;
                 }
-                wid->double_click = xbutton->time;
             }
             _has_pointer(wid, &xev->xbutton);
             if(wid->flags & HAS_POINTER) wid->state = 1;
