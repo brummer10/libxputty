@@ -31,6 +31,19 @@ void combobox_set_active_entry(Widget_t *w, int active) {
     adj_set_value(w->adj, value);
 }
 
+void combobox_rename_entry(Widget_t *w, int active, const char* label) {
+    float value = (float)active;
+    if ((value>w->adj->max_value) || (value<w->adj->min_value)) return;
+    Widget_t * menu = w->childlist->childs[1];
+    Widget_t* view_port =  menu->childlist->childs[0];
+    ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
+    //fprintf(stderr,"%s %s\n", comboboxlist->list_names[active], label);
+    free(comboboxlist->list_names[active]);
+    comboboxlist->list_names[active] = NULL;
+    asprintf(&comboboxlist->list_names[active],"%s",label);
+    assert(comboboxlist->list_names != NULL);
+}
+
 void combobox_mem_free(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     ComboBox_t *comboboxlist = (ComboBox_t*)w->parent_struct;

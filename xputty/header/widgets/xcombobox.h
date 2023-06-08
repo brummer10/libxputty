@@ -68,10 +68,20 @@ Widget_t* add_combobox(Widget_t *parent, const char  * label, int x, int y, int 
  * @brief combobox_add_entry    - add a entry to the combobox
  * @param *wid                  - pointer to the Widget_t combobox
  * @param *label                - Label to show on the menu
- * @return Widget_t*            - pointer to the Widget_t menu_item struct
+ * @return void
  */
 
 void combobox_add_entry(Widget_t *wid, const char  * label);
+
+/**
+ * @brief combobox_rename_entry - rename a entry in the combobox
+ * @param *wid                  - pointer to the Widget_t combobox
+ * @param active                - the entry to rename (int)
+ * @param *label                - new Label to show on the menu
+ * @return void
+ */
+
+void combobox_rename_entry(Widget_t *wid, int active, const char* label);
 
 /**
  * @brief combobox_add_numeric_items - add numeric items from imin to imax to wid
