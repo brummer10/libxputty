@@ -48,6 +48,7 @@ typedef struct {
     Widget_t *scale_size;
     FilePicker *fp;
     char **xdg_user_dirs;
+    char **xdg_user_dirs_path;
     const char *home_dir;
     unsigned int xdg_dir_counter;
     bool list_view;

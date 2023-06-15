@@ -454,6 +454,14 @@ static void fd_mem_free(void *w_, void* user_data) {
         file_dialog->parent->func.dialog_callback(file_dialog->parent,NULL);
     fp_free(file_dialog->fp);
     free(file_dialog->fp);
+    for (int i = 0; i<sizeof(file_dialog->xdg_user_dirs);i++) {
+        free(file_dialog->xdg_user_dirs[i]);
+    }
+    free(file_dialog->xdg_user_dirs);
+    for (int i = 0; i<sizeof(file_dialog->xdg_user_dirs_path);i++) {
+        free(file_dialog->xdg_user_dirs_path[i]);
+    }
+    free(file_dialog->xdg_user_dirs_path);
     free(file_dialog);
 }
 
@@ -492,37 +500,55 @@ static void parse_xdg_dirs(FileDialog *file_dialog) {
     char * line = NULL;
     size_t len = 0;
     ssize_t read;
-
-    file_dialog->xdg_user_dirs = (char **)realloc(file_dialog->xdg_user_dirs,
-      (file_dialog->xdg_dir_counter + 1) * sizeof(char *));
-    assert(file_dialog->xdg_user_dirs != NULL);
-    asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", _("Home"));
-    assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter-1] != NULL);
-    
-
+    int p = 2;
     fp = fopen(xdg_dir, "r");
     if (fp != NULL) {
         while ((read = getline(&line, &len, fp)) != -1) {
             if(starts_with(line,"XDG_")) {
+                p++;
+            }
+        }
+    }
+    file_dialog->xdg_user_dirs_path = (char **)realloc(file_dialog->xdg_user_dirs_path,
+        p * sizeof(char *));
+    file_dialog->xdg_user_dirs = (char **)realloc(file_dialog->xdg_user_dirs,
+        p * sizeof(char *));
+    p = 0;
+
+    assert(file_dialog->xdg_user_dirs_path != NULL);
+    asprintf(&file_dialog->xdg_user_dirs_path[p], "%s", file_dialog->home_dir); 
+
+    assert(file_dialog->xdg_user_dirs != NULL);
+    asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", _("Home"));
+
+    if (fp != NULL) {
+        rewind(fp);
+        while ((read = getline(&line, &len, fp)) != -1) {
+            if(starts_with(line,"XDG_")) {
+                p++;
                 char* xdg = strstr(line, "$HOME/");
-                if (!strremove(xdg, "$HOME/")) continue;
-                char* rep = strstr(xdg, "\"");
-                *rep = '\0';
-                file_dialog->xdg_user_dirs = (char **)realloc(file_dialog->xdg_user_dirs,
-                  (file_dialog->xdg_dir_counter + 1) * sizeof(char *));
-                assert(file_dialog->xdg_user_dirs != NULL);
-                asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", xdg);
-                assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter-1] != NULL);
+                if (xdg == NULL) {
+                    xdg = strrchr(line, '/')+1;
+                    char* path = strstr(line, "/");
+                    char* re = strstr(path, "\"");
+                    *re = '\0';
+                    asprintf(&file_dialog->xdg_user_dirs_path[p], "%s", strstr(line, "/"));
+                    asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", xdg);
+                } else if (!strremove(xdg, "$HOME/")) {
+                    continue;
+                } else {
+                    char* rep = strstr(xdg, "\"");
+                    if (rep) *rep = '\0';
+                    asprintf(&file_dialog->xdg_user_dirs_path[p], "%s/%s", file_dialog->home_dir, xdg);
+                    asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", xdg);
+                }
             }
         }
         fclose(fp);
     }
-
-    file_dialog->xdg_user_dirs = (char **)realloc(file_dialog->xdg_user_dirs,
-      (file_dialog->xdg_dir_counter + 1) * sizeof(char *));
-    assert(file_dialog->xdg_user_dirs != NULL);
+    p++;
+    asprintf(&file_dialog->xdg_user_dirs_path[p], "%s", PATH_SEPARATOR);
     asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter++], "%s", _("Computer"));
-    assert(file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter-1] != NULL);
 
     if (line)
         free(line);    
@@ -532,22 +558,10 @@ static void xdg_dir_select_callback(void *w_, void *button, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     int v = (int)adj_get_value(w->adj);
-    if (v == 0) {
-        free(file_dialog->fp->path);
-        file_dialog->fp->path = NULL;
-        asprintf(&file_dialog->fp->path, "%s",file_dialog->home_dir);
-        assert(file_dialog->fp->path != NULL);
-    } else if (v == file_dialog->xdg_dir_counter) {
-        free(file_dialog->fp->path);
-        file_dialog->fp->path = NULL;
-        asprintf(&file_dialog->fp->path, "%s",PATH_SEPARATOR);
-        assert(file_dialog->fp->path != NULL);
-    } else {
-        free(file_dialog->fp->path);
-        file_dialog->fp->path = NULL;
-        asprintf(&file_dialog->fp->path, "%s/%s",file_dialog->home_dir,file_dialog->xdg_user_dirs[v]);
-        assert(file_dialog->fp->path != NULL);
-    }
+    free(file_dialog->fp->path);
+    file_dialog->fp->path = NULL;
+    asprintf(&file_dialog->fp->path, "%s",file_dialog->xdg_user_dirs_path[v]);
+    assert(file_dialog->fp->path != NULL);
     reload_from_dir(file_dialog);
 }
 
@@ -565,6 +579,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     FileDialog *file_dialog = (FileDialog*)malloc(sizeof(FileDialog));
 
     file_dialog->xdg_user_dirs = NULL;
+    file_dialog->xdg_user_dirs_path = NULL;
     file_dialog->xdg_dir_counter = 0;
     parse_xdg_dirs(file_dialog);
     file_dialog->fp = (FilePicker*)malloc(sizeof(FilePicker));
