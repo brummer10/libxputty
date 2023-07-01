@@ -134,6 +134,7 @@ void _draw_tuner(void *w_, void* user_data) {
     }
 
     scale = (fvis-vis) / 4;
+    float cent = (scale * 10000) / 25;
     vis = vis % _get_tuner_temperament(w);
     if (vis < 0) {
         vis += _get_tuner_temperament(w);
@@ -169,6 +170,7 @@ void _draw_tuner(void *w_, void* user_data) {
         cairo_show_text(w->crb, octave[indicate_oc]);
 
         char s[64];
+        char sc[64];
         const char* format[] = {"%.1f Hz", "%.2f Hz", "%.3f Hz"};
         snprintf(s, 63, format[2-1], value);
         use_text_color_scheme(w, NORMAL_);
@@ -176,30 +178,63 @@ void _draw_tuner(void *w_, void* user_data) {
         cairo_text_extents(w->crb,s , &extents);
         cairo_move_to (w->crb, width/1.1-extents.width, height-extents.height );
         cairo_show_text(w->crb, s);
+        snprintf(sc, 63, "%.2f cent", cent);
+        cairo_text_extents(w->crb,sc , &extents);
+        cairo_move_to (w->crb, width/4.1-extents.width, height-extents.height );
+        cairo_show_text(w->crb, sc);
     
         cairo_set_source(w->crb,pat);
-        int m = 100*scale;
-        if (m==0 && xt->smove !=0) xt->move=width/20;
+        int m = 1000*scale;
+        int n = 100*scale;
+        int o = 500*scale;
+        int p = 250*scale;
+        //if (m==0 && xt->smove !=0) xt->move=width/20;
         xt->smove = m;
         xt->move +=m;
+        static int cmove = 0;
+        static int omove = 0;
+        static int pmove = 0;
+        cmove += n;
+        omove += o;
+        pmove += p;
         if(xt->move<-width/20) xt->move=width/20;
-        if(xt->move>width/20) xt->move=-width/20;
+        else if(xt->move>width/20) xt->move=-width/20;
+        if(cmove<-width/20) cmove=width/20;
+        else if(cmove>width/20) cmove=-width/20;
+        if(omove<-width/20) omove=width/20;
+        else if(omove>width/20) omove=-width/20;
+        if(pmove<-width/20) pmove=width/20;
+        else if(pmove>width/20) pmove=-width/20;
         if (m==0) {
-        if(xt->move<0) xt->move+=1;
-        if(xt->move>0) xt->move-=1;
-            
+            if(xt->move<0) xt->move+=1;
+            else if(xt->move>0) xt->move-=1;
+        }
+        if (n==0) {
+            if(cmove<0) cmove+=1;
+            else if(cmove>0) cmove-=1;
+        }
+        if (o==0) {
+            if(omove<0) omove+=1;
+            else if(omove>0) omove-=1;
+        }
+        if (p==0) {
+            if(pmove<0) pmove+=1;
+            else if(pmove>0) pmove-=1;
         }
         for (int i = 0; i < 4; ++i) {
-            if (m==0) {
+           /* if (m==0) {
                 if(xt->move<0) xt->move+=1;
                 if(xt->move>0) xt->move-=1;
                 cairo_rectangle(w->crb,(width/2)+10 + (xt->move)*10, 5, 5, 5);
                 cairo_rectangle(w->crb,(width/2) + (xt->move)*10, 5, 5, 5);
                 cairo_rectangle(w->crb,(width/2)-10 - (xt->move)*10, 5, 5, 5);
                 cairo_rectangle(w->crb,(width/2)-20 - (xt->move)*10, 5, 5, 5);
-            } else {
+            } else {*/
                 cairo_rectangle(w->crb,(width/2)-20 + (xt->move+i)*10, 5, 5, 5);
-            }
+                cairo_rectangle(w->crb,(width/2)-20 + (omove+i)*10, 10, 5, 5);
+                cairo_rectangle(w->crb,(width/2)-20 + (pmove+i)*10, 15, 5, 5);
+                cairo_rectangle(w->crb,(width/2)-20 + (cmove+i)*10, 20, 5, 5);
+            //}
             cairo_fill(w->crb);
         }
     }
