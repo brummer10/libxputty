@@ -105,12 +105,12 @@ void _draw_tuner(void *w_, void* user_data) {
 
     cairo_set_source_rgb(w->crb,0.2,0.2,0.2);
     int i = 0;
-    for (; i < width/20; ++i) {
-        cairo_rectangle(w->crb,(width/2)+i*10, 5, 5, 5);
+    for (; i < width/20 +1; ++i) {
+        cairo_rectangle(w->crb,(width/2)+i*10, 5, 5, 20);
         cairo_fill(w->crb);
     }
     for (; i >0; --i) {
-        cairo_rectangle(w->crb,(width/2)-i*10, 5, 5, 5);
+        cairo_rectangle(w->crb,(width/2)-i*10, 5, 5, 20);
         cairo_fill(w->crb);
     }
     
@@ -159,22 +159,21 @@ void _draw_tuner(void *w_, void* user_data) {
     cairo_set_source_rgba(w->crb, fabsf(scale)*2, 1-(scale*scale*4), 0.2,max(0,1-(fabsf(scale)*6)));
     cairo_set_font_size(w->crb, (w->app->big_font*2)/w->scale.ascale);
     cairo_text_extents_t extents;
-    cairo_text_extents(w->crb,_get_note_set(w)[vis] , &extents);
 
     if (value > 24.0 && value < 999.0) {
+        cairo_text_extents(w->crb,_get_note_set(w)[vis] , &extents);
         float c = (extents.width/2)+10.0;
-        cairo_move_to(w->crb,x0-c , y0+5 );
+        cairo_move_to(w->crb,x0-c , y0+10 );
         cairo_show_text(w->crb, _get_note_set(w)[vis]);
         cairo_set_font_size(w->crb, (w->app->small_font*2)/w->scale.ascale);
-        cairo_move_to(w->crb,x0+c-10.0, y0+5+ extents.height/2 );
+        cairo_move_to(w->crb,x0+c-10.0, y0+10+ extents.height/2 );
         cairo_show_text(w->crb, octave[indicate_oc]);
 
         char s[64];
         char sc[64];
-        const char* format[] = {"%.1f Hz", "%.2f Hz", "%.3f Hz"};
-        snprintf(s, 63, format[2-1], value);
+        snprintf(s, 63, "%.2f Hz", value);
         use_text_color_scheme(w, NORMAL_);
-        cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
+        cairo_set_font_size (w->crb, w->app->big_font/w->scale.ascale);
         cairo_text_extents(w->crb,s , &extents);
         cairo_move_to (w->crb, width/1.1-extents.width, height-extents.height );
         cairo_show_text(w->crb, s);
@@ -222,21 +221,32 @@ void _draw_tuner(void *w_, void* user_data) {
             else if(pmove>0) pmove-=1;
         }
         for (int i = 0; i < 4; ++i) {
-           /* if (m==0) {
-                if(xt->move<0) xt->move+=1;
-                if(xt->move>0) xt->move-=1;
-                cairo_rectangle(w->crb,(width/2)+10 + (xt->move)*10, 5, 5, 5);
-                cairo_rectangle(w->crb,(width/2) + (xt->move)*10, 5, 5, 5);
-                cairo_rectangle(w->crb,(width/2)-10 - (xt->move)*10, 5, 5, 5);
-                cairo_rectangle(w->crb,(width/2)-20 - (xt->move)*10, 5, 5, 5);
-            } else {*/
-                cairo_rectangle(w->crb,(width/2)-20 + (xt->move+i)*10, 5, 5, 5);
-                cairo_rectangle(w->crb,(width/2)-20 + (omove+i)*10, 10, 5, 5);
-                cairo_rectangle(w->crb,(width/2)-20 + (pmove+i)*10, 15, 5, 5);
-                cairo_rectangle(w->crb,(width/2)-20 + (cmove+i)*10, 20, 5, 5);
-            //}
+            cairo_rectangle(w->crb,(width/2)-20 + (xt->move+i)*10, 5, 5, 5);
+            cairo_rectangle(w->crb,(width/2)-20 + (omove+i)*10, 10, 5, 5);
+            cairo_rectangle(w->crb,(width/2)-20 + (pmove+i)*10, 15, 5, 5);
+            cairo_rectangle(w->crb,(width/2)-20 + (cmove+i)*10, 20, 5, 5);
             cairo_fill(w->crb);
         }
+    } else {
+        cairo_set_source_rgb(w->crb,0.2,0.2,0.2);
+
+        cairo_set_font_size (w->crb, w->app->big_font/w->scale.ascale);
+        cairo_text_extents(w->crb, "000.00 Hz", &extents);
+        cairo_move_to (w->crb, width/1.1-extents.width, height-extents.height );
+        cairo_show_text(w->crb, "000.00 Hz");
+
+        cairo_text_extents(w->crb, "0.00 cent", &extents);
+        cairo_move_to (w->crb, width/4.1-extents.width, height-extents.height );
+        cairo_show_text(w->crb, "0.00 cent");        
+
+        cairo_set_font_size(w->crb, (w->app->big_font*2)/w->scale.ascale);
+        cairo_text_extents(w->crb,"#" , &extents);
+        float c = (extents.width/2)+10.0;
+        cairo_move_to(w->crb,x0-c , y0+10 );
+        cairo_show_text(w->crb, "#");
+        cairo_set_font_size(w->crb, (w->app->small_font*2)/w->scale.ascale);
+        cairo_move_to(w->crb,x0+c-10.0, y0+10+ extents.height/2 );
+        cairo_show_text(w->crb, "0");
     }
     cairo_pattern_destroy(pat);
 }
