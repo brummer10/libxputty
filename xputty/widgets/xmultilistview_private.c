@@ -24,6 +24,7 @@
 #include <sys/stat.h>
 #include <libgen.h>
 
+
 char* _utf8cpy(char* dst, const char* src, size_t sizeDest ) {
     if( sizeDest ){
         size_t sizeSrc = strlen(src);
@@ -49,11 +50,11 @@ void _draw_multi_listview(void *w_, void* user_data) {
 
 void _draw_multi_list(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    if (attrs.map_state != IsViewable) return;
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
+    if (!metrics.visible) return;
     ViewMultiList_t *filelist = (ViewMultiList_t*)w->parent_struct;
     if (!filelist->folder_scaled) return;
 
@@ -65,7 +66,6 @@ void _draw_multi_list(void *w_, void* user_data) {
     cairo_text_extents_t fextents;
     cairo_text_extents(w->crb,"Ay", &extents);
     double h = extents.height/2.0;
-    struct stat sb;
 
     int i = (int)max(0,adj_get_value(w->adj)*filelist->column);
     int a = 0;
@@ -75,7 +75,7 @@ void _draw_multi_list(void *w_, void* user_data) {
         int k = 0;
         for(;k<filelist->column;k++) {
             if (filelist->check_dir) {
-                if (stat(filelist->list_names[i], &sb) == 0 && S_ISDIR(sb.st_mode)) {
+                if (os_is_directory(filelist->list_names[i])) {
                     cairo_set_source_surface (w->crb, filelist->folder_scaled,
                         (filelist->icon_pos+(k*filelist->item_width)),
                         ((double)a+0.1)*filelist->item_height);
@@ -101,22 +101,27 @@ void _draw_multi_list(void *w_, void* user_data) {
 
                 char label[124];
                 memset(label, '\0', sizeof(char)*124);
-                cairo_text_extents(w->crb, basename(filelist->list_names[i]), &extents);
+                const char *ulabel = utf8_from_locale(basename(filelist->list_names[i]));
+                cairo_text_extents(w->crb, ulabel, &extents);
                 if (extents.width > filelist->item_width-10) {
-                    int slen = strlen(basename(filelist->list_names[i]));
+                    int slen = strlen(ulabel);
                     int len = ((filelist->item_width-5)/(extents.width/slen));
-                    _utf8cpy(label,basename(filelist->list_names[i]), min(slen-4,len-3));
+                    _utf8cpy(label,ulabel, min(slen-4,len-3));
                     strcat(label,"...");
                 } else {
-                    strcpy(label,basename(filelist->list_names[i]));
+                    strcpy(label, ulabel);
                 }
+                free((void*)ulabel);
                 cairo_text_extents(w->crb, label, &fextents);
                 int pos_x = (k*filelist->item_width) + (filelist->item_width/2) - (fextents.width*0.5);
                 cairo_move_to (w->crb, pos_x, pos_y);
                 cairo_show_text(w->crb, label);
                 cairo_new_path (w->crb);
                 if (i == filelist->prelight_item && extents.width > (float)filelist->item_width-10) {
-                    tooltip_set_text(w,filelist->list_names[i]);
+                    free(filelist->tooltip_text);
+                    filelist->tooltip_text = NULL;
+                    filelist->tooltip_text = utf8_from_locale(filelist->list_names[i]);
+                    tooltip_set_text(w, filelist->tooltip_text);
                     w->flags |= HAS_TOOLTIP;
                     show_tooltip(w);
                 } else if (i == filelist->prelight_item && extents.width < (float)filelist->item_width-10){
@@ -133,10 +138,11 @@ void _draw_multi_list(void *w_, void* user_data) {
 
 void _update_view(void *w_) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    if (attrs.map_state != IsViewable) return;
-    int height = attrs.height;
+#ifdef __linux__
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int height = metrics.height-2;
+    if (!metrics.visible) return;
     ViewMultiList_t *filelist = (ViewMultiList_t*)w->parent_struct;
     cairo_push_group (w->crb);
     cairo_set_font_size (w->crb, w->app->normal_font * (0.5 +((filelist->scale_down/0.2)/2.0)));
@@ -234,6 +240,9 @@ void _update_view(void *w_) {
 
     cairo_pop_group_to_source (w->cr);
     cairo_paint (w->cr);
+#else
+    os_expose_widget(w);
+#endif
 }
 
 void _multi_list_motion(void *w_, void* xmotion_, void* user_data) {
@@ -258,9 +267,9 @@ void _multi_list_key_pressed(void *w_, void* xkey_, void* user_data) {
     Widget_t* listview = (Widget_t*) w->parent;
     XKeyEvent *xkey = (XKeyEvent*)xkey_;
     ViewMultiList_t *filelist = (ViewMultiList_t*)w->parent_struct;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int height = metrics.height;
     int _items = height/(height/filelist->item_height);
     filelist->prelight_item = xkey->y/_items  + (int)max(0,adj_get_value(w->adj));
     int nk = key_mapping(w->app->dpy, xkey);
@@ -283,9 +292,9 @@ void _multi_list_entry_released(void *w_, void* button_, void* user_data) {
     if (w->flags & HAS_POINTER) {
         ViewMultiList_t *filelist = (ViewMultiList_t*)w->parent_struct;
         XButtonEvent *xbutton = (XButtonEvent*)button_;
-        XWindowAttributes attrs;
-        XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-        int height = attrs.height;
+        Metrics_t metrics;
+        os_get_window_metrics(w, &metrics);
+        int height = metrics.height;
         int _items = height/(height/filelist->item_height);
         int prelight_item = xbutton->y/_items  + (int)max(0,adj_get_value(w->adj));
         if (prelight_item > filelist->list_size-1) return;
@@ -314,10 +323,10 @@ void _multi_list_entry_double_clicked(void *w_, void* button_, void* user_data) 
     Widget_t* listview = (Widget_t*) w->parent;
     ViewMultiList_t *filelist = (ViewMultiList_t*)w->parent_struct;
     XButtonEvent *xbutton = (XButtonEvent*)button_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
     int h = floor(max(1,(height/filelist->item_height))) * filelist->item_height;
     int x_items = max(1,width/filelist->column);
     int _items = h/max(1,(height/filelist->item_height));
@@ -337,10 +346,10 @@ void _reconfigure_multi_listview_viewport(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t* listview = (Widget_t*) w->parent;
     ViewMultiList_t *filelist = (ViewMultiList_t*)w->parent_struct;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(listview->app->dpy, (Window)listview->widget, &attrs);
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(listview, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
     float st = adj_get_value(filelist->slider->adj);
     filelist->column = max(1,width/filelist->item_width);
     filelist->show_items = (height/filelist->item_height) * filelist->column;
@@ -364,11 +373,11 @@ void _draw_multi_listviewslider(void *w_, void* user_data) {
     ViewMultiList_t *filelist = (ViewMultiList_t*)view_port->parent_struct;
     int v = (int)w->adj->max_value;
     if (!v) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    if (attrs.map_state != IsViewable) return;
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
+    if (!metrics.visible) return;
     float slidersize = 1.0;
     if (filelist->list_size > filelist->show_items)
         slidersize = (float)((float)filelist->show_items/(float)filelist->list_size);

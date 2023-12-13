@@ -54,6 +54,56 @@ else
 $(error Neither xxd, nor xxdi.pl, nor suitable ld found)
 endif
 
+	# check OS specific stuff
+	OS := $(shell echo $$OS)
+	UNAME_S := $(shell uname -s)
+	# default library extension
+	# cross compilation (e.g.: PKG_CONFIG_PATH=/usr/local/pkgconfig make CROSS=x86_64-w64-mingw32- mod)
+	ifneq (,$(findstring mingw,$(CROSS)))
+		# Found
+		TARGET = Windows
+		STRIP = $(CROSS)strip
+		PKGCONFIG = $(CROSS)pkg-config
+		CC = $(CROSS)cc
+		CXX = $(CROSS)g++
+		LD = $(CROSS)ld
+	else ifneq (,$(findstring mingw,$(CXX)))
+		# Found
+		TARGET = Windows
+	else
+		# Not found
+		ifeq ($(UNAME_S), Linux) #LINUX
+			TARGET = Linux
+		endif
+		ifeq ($(OS), Windows_NT) #WINDOWS
+			TARGET = Windows
+		endif
+		ifeq ($(UNAME_S), Darwin) #APPLE
+			TARGET = Apple
+		endif
+	endif
+	ifeq ($(TARGET), Linux)
+		ABI_CFLAGS = -Wl,-z,nodelete
+		ABI_CXXFLAGS = -Wl,-z,relro,-z,now
+		ABI_LDFLAGS = -Wl,-z,noexecstack
+		STRIP = strip
+		PKGCONFIG = pkg-config
+		XELF = x11
+		LIB_EXT = so
+		STATIC_LIB_EXT = a
+		XDG_DIR := ../xputty/xdgmime/
+	endif
+	ifeq ($(TARGET), Windows)
+		ECHO += -e
+		ABI_LDFLAGS = -static -lpthread
+		GUI_LIBS = -liconv -lstdc++
+		STRIP = x86_64-w64-mingw32-strip
+		PKGCONFIG = x86_64-w64-mingw32-pkg-config
+		PKGCONFIG_FLAGS = --static
+		LIB_EXT = dll
+		STATIC_LIB_EXT = lib
+	endif
+
 	# set  name
 	NAME = Xputty
 	VER = 1.0
@@ -70,23 +120,20 @@ endif
 	DIALOG_DIR := $(LIB_DIR)dialogs/
 	DIALOG_HEADER_DIR := $(HEADER_DIR)dialogs/
 	RESOURCES_DIR :=$(LIB_DIR)resources/
-	XDG_DIR := $(LIB_DIR)xdgmime/
 	OBJ_DIR := .
 	RELEASE_DIR := ../libxputty/
 
 	# include path for library headers
 	INCLUDES := -I. -I$(HEADER_DIR) -I$(WIDGET_HEADER_DIR) -I$(RESOURCES_DIR) -I$(DIALOG_HEADER_DIR) -I$(XDG_DIR)
 	# link flags to dynamic link cairo and X11 (default)
-	LDFLAGS += -fPIC `pkg-config --cflags --libs cairo x11` -lm
+	LDFLAGS += -fPIC `$(PKGCONFIG) $(PKGCONFIG_FLAGS) --cflags --libs cairo $(XELF)` -lm
 	# set link flags to static link cairo and X11
 	# (you could ignore ld warnings, but the resulting binary is huge
 	# (6.4Mb for x11 and cairo) NOT RECOMMENDED!!
 	STATIC_LDFLAGS += -fPIC -static `pkg-config --static --cflags --libs cairo ` \
 	 -lX11 -ldl -lxcb -lpthread -lXau -lXdmcp
 	# debug flags, use this to indicate a problem with libxputty
-	DEBUG_LDFLAGS += -g -D DEBUG  -fPIC\
-	 `pkg-config --static --cflags --libs cairo` \
-	 -L/usr/X11/lib -lX11 -lm
+	DEBUG_LDFLAGS += -g -DDEBUG -DLIBDEBUG
 
 
 	LIB_SOURCES := $(wildcard $(LIB_DIR)*.c)
@@ -118,9 +165,9 @@ endif
 
 .NOTPARALLEL:
 
-all:  $(RESOURCEHEADER) libxputty.a
+all:  $(RESOURCEHEADER) libxputty.$(STATIC_LIB_EXT)
 
-debug: LDFLAGS = $(DEBUG_LDFLAGS)
+debug: LDFLAGS += $(DEBUG_LDFLAGS)
 debug: all
 
 nls: LDFLAGS += -DENABLE_NLS
@@ -131,7 +178,7 @@ updatepot:
 po:
 
 clean:
-	rm -f libxputty.a libxputty.so libxputty.so.1 libxputty.so.1.0 xputty.pc $(RESOURCES_C) $(SVGRESOURCES_C) \
+	rm -f libxputty.$(STATIC_LIB_EXT) libxputty.$(LIB_EXT) libxputty.$(LIB_EXT).1 libxputty.$(LIB_EXT).1.0 xputty.pc $(RESOURCES_C) $(SVGRESOURCES_C) \
 	$(LIB_OBJ) $(WIDGET_OBJ) $(RESOURCES_OBJ) $(SVGRESOURCES_OBJ) $(DIALOG_OBJ) $(XDG_OBJ) $(DEP) $(RESOURCEHEADER)
 	rm -rf $(RELEASE_DIR)
 
@@ -179,29 +226,31 @@ $(LIB_OBJ): $(LIB_SOURCES)
 -include $(DEP)
 
 xputty.pc: xputty.pc.in
-	sed 's;PATH;$(PREFIX);' $< >$@
 
-libxputty.a: $(RESOURCES_OBJ) $(SVGRESOURCES_OBJ) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
-	$(AR) rcs libxputty.a $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ)  $(SVGRESOURCES_OBJ) $(XDG_OBJ)
+libxputty.$(STATIC_LIB_EXT): $(RESOURCES_OBJ) $(SVGRESOURCES_OBJ) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
+	$(AR) rcs libxputty.$(STATIC_LIB_EXT) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ)  $(SVGRESOURCES_OBJ) $(XDG_OBJ)
 	mkdir -p $(RELEASE_DIR)include/
 	cp $(HEADER_DIR)*.h $(RELEASE_DIR)include/
 	cp $(WIDGET_HEADER_DIR)*.h $(RELEASE_DIR)include/
 	cp $(DIALOG_HEADER_DIR)*.h $(RELEASE_DIR)include/
 	cp $(RESOURCEHEADER) $(RELEASE_DIR)include/
+ifeq ($(TARGET), Linux)
 	cp $(XDG_DIR)*.h $(RELEASE_DIR)include/
+endif
 	cp -r $(LIB_DIR)lv2_plugin $(RELEASE_DIR)
-	cp libxputty.a $(RELEASE_DIR)
+	cp libxputty.$(STATIC_LIB_EXT) $(RELEASE_DIR)
 
-libxputty.so: xputty.pc libxputty.a
-	$(CC) -shared -Wl,-soname,libxputty.so.1 -o libxputty.so.1.0 $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ) $(XDG_OBJ)
-	cp libxputty.so.1.0 $(RELEASE_DIR)
-	ln -sf libxputty.so.1.0 libxputty.so.1
-	ln -sf libxputty.so.1 libxputty.so
-	cp -Pf libxputty.so.1 $(RELEASE_DIR)
-	cp -Pf libxputty.so $(RELEASE_DIR)
+libxputty.$(LIB_EXT): xputty.pc libxputty.$(STATIC_LIB_EXT)
+	$(CC) -shared -Wl,-soname,libxputty.$(LIB_EXT).1 -o libxputty.$(LIB_EXT).1.0 $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ) $(XDG_OBJ)
+	cp libxputty.$(LIB_EXT).1.0 $(RELEASE_DIR)
+	ln -sf libxputty.$(LIB_EXT).1.0 libxputty.$(LIB_EXT).1
+	ln -sf libxputty.$(LIB_EXT).1 libxputty.$(LIB_EXT)
+	cp -Pf libxputty.$(LIB_EXT).1 $(RELEASE_DIR)
+	cp -Pf libxputty.$(LIB_EXT) $(RELEASE_DIR)
 	cp xputty.pc $(RELEASE_DIR)
 
-shared: libxputty.so
+shared: libxputty.$(LIB_EXT)
+	sed 's;PATH;$(PREFIX);' $< >$@
 
 doc:
 
@@ -213,17 +262,17 @@ ifneq ("$(wildcard $(RELEASE_DIR))","")
 	mkdir -p $(DESTDIR)$(INSTALL_DIR)
 	mkdir -p $(DESTDIR)$(SHARE_DIR)pkgconfig/
 	cp $(RELEASE_DIR)include/*.h $(DESTDIR)$(INCLUDE_DIR)xputty/
-	cp $(RELEASE_DIR)*.so.1.0 $(DESTDIR)$(INSTALL_DIR)
-	cp -Pf $(RELEASE_DIR)*.so.1 $(DESTDIR)$(INSTALL_DIR)
-	cp -Pf $(RELEASE_DIR)*.so $(DESTDIR)$(INSTALL_DIR)
-	cp $(RELEASE_DIR)libxputty.a $(DESTDIR)$(INSTALL_DIR)
+	cp $(RELEASE_DIR)*.$(LIB_EXT).1.0 $(DESTDIR)$(INSTALL_DIR)
+	cp -Pf $(RELEASE_DIR)*.$(LIB_EXT).1 $(DESTDIR)$(INSTALL_DIR)
+	cp -Pf $(RELEASE_DIR)*.$(LIB_EXT) $(DESTDIR)$(INSTALL_DIR)
+	cp $(RELEASE_DIR)libxputty.$(STATIC_LIB_EXT) $(DESTDIR)$(INSTALL_DIR)
 	cp $(RELEASE_DIR)xputty.pc $(DESTDIR)$(SHARE_DIR)pkgconfig/
 else
 	@echo "you must run 'make' first"
 endif
 
 uninstall:
-	@rm -rf $(DESTDIR)$(INSTALL_DIR)libxputty.so $(DESTDIR)$(INSTALL_DIR)libxputty.so.1 \
-	$(DESTDIR)$(INSTALL_DIR)libxputty.so.1.0 $(DESTDIR)$(INSTALL_DIR)libxputty.a
+	@rm -rf $(DESTDIR)$(INSTALL_DIR)libxputty.$(LIB_EXT) $(DESTDIR)$(INSTALL_DIR)libxputty.$(LIB_EXT).1 \
+	$(DESTDIR)$(INSTALL_DIR)libxputty.$(LIB_EXT).1.0 $(DESTDIR)$(INSTALL_DIR)libxputty.$(STATIC_LIB_EXT)
 	@rm -rf $(DESTDIR)$(INCLUDE_DIR)xputty/
 	@rm -rf $(DESTDIR)$(SHARE_DIR)pkgconfig/xputty.pc

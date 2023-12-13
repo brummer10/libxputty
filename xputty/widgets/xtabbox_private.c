@@ -38,10 +38,11 @@ void _rounded_box(cairo_t *cr,float x, float y, float w, float h, float lsize) {
 
 void _draw_tabbox(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width_t = attrs.width;
-    int height_t = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width_t = metrics.width;
+    int height_t = metrics.height;
+    if (!metrics.visible) return;
 
     int tabsize = 1;
     int elem = w->childlist->elem;
@@ -96,9 +97,9 @@ void _draw_tab(void *w_, void* user_data) {
 
 void _tab_button_released(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width_t = attrs.width;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width_t = metrics.width;
     if (w->flags & HAS_POINTER) {
         XButtonEvent *xbutton = (XButtonEvent*)button_;
         if (xbutton->y < 20) {

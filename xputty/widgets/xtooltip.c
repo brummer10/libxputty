@@ -47,25 +47,10 @@ void add_tooltip(Widget_t *w, const char* label) {
 Widget_t* create_tooltip(Widget_t *parent, int width, int height) {
 
     int x1, y1;
-    Window child;
-    XTranslateCoordinates( parent->app->dpy, parent->widget, DefaultRootWindow(parent->app->dpy), 0, 0, &x1, &y1, &child );
-    Widget_t *wid = create_window(parent->app, DefaultRootWindow(parent->app->dpy), x1+10, y1+10, width, height);
-
-    XSetWindowAttributes attributes;
-    attributes.override_redirect = True;
-    XChangeWindowAttributes(parent->app->dpy, wid->widget, CWOverrideRedirect, &attributes);
-
-    Atom window_type = XInternAtom(wid->app->dpy, "_NET_WM_WINDOW_TYPE", False);
-    Atom window_type_tooltip = XInternAtom(wid->app->dpy, "_NET_WM_WINDOW_TYPE_TOOLTIP", False);
-    XChangeProperty(wid->app->dpy, wid->widget, window_type,
-        XA_ATOM, 32, PropModeReplace, (unsigned char *) &window_type_tooltip,1 );
-
-    Atom window_state = XInternAtom(wid->app->dpy, "_NET_WM_STATE", False);
-    Atom window_state_modal = XInternAtom(wid->app->dpy, "_NET_WM_STATE_MODAL", False);
-    XChangeProperty(wid->app->dpy, wid->widget, window_state,
-        XA_ATOM, 32, PropModeReplace, (unsigned char *) &window_state_modal, 1);
-
-    XSetTransientForHint(parent->app->dpy,wid->widget,parent->widget);
+    os_translate_coords(parent, parent->widget, os_get_root_window(parent->app, IS_WIDGET), 0, 0, &x1, &y1);
+    Widget_t *wid = create_window(parent->app, os_get_root_window(parent->app, IS_WIDGET), x1+10, y1+10, width, height);
+    os_set_window_attrb(wid);
+    os_set_transient_for_hint(parent, wid);
     wid->flags &= ~USE_TRANSPARENCY;
     wid->func.expose_callback = _draw_tooltip;
     wid->flags |= IS_TOOLTIP;

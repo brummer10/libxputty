@@ -86,11 +86,11 @@ void _draw_tuner(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
     XTuner *xt = (XTuner *)w->parent_struct;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    if (attrs.map_state != IsViewable) return;
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
+    if (!metrics.visible) return;
     float x0 = width/2;
     float y0 = height/2;
 

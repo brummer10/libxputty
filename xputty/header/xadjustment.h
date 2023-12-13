@@ -130,7 +130,6 @@ Adjustment_t *add_adjustment(Widget_t *w, float std_value, float value,
  * @param max_value          - maximal value of the Adjustment_t
  * @param step               - step to increase/decrease the Adjustment_t
  * @param type               - set CL_type of Adjustment_t
- * @return *adj              - pointer to Adjustment_t
  */
 
 void set_adjustment(Adjustment_t *adj, float std_value, float value,
@@ -140,7 +139,6 @@ void set_adjustment(Adjustment_t *adj, float std_value, float value,
  * @brief delete_adjustment  - freeing the memory of the Adjustment_t
  * You usually don't need to call this, as it get handled by main_quit() -> destroy_widget()
  * @param *adj               - pointer to the Adjustment to free 
- * @return *void
  */
 
 void *delete_adjustment(Adjustment_t *adj);
@@ -156,7 +154,7 @@ float adj_get_state(Adjustment_t *adj);
 /**
  * @brief adj_set_state      - set the current state of the Adjustment_t
  * @param *adj               - pointer to the Adjustment_t
- * @return float             - set the Adjustment_t state mapped to (0<->1)
+ * @param state              - set the Adjustment_t state mapped to (0<->1)
  */
 
 void adj_set_state(Adjustment_t *adj, float state);
@@ -197,7 +195,6 @@ float adj_get_max_value(Adjustment_t *adj);
  * @brief adj_set_value      - set the current value to the Adjustment_t
  * @param *adj               - pointer to the Adjustment_t
  * @param value              - value to set the Adjustment_t to 
- * @return void
  */
 
 void adj_set_value(Adjustment_t *adj, float value);
@@ -206,7 +203,6 @@ void adj_set_value(Adjustment_t *adj, float value);
  * @brief adj_set_min_value  - set the minimal value to the Adjustment_t
  * @param *adj               - pointer to the Adjustment_t
  * @param value              - value to set the Adjustment_t to 
- * @return void
  */
 
 void adj_set_min_value(Adjustment_t *adj, float value);
@@ -215,7 +211,6 @@ void adj_set_min_value(Adjustment_t *adj, float value);
  * @brief adj_set_max_value  - set the maximal value to the Adjustment_t
  * @param *adj               - pointer to the Adjustment_t
  * @param value              - value to set the Adjustment_t to 
- * @return void
  */
 
 void adj_set_max_value(Adjustment_t *adj, float value);
@@ -224,7 +219,6 @@ void adj_set_max_value(Adjustment_t *adj, float value);
  * @brief adj_set_std_value  - set the standart value to the Adjustment_t
  * @param *adj               - pointer to the Adjustment_t
  * @param value              - value to set the Adjustment_t to 
- * @return void
  */
 
 void adj_set_std_value(Adjustment_t *adj, float value);
@@ -232,7 +226,6 @@ void adj_set_std_value(Adjustment_t *adj, float value);
 /**
  * @brief adj_set_start_value - internal use to store the value when pointer movment starts
  * @param *w                  - pointer to Widget_t containing the Adjustment_t
- * @return void
  */
 
 void adj_set_start_value(void *w);
@@ -241,7 +234,6 @@ void adj_set_start_value(void *w);
  * @brief adj_set_scale      - internal use to scale the pointer movement (0.1 -1.0)
  * @param *adj               - pointer to the Adjustment_t
  * @param value              - value to set the scaleing factor to 
- * @return void
  */
 
 void adj_set_scale(Adjustment_t *adj, float value);
@@ -250,7 +242,6 @@ void adj_set_scale(Adjustment_t *adj, float value);
  * @brief adj_set_log_scale  - internal use to set the logarithmic scale 
  * @param *adj               - pointer to the Adjustment_t
  * @param value              - value to set the scaleing factor to 
- * @return void
  */
 
 void adj_set_log_scale(Adjustment_t *adj, float value);
@@ -261,7 +252,6 @@ void adj_set_log_scale(Adjustment_t *adj, float value);
  * @param *w                     - pointer to Widget_t containing Adjustment_t
  * @param x                      - movment on the x-axis
  * @param y                      - movement on the y-axis
- * @return void
  */
 
 void adj_set_motion_state(void *w, float x, float y);
@@ -271,7 +261,6 @@ void adj_set_motion_state(void *w, float x, float y);
  * value_changed_callback (VALUE_CHANGED) and adj_callback (ADJ_INTERN) if so
  * @param *adj                  - pointer to the Adjustment_t
  * @param value                 - value to check
- * @return void
  */
 
 void check_value_changed(Adjustment_t *adj, float *value);

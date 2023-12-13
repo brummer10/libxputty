@@ -27,13 +27,14 @@ Widget_t* add_knob(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 
     Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
+    wid->widget_type = WT_KNOB;
     wid->label = label;
     wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, 1.0,0.01, CL_CONTINUOS);
     wid->adj = wid->adj_y;
     wid->scale.gravity = ASPECT;
     wid->func.expose_callback = _draw_knob;
-    wid->func.enter_callback = transparent_draw;
-    wid->func.leave_callback = transparent_draw;
+    wid->func.enter_callback = os_transparent_draw;
+    wid->func.leave_callback = os_transparent_draw;
     wid->func.button_release_callback = _knob_released;
     return wid;
 }
@@ -47,8 +48,8 @@ Widget_t* add_image_knob(Widget_t *parent, const char * label,
     wid->adj = wid->adj_y;
     wid->scale.gravity = ASPECT;
     wid->func.expose_callback = _draw_knob_image;
-    wid->func.enter_callback = transparent_draw;
-    wid->func.leave_callback = transparent_draw;
+    wid->func.enter_callback = os_transparent_draw;
+    wid->func.leave_callback = os_transparent_draw;
     wid->func.button_release_callback = _knob_released;
     return wid;
 }

@@ -41,8 +41,8 @@ Widget_t* add_vslider(Widget_t *parent, const char * label,
     wid->adj = wid->adj_y;
     wid->scale.gravity = ASPECT;
     wid->func.expose_callback = _draw_vslider;
-    wid->func.enter_callback = transparent_draw;
-    wid->func.leave_callback = transparent_draw;
+    wid->func.enter_callback = os_transparent_draw;
+    wid->func.leave_callback = os_transparent_draw;
     wid->func.button_release_callback = _slider_released;
     wid->func.mem_free_callback = slider_mem_free;
     return wid;
@@ -62,8 +62,8 @@ Widget_t* add_hslider(Widget_t *parent, const char * label,
     wid->adj = wid->adj_x;
     wid->scale.gravity = ASPECT;
     wid->func.expose_callback = _draw_hslider;
-    wid->func.enter_callback = transparent_draw;
-    wid->func.leave_callback = transparent_draw;
+    wid->func.enter_callback = os_transparent_draw;
+    wid->func.leave_callback = os_transparent_draw;
     wid->func.button_release_callback = _slider_released;
     wid->func.mem_free_callback = slider_mem_free;
     return wid;

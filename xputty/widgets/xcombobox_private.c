@@ -26,11 +26,11 @@
 void _draw_combobox_button(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width-2;
-    int height = attrs.height-4;
-    if (attrs.map_state != IsViewable) return;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width-2;
+    int height = metrics.height-2;
+    if (!metrics.visible) return;
     if (!w->state && (int)w->adj_y->value)
         w->state = 3;
 
@@ -100,11 +100,11 @@ void _draw_combobox_button(void *w_, void* user_data) {
 void _draw_combobox(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width-2;
-    int height = attrs.height-2;
-    if (attrs.map_state != IsViewable) return;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width-2;
+    int height = metrics.height-2;
+    if (!metrics.visible) return;
     int v = (int)adj_get_value(w->adj);
     int vl = v - (int) w->adj->min_value;
    // if (v<0) return;
@@ -177,11 +177,11 @@ void _draw_combobox_menu(void *w_, void* user_data) {
 
 void _draw_combobox_entrys(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    if (attrs.map_state != IsViewable) return;
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width-2;
+    int height = metrics.height-2;
+    if (!metrics.visible) return;
     ComboBox_t *comboboxlist = (ComboBox_t*)w->parent_struct;
 
     use_base_color_scheme(w, NORMAL_);
@@ -241,9 +241,9 @@ void _combobox_motion(void *w_, void* xmotion_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     ComboBox_t *comboboxlist = (ComboBox_t*)w->parent_struct;
     XMotionEvent *xmotion = (XMotionEvent*)xmotion_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int height = metrics.height-2;
     int _items = height/(height/25);
     int prelight_item = (xmotion->y/_items)  + (int)max(0,adj_get_value(w->adj));
     if(prelight_item != comboboxlist->prelight_item) {
@@ -256,9 +256,9 @@ void _combobox_key_pressed(void *w_, void* xkey_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     XKeyEvent *xkey = (XKeyEvent*)xkey_;
     ComboBox_t *comboboxlist = (ComboBox_t*)w->parent_struct;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int height = metrics.height-2;
     int _items = height/(height/25);
     comboboxlist->prelight_item = xkey->y/_items  + (int)max(0,adj_get_value(w->adj));
     int nk = key_mapping(w->app->dpy, xkey);
@@ -280,9 +280,9 @@ void _combobox_entry_released(void *w_, void* button_, void* user_data) {
     if (w->flags & HAS_POINTER) {
         ComboBox_t *comboboxlist = (ComboBox_t*)w->parent_struct;
         XButtonEvent *xbutton = (XButtonEvent*)button_;
-        XWindowAttributes attrs;
-        XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-        int height = attrs.height;
+        Metrics_t metrics;
+        os_get_window_metrics(w, &metrics);
+        int height = metrics.height-2;
         int _items = height/(height/25);
         int prelight_item = xbutton->y/_items  + (int)max(0,adj_get_value(w->adj));
         if(xbutton->button == Button4) {
@@ -316,9 +316,9 @@ void _reconfigure_combobox_viewport(void *w_, void* user_data) {
     float st = adj_get_state(w->adj);
     Widget_t* combobox = (Widget_t*) w->parent;
     ComboBox_t *comboboxlist = (ComboBox_t*)w->parent_struct;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(combobox->app->dpy, (Window)combobox->widget, &attrs);
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(combobox, &metrics);
+    int height = metrics.height;
     comboboxlist->show_items = height/25;
     set_adjustment(comboboxlist->slider->adj,0.0, 0.0, 0.0,
         (float)(comboboxlist->list_size-(comboboxlist->show_items-1)),1.0, CL_VIEWPORTSLIDER);
@@ -340,11 +340,11 @@ void _draw_combobox_menu_slider(void *w_, void* user_data) {
     ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
     int v = (int)w->adj->max_value;
     if (!v) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    if (attrs.map_state != IsViewable) return;
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width-2;
+    int height = metrics.height-2;
+    if (!metrics.visible) return;
     int show_items = height/25;
     float slidersize = 1.0;
     if (comboboxlist->list_size > show_items)
@@ -408,7 +408,7 @@ void _set_entry(void *w_, void* user_data) {
         comboboxlist->active_item = v;
         adj_set_value(w->adj,comboboxlist->active_item + w->adj->min_value);
         adj_set_state(comboboxlist->slider->adj,adj_get_state(w->adj));
-        transparent_draw(w, user_data);
+        os_transparent_draw(w, user_data);
     }
 }
 
@@ -420,8 +420,7 @@ void _configure_combobox_menu(Widget_t *parent, Widget_t *menu, int elem, bool a
     int height = 25;
     int x1, y1;
     int posy = (above) ? parent->height : 0;
-    Window child;
-    XTranslateCoordinates( parent->app->dpy, parent->widget, DefaultRootWindow(parent->app->dpy), 0, posy, &x1, &y1, &child );
+    os_translate_coords(parent, parent->widget, os_get_root_window(parent->app, IS_WIDGET), 0, posy, &x1, &y1);
     int item_width = 1.0;
     cairo_text_extents_t extents;
     int i = comboboxlist->list_size-1;
@@ -442,12 +441,12 @@ void _configure_combobox_menu(Widget_t *parent, Widget_t *menu, int elem, bool a
     if(above) {
         if(item_width<parent->width)item_width = parent->width;
     }
-    int snum = DefaultScreen(parent->app->dpy);
-    int screen_height = DisplayHeight(parent->app->dpy, snum);
+
+    int screen_height = os_get_screen_height(parent);
     if (y1+(height*elem) > screen_height) y1 = y1-((height*elem)+parent->height);
-    XResizeWindow (menu->app->dpy, menu->widget, item_width, height*elem);
-    XResizeWindow (view_port->app->dpy, view_port->widget, item_width, height*elem);
-    XMoveWindow(menu->app->dpy,slider->widget,item_width-15, 0);
-    XResizeWindow(menu->app->dpy,slider->widget,15,height*elem);
-    XMoveWindow(menu->app->dpy,menu->widget,x1, y1);   
+    os_resize_window (menu->app->dpy, menu, item_width, height*elem);
+    os_resize_window (view_port->app->dpy, view_port, item_width, height*elem);
+    os_move_window(menu->app->dpy,slider,item_width-15, 0);
+    os_resize_window(menu->app->dpy,slider,15,height*elem);
+    os_move_window(menu->app->dpy,menu,x1, y1);   
 }

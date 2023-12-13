@@ -19,7 +19,8 @@
  */
 
 /**
- * here are the private functions from xwidget
+ * @file xwidget_private.h
+ * @brief This file contains private function definitions used on all platforms.
  */
 
 #pragma once
@@ -107,7 +108,6 @@ void _propagate_child_expose(Widget_t *wid);
  * @brief _check_keymap     - check if key is in map, send requests if so 
  * @param *w                - pointer to the Widget_t receiving the event
  * @param xkey              - the XKeyEvent to check
- * @return void
  */
 
 void _check_keymap (void *w_ , XKeyEvent xkey);
@@ -115,7 +115,6 @@ void _check_keymap (void *w_ , XKeyEvent xkey);
 /**
  * @brief _hide_all_tooltips - hide all active tooltips
  * @param *wid               - pointer to the Widget_t receiving the event
- * @return void
  */
 
 void _hide_all_tooltips(Widget_t *wid);
@@ -124,7 +123,6 @@ void _hide_all_tooltips(Widget_t *wid);
  * @brief _has_pointer      - check if the widget has the pointer 
  * @param *w                - pointer to the Widget_t sending the request
  * @param *button           - pointer to the XButtonEvent sending the notify
- * @return void
  */
 
 void _has_pointer(Widget_t *w, XButtonEvent *button);
@@ -133,7 +131,6 @@ void _has_pointer(Widget_t *w, XButtonEvent *button);
  * @brief _set_adj_value    - set value to adjustment from key event
  * @param *w                - pointer to the Widget_t receiving the event
  * @param x                 - use x or y-axis
- * @return void
  */
 
 void _set_adj_value(void *w_, bool x, int direction);

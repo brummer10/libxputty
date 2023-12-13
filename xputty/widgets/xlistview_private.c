@@ -33,11 +33,11 @@ void _draw_listview(void *w_, void* user_data) {
 
 void _draw_list(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    if (attrs.map_state != IsViewable) return;
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
+    if (!metrics.visible) return;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
 
     use_base_color_scheme(w, NORMAL_);
@@ -78,8 +78,7 @@ void _draw_list(void *w_, void* user_data) {
             use_text_color_scheme(w,NORMAL_ );
 
         if (filelist->check_dir) {
-            struct stat sb;
-            if (stat(filelist->list_names[i], &sb) == 0 && S_ISDIR(sb.st_mode)) {
+            if (os_is_directory(filelist->list_names[i])) {
                 cairo_scale(w->crb,0.08, 0.08);
                 cairo_set_source_surface (w->crb, filelist->folder,1.0*12.5,((double)a+0.1)*25.0*12.5);
                 cairo_paint (w->crb);
@@ -112,10 +111,9 @@ void _draw_list(void *w_, void* user_data) {
 
 void _update_list_view(void *w_) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    if (attrs.map_state != IsViewable) return;
-    int width = attrs.width;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
 
     cairo_push_group (w->crb);
@@ -205,9 +203,9 @@ void _list_motion(void *w_, void* xmotion_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
     XMotionEvent *xmotion = (XMotionEvent*)xmotion_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int height = metrics.height;
     int _items = height/(height/25);
     int prelight_item = (xmotion->y/_items)  + (int)max(0,adj_get_value(w->adj));
     if(prelight_item != filelist->prelight_item) {
@@ -223,9 +221,9 @@ void _list_key_pressed(void *w_, void* xkey_, void* user_data) {
     Widget_t* listview = (Widget_t*) w->parent;
     XKeyEvent *xkey = (XKeyEvent*)xkey_;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int height = metrics.height;
     int _items = height/(height/25);
     filelist->prelight_item = xkey->y/_items  + (int)max(0,adj_get_value(w->adj));
     int nk = key_mapping(w->app->dpy, xkey);
@@ -248,9 +246,9 @@ void _list_entry_released(void *w_, void* button_, void* user_data) {
     if (w->flags & HAS_POINTER) {
         ViewList_t *filelist = (ViewList_t*)w->parent_struct;
         XButtonEvent *xbutton = (XButtonEvent*)button_;
-        XWindowAttributes attrs;
-        XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-        int height = attrs.height;
+        Metrics_t metrics;
+        os_get_window_metrics(w, &metrics);
+        int height = metrics.height;
         int _items = height/(height/25);
         int prelight_item = xbutton->y/_items  + (int)max(0,adj_get_value(w->adj));
         if (prelight_item > filelist->list_size-1) return;
@@ -276,9 +274,9 @@ void _list_entry_double_clicked(void *w_, void* button_, void* user_data) {
     Widget_t* listview = (Widget_t*) w->parent;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
     XButtonEvent *xbutton = (XButtonEvent*)button_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int height = metrics.height;
     int _items = height/(height/25);
     int prelight_item = xbutton->y/_items  + (int)max(0,adj_get_value(w->adj));
     if (prelight_item > filelist->list_size-1) return;
@@ -297,9 +295,9 @@ void _reconfigure_listview_viewport(void *w_, void* user_data) {
     float st = adj_get_state(w->adj);
     Widget_t* listview = (Widget_t*) w->parent;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(listview->app->dpy, (Window)listview->widget, &attrs);
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(listview, &metrics);
+    int height = metrics.height;
     filelist->show_items = height/25;
     w->adj->max_value = filelist->list_size-filelist->show_items;
     adj_set_state(w->adj,st);
@@ -309,14 +307,14 @@ void _configure_listview(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t* listview = (Widget_t*) w->parent;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(listview->app->dpy, (Window)listview->widget, &attrs);
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(listview, &metrics);
+    int height = metrics.height;
+    int width = metrics.width;
     filelist->show_items = height/25;
     filelist->slider->adj->step = max(0.0,1.0/(filelist->list_size-filelist->show_items));
     adj_set_scale(filelist->slider->adj, ((float)filelist->list_size/(float)filelist->show_items)/25.0);
-    XResizeWindow (w->app->dpy, w->widget, width, height);
+    os_resize_window (w->app->dpy, w, width, height);
 }
 
 void _set_listview_viewpoint(void *w_, void* user_data) {
@@ -332,11 +330,11 @@ void _draw_listviewslider(void *w_, void* user_data) {
     ViewList_t *filelist = (ViewList_t*)view_port->parent_struct;
     int v = (int)w->adj->max_value;
     if (!v) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    if (attrs.map_state != IsViewable) return;
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
+    if (!metrics.visible) return;
     int show_items = height/25;
     float slidersize = 1.0;
     if (filelist->list_size > show_items)

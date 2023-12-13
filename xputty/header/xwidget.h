@@ -18,12 +18,20 @@
  *
  */
 
+/**
+ * @file xwidget.h
+ * @brief This file contains definitions and structs used on all platforms.
+ * Platform specific definitions are located in xwidget-platform.h
+ * Xlib compatibility definitions for MSWindows are located in xputty-mswin.h.
+ */
+
 #pragma once
 
 #ifndef XWIDGET_H
 #define XWIDGET_H
 
 #include "xputty.h"
+#include "xwidget-platform.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,7 +53,6 @@ extern "C" {
  * @param *main       - pointer to Xputty main struct running the loop
  * @param *event      - void pointer to the XEvent
  * @param *user_data  - void pointer to attached user_data, maybe NULL
- * @return void
  */
 
 typedef void (*vfunc)(void * widget, void * event, Xputty *main, void* user_data);
@@ -55,7 +62,6 @@ typedef void (*vfunc)(void * widget, void * event, Xputty *main, void* user_data
  * @param *widget     - void pointer to the Widget_t
  * @param *event      - void pointer to the XEvent
  * @param *user_data  - void pointer to attached user_data, maybe NULL
- * @return void
  */
 
 typedef void (*evfunc)(void * widget, void * event, void* user_data);
@@ -65,7 +71,6 @@ typedef void (*evfunc)(void * widget, void * event, void* user_data);
  * @brief *xevfunc     - function pointer to connect XEvents from a Widget_t to a event handler
  * @param *widget      - void pointer to the widget
  * @param *user_data   - void pointer to attached user_data, maybe NULL
- * @return void
  */
 
 typedef void (*xevfunc)(void * widget, void* user_data);
@@ -111,7 +116,7 @@ typedef struct {
  * @param ADJ_INTERN        - (*xevfunc) adj_callback(void * widget, void* user_data)
  * @param VALUE_CHANGED     - (*xevfunc) value_changed_callback(void * widget, void* user_data)
  * @param USER              - (*xevfunc) user_callback(void * widget, void* user_data)
- * @param MEM_FREE          - (*xevfunc) mem_free_callback(void * widget, void* user_data)
+ * @param MEM_FREE_CB       - (*xevfunc) mem_free_callback(void * widget, void* user_data)
  * @param CONFIGURE_NOTIFY  - (*xevfunc) configure_notify_callback(void * widget, void* user_data)
  * @param MAP_NOTIFY        - (*xevfunc) map_notify_callback(void * widget, void* user_data)
  * @param UNMAP_NOTIFY      - (*xevfunc) unmap_notify_callback(void * widget, void* user_data)
@@ -131,7 +136,7 @@ typedef enum {
     ADJ_INTERN,
     VALUE_CHANGED,
     USER,
-    MEM_FREE,
+    MEM_FREE_CB,
     CONFIGURE_NOTIFY,
     MAP_NOTIFY,
     UNMAP_NOTIFY,
@@ -142,6 +147,141 @@ typedef enum {
     KEY_PRESS,
     KEY_RELEASE,
 } EventType;
+
+/**
+ *
+ * @brief WidgetType                    - enum describing the kind of the widget (button, menu, ...)
+ * \n The widget_type member can be used to identify the source widget e.g. in the messageloop
+ * @param WT_NONE                       - (unitialized or error)
+ * @param WT_WINDOW                     - create_window()
+ * @param WT_WIDGET                     - create_widget()
+ * @param WT_BUTTON                     - add_button()
+ * @param WT_ON_OFF_BUTTON              - add_on_off_button()
+ * @param WT_TOGGLE_BUTTON              - add_toggle_button()
+ * @param WT_IMAGE_TOGGLE_BUTTON        - add_image_toggle_button()
+ * @param WT_SWITCH_IMAGE_TOGGLE_BUTTON - add_switch_image_button()
+ * @param WT_CHECK_BUTTON               - add_check_box()
+ * @param WT_CHECK_BOX                  - add_check_box()
+ * @param WT_COMBOBOX                   - add_combobox()
+ * @param WT_FILE_DIALOG                - open_file_dialog()
+ * @param WT_KNOB                       - add_knob()
+ * @param WT_IMAGE_KNOB                 - add_image_knob()
+ * @param WT_LABEL                      - add_label()
+ * @param WT_LISTBOX                    - add_listbox()
+ * @param WT_LISTBOX_VIEWPORT           - create_listbox_viewport()
+ * @param WT_LISTBOX_ENTRY              - listbox_add_entry()
+ * @param WT_LISTVIEW                   - add_listview()
+ * @param WT_LISTVIEW_VIEWPORT          - create_listbox_viewport()
+ * @param WT_MENU                       - create_menu(), used by WT_COMBOBOX
+ * @param WT_MENU_VIEWPORT              - create_viewport()
+ * @param WT_MENU_ITEM                  - menu_add_item()
+ * @param WT_MENU_CHECK_ITEM            - menu_add_check_item()
+ * @param WT_MENU_RADIO_ITEM            - menu_add_radio_item()
+ * @param WT_MESSAGE_DIALOG             - open_message_dialog()
+ * @param WT_TEXT_ENTRY                 - create_entry_box(), used by WT_MESSAGE_DIALOG
+ * @param WT_VMETER                     - add_vmeter()
+ * @param WT_VMETER_SCALE               - add_vmeter()
+ * @param WT_HMETER                     - add_hmeter()
+ * @param WT_HMETER_SCALE               - add_hmeter()
+ * @param WT_MIDI_KEYBOARD              - open_midi_keyboard()
+ * @param WT_PLAYHEAD                   - add_playhead()
+ * @param WT_VSLIDER                    - add_vslider()
+ * @param WT_HSLIDER                    - add_hslider()
+ * @param WT_TOOLTIP                    - add_tooltip()
+ * @param WT_TUNER                      - add_tuner()
+ * @param WT_VALUEDISPLAY               - add_valuedisplay()
+ */
+
+typedef enum {
+    WT_NONE,
+    WT_WINDOW,
+    WT_WIDGET,
+    WT_BUTTON,
+    WT_ON_OFF_BUTTON,
+    WT_TOGGLE_BUTTON,
+    WT_IMAGE_TOGGLE_BUTTON,
+    WT_SWITCH_IMAGE_TOGGLE_BUTTON,
+    WT_CHECK_BUTTON,
+    WT_CHECK_BOX,
+    WT_COMBOBOX,
+    WT_FILE_DIALOG,
+    WT_KNOB,
+    WT_IMAGE_KNOB,
+    WT_LABEL,
+    WT_LISTBOX_VIEWPORT,
+    WT_LISTBOX,
+    WT_LISTBOX_ENTRY,
+    WT_LISTVIEW_VIEWPORT,
+    WT_LISTVIEW,
+    WT_MENU,
+    WT_MENU_VIEWPORT,
+    WT_MENU_ITEM,
+    WT_MENU_CHECK_ITEM,
+    WT_MENU_RADIO_ITEM,
+    WT_MESSAGE_DIALOG,
+    WT_VMETER,
+    WT_VMETER_SCALE,
+    WT_HMETER,
+    WT_HMETER_SCALE,
+    WT_MIDI_KEYBOARD,
+    WT_PLAYHEAD,
+    WT_VSLIDER,
+    WT_HSLIDER,
+    WT_TOOLTIP,
+    WT_TUNER,
+    WT_VALUEDISPLAY,
+    WT_TEXT_ENTRY,
+} WidgetType;
+
+/**
+ *
+ * @brief widget_type_names[]           - array with textual representations for WidgetType
+ * \n Max. length in characters for each name is XPUTTY_WIDGET_NAME_MAXLEN
+ * \n The last member "UKNOWN" is used for WidgetType out of bounds (0 < WidgetType < XPUTTY_WIDGET_NAME_COUNT)
+ */
+#define XPUTTY_WIDGET_NAME_COUNT 38
+#define XPUTTY_WIDGET_NAME_MAXLEN 256
+static const char widget_type_names[XPUTTY_WIDGET_NAME_COUNT + 1][XPUTTY_WIDGET_NAME_MAXLEN] = {
+    "WT_NONE",
+    "WT_WINDOW",
+    "WT_WIDGET",
+    "WT_BUTTON",
+    "WT_ON_OFF_BUTTON",
+    "WT_TOGGLE_BUTTON",
+    "WT_IMAGE_TOGGLE_BUTTON",
+    "WT_SWITCH_IMAGE_TOGGLE_BUTTON",
+    "WT_CHECK_BUTTON",
+    "WT_CHECK_BOX",
+    "WT_COMBOBOX",
+    "WT_FILE_DIALOG",
+    "WT_KNOB",
+    "WT_IMAGE_KNOB",
+    "WT_LABEL",
+    "WT_LISTBOX_VIEWPORT",
+    "WT_LISTBOX",
+    "WT_LISTBOX_ENTRY",
+    "WT_LISTVIEW_VIEWPORT",
+    "WT_LISTVIEW",
+    "WT_MENU",
+    "WT_MENU_VIEWPORT",
+    "WT_MENU_ITEM",
+    "WT_MENU_CHECK_ITEM",
+    "WT_MENU_RADIO_ITEM",
+    "WT_MESSAGE_DIALOG",
+    "WT_VMETER",
+    "WT_VMETER_SCALE",
+    "WT_HMETER",
+    "WT_HMETER_SCALE",
+    "WT_MIDI_KEYBOARD",
+    "WT_PLAYHEAD",
+    "WT_VSLIDER",
+    "WT_HSLIDER",
+    "WT_TOOLTIP",
+    "WT_TUNER",
+    "WT_VALUEDISPLAY",
+    "WT_TEXT_ENTRY",
+    "UNKNOWN"
+};
 
 /**
  * 
@@ -333,6 +473,8 @@ struct Widget_t {
     void *parent_struct;
 /** pointer to the Parent struct */
     void *private_struct;
+/** enum containing widget type/class (button, menu, ...) */
+    WidgetType widget_type;
 /** the main XEvent callback */
     vfunc event_callback;
 /** struct holding the event callbacks */
@@ -359,8 +501,10 @@ struct Widget_t {
     XIC xic;
 /** Context to Locale and UTF 8 support */
     XIM xim;
+#ifdef __linux__
 /** int to hold the widget state default = 0 */
     Time double_click;
+#endif
 /** int to hold user data */
     int data;
 /** time of the last button press */
@@ -379,6 +523,12 @@ struct Widget_t {
     int height;
 /** struct used to resize child widgets */
     Resize_t scale;
+#ifdef _WIN32 //Widget_t extensions
+/** _WIN32 helper for EnterNotify */
+    bool mouse_inside;
+/** _WIN32 helper for os_set_window_minimal_size() */
+    Metrics_t metrics_min;
+#endif //_WIN32 //Widget_t extensions
 /** notify widget that a paste is in clipboard */
     xevfunc xpaste_callback;
 };
@@ -418,7 +568,6 @@ Widget_t *create_widget(Xputty *app, Widget_t *win,
  * without type check. For supported events see: Func_t
  * @param **event           - the event to connect
  * @param *handler          - the handler to handle the event
- * @return void
  */
 
 void connect_func(void (**event)(), void (*handler)());
@@ -427,7 +576,6 @@ void connect_func(void (**event)(), void (*handler)());
  * @brief widget_set_title  - set window title for a Widget_t
  * @param *w                - pointer to the Widget_t to set the title
  * @param *title            - the title to store
- * @return void 
  */
 
 void widget_set_title(Widget_t *w, const char *title);
@@ -435,7 +583,6 @@ void widget_set_title(Widget_t *w, const char *title);
 /**
  * @brief widget_show       - map/show widget
  * @param *w                - pointer to the Widget_t to map
- * @return void 
  */
 
 void widget_show(Widget_t *w);
@@ -443,7 +590,6 @@ void widget_show(Widget_t *w);
 /**
  * @brief pop_widget_show_all   - map/show popup widget with all it's childs
  * @param *w                    - pointer to the Widget_t to map
- * @return void 
  */
 
 void pop_widget_show_all(Widget_t *w);
@@ -451,7 +597,6 @@ void pop_widget_show_all(Widget_t *w);
 /**
  * @brief submenu_widget_show_all   - map/show submenu Widget_t with all childs
  * @param *w                        - pointer to the Widget_t to map
- * @return void 
  */
 
 void submenu_widget_show_all(Widget_t *w);
@@ -459,7 +604,6 @@ void submenu_widget_show_all(Widget_t *w);
 /**
  * @brief widget_hide       - unmap/hide a Widget_t
  * @param *w                - pointer to the Widget_t to unmap
- * @return void 
  */
 
 void widget_hide(Widget_t *w);
@@ -467,7 +611,6 @@ void widget_hide(Widget_t *w);
 /**
  * @brief widget_hide_all   - unmap/hide all Widget_t from app
  * @param *w                - pointer to the Widget_t which send the unmap request
- * @return void 
  */
 
 void widget_hide_all(Widget_t *w);
@@ -475,7 +618,6 @@ void widget_hide_all(Widget_t *w);
 /**
  * @brief widget_show_all   - map/show Widget_t with all childs
  * @param *w                - pointer to the Widget_t to map
- * @return void 
  */
 
 void widget_show_all(Widget_t *w);
@@ -484,7 +626,6 @@ void widget_show_all(Widget_t *w);
  * @brief show_tooltip      - check if a Widget_t have a tooltip,
  * and show it, if a tooltip is available. 
  * @param *wid              - pointer to the Widget_t receiving the event
- * @return void
  */
 
 void show_tooltip(Widget_t *wid);
@@ -493,7 +634,6 @@ void show_tooltip(Widget_t *wid);
  * @brief hide_tooltip     - check if a Widget_t have a tooltip,
  * and hide it, if a tooltip is mapped. 
  * @param *wid              - pointer to the Widget_t receiving the event
- * @return void
  */
 
 void hide_tooltip(Widget_t *wid);
@@ -501,7 +641,6 @@ void hide_tooltip(Widget_t *wid);
 /**
  * @brief *get_toplevel_widget - get pointer to the top level Widget_t
  * @param *main                - pointer to the main Xputty struct
- * @return void 
  */
 
 Widget_t *get_toplevel_widget(Xputty *main);
@@ -509,7 +648,6 @@ Widget_t *get_toplevel_widget(Xputty *main);
 /**
  * @brief quit              - exit the main loop
  * @param *w                - pointer to the Widget_t sending the request
- * @return void 
  */
 
 void quit(Widget_t *w);
@@ -517,7 +655,6 @@ void quit(Widget_t *w);
 /**
  * @brief quit_widget       - remove a widget from the processing loop
  * @param *w                - pointer to the Widget_t sending the request
- * @return void 
  */
 
 void quit_widget(Widget_t *w);
@@ -529,7 +666,6 @@ void quit_widget(Widget_t *w);
  * \n this is the default setting for Widget_t
  * @param *wid              - pointer to the Widget_t receiving the event
  * @param *user_data        - void pointer to attached user_data
- * @return void 
  */
 
 void transparent_draw(void * wid, void* user_data);
@@ -538,7 +674,6 @@ void transparent_draw(void * wid, void* user_data);
  * @brief widget_draw       - redraw only the widget,not the child widgets
  * @param *wid              - pointer to the Widget_t receiving the event
  * @param *user_data        - void pointer to attached user_data
- * @return void 
  */
 
 void widget_draw(void * w_, void* user_data);
@@ -546,7 +681,6 @@ void widget_draw(void * w_, void* user_data);
 /**
  * @brief resize_childs      - intern check if child widgets needs resizing
  * @param *wid               - pointer to the Widget_t receive the event
- * @return void 
  */
 
 void resize_childs(Widget_t *wid);
@@ -555,7 +689,6 @@ void resize_childs(Widget_t *wid);
  * @brief widget_reset_scale - used to reset scaling mode after a image surface
  * is drawn to the Widget_t surface with widget_set_scale()
  * @param *w                 - pointer to the Widget_t sending the request
- * @return void 
  */
 
 void widget_reset_scale(Widget_t *w);
@@ -564,7 +697,6 @@ void widget_reset_scale(Widget_t *w);
  * @brief widget_set_scale   - set scaling mode to scale a image surface
  * to the size of the Widget_t surface
  * @param *w                 - pointer to the Widget_t sending the request
- * @return void 
  */
 
 void widget_set_scale(Widget_t *w);
@@ -576,7 +708,6 @@ void widget_set_scale(Widget_t *w);
  * Widget_t itself close.
  * @param *w                - pointer to the Widget_t sending the request
  * @param *main             - pointer to main struct
- * @return void 
  */
 
 void destroy_widget(Widget_t *w, Xputty *main);
@@ -588,7 +719,6 @@ void destroy_widget(Widget_t *w, Xputty *main);
  * @param *main             - void pointer to the Xputty *main struct running 
  * the event loop
  * @param *user_data        - void pointer to attached user_data
- * @return void 
  */
 
 void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data);
@@ -599,7 +729,6 @@ void widget_event_loop(void *w_, void* event, Xputty *main, void* user_data);
  * @param *w                   - pointer to the Widget_t to send the notify
  * @param x,y                  - the new Widget_t position
  * @param width,height         - the new Widget_t size
- * @return void 
  */
 
 void send_configure_event(Widget_t *w,int x, int y, int width, int height);
@@ -608,7 +737,6 @@ void send_configure_event(Widget_t *w,int x, int y, int width, int height);
  * @brief send_button_press_event   - send ButtonPress event to Widget_t
  * \n simulate a BUTTON_PRESS Event
  * @param *w                        - pointer to the Widget_t to send the notify
- * @return void 
  */
 
 void send_button_press_event(Widget_t *w);
@@ -617,7 +745,6 @@ void send_button_press_event(Widget_t *w);
  * @brief send_button_release_event - send ButtonRelease event to Widget_t
  * \n simulate a BUTTON_RELEASE Event
  * @param *w                        - pointer to the Widget_t to send the notify
- * @return void 
  */
 
 void send_button_release_event(Widget_t *w);
@@ -626,7 +753,6 @@ void send_button_release_event(Widget_t *w);
  * @brief send_systray_message      - request a systray icon for Widget_t
  * \n currently not working
  * @param *w                        - pointer to the Widget_t to send the notify
- * @return void 
  */
 
 void send_systray_message(Widget_t *w);
@@ -634,7 +760,6 @@ void send_systray_message(Widget_t *w);
 /**
  * @brief expose_widgets    - send a expose event (EXPOSE) to a Widget_t
  * @param w                 - the Widget_t to send the event to
- * @return void
  */
 
 void expose_widget(Widget_t *w);
@@ -649,11 +774,18 @@ void expose_widget(Widget_t *w);
 int key_mapping(Display *dpy, XKeyEvent *xkey);
 
 /**
+ * @brief widget_type_name  - textual representation of (Widget_t*)->widget_type
+ * @param w                 - the Widget_t* to query (NULL is allowed)
+ * @return const char*      - zero terminated string; must not be free()d
+ */
+
+const char *widget_type_name(Widget_t *w);
+
+/**
  * @brief strdecode         - replace string in char*
  * @param *target           - the string to modify
  * @param *needle           - the string to replace
  * @param *replacement      - the replacement for the needle
- * @return void
  */
 
 void strdecode(char *target, const char *needle, const char *replacement);
@@ -661,7 +793,6 @@ void strdecode(char *target, const char *needle, const char *replacement);
 /**
  * @brief widget_set_dnd_aware    - allow drag and drop for on Widget_t
  * @param w                       - the Widget_t to send the event to
- * @return void 
  */
 
 void widget_set_dnd_aware(Widget_t *w);
@@ -669,7 +800,6 @@ void widget_set_dnd_aware(Widget_t *w);
 /**
  * @brief widget_set_dnd_unaware  - disable drag and drop for on Widget_t
  * @param w                       - the Widget_t to send the event to
- * @return void 
  */
 
 void widget_set_dnd_unaware(Widget_t *w);
@@ -678,7 +808,6 @@ void widget_set_dnd_unaware(Widget_t *w);
  * @brief handle_drag_data  - handle recived drag data
  * @param w                 - the Widget_t recive the event
  * @param event             - the drag event contain the drop data
- * @return void 
  */
 
 void handle_drag_data(Widget_t *w, XEvent* event);
@@ -687,7 +816,6 @@ void handle_drag_data(Widget_t *w, XEvent* event);
  * @brief handle_drag_enter - handle  drag event enter the Widget_t
  * @param main              - pointer to the Xputty *main struct running
  * @param event             - the drag event contain the drop data
- * @return void 
  */
 
 void handle_dnd_enter(Xputty *main, XEvent* event);
@@ -696,7 +824,6 @@ void handle_dnd_enter(Xputty *main, XEvent* event);
  * @brief send_dnd_finished_event - notify the drag sender that the event is handled
  * @param w                       - the Widget_t handled the event 
  * @param event                   - the drag event contain the drop data
- * @return void 
  */
 
 void send_dnd_finished_event(Widget_t *w, XEvent* event);
@@ -705,7 +832,6 @@ void send_dnd_finished_event(Widget_t *w, XEvent* event);
  * @brief send_dnd_status_event   - notify the drag sender that prepared to recive the event
  * @param w                       - the Widget_t to recive the event 
  * @param event                   - the drag event contain the drop data
- * @return void 
  */
 
 void send_dnd_status_event(Widget_t *w, XEvent* event);
@@ -715,7 +841,6 @@ void send_dnd_status_event(Widget_t *w, XEvent* event);
  * @param w                       - the Widget_t to send the event 
  * @param text                    - the text buffer to send to clipboard 
  * @param size                    - the size of the buffer to send
- * @return void 
  */
 
 void copy_to_clipboard(Widget_t *w, char* text, int size);
@@ -724,7 +849,6 @@ void copy_to_clipboard(Widget_t *w, char* text, int size);
  * @brief send_to_clipboard       - send textbuffer to clipboard on request
  * @param w                       - the Widget_t to send the event 
  * @param event                   - the event contain the request
- * @return void 
  */
 
 void send_to_clipboard(Widget_t *w, XEvent* event);
@@ -733,7 +857,6 @@ void send_to_clipboard(Widget_t *w, XEvent* event);
 /**
  * @brief have_paste                     - check if clipboard contain a textbuffer
  * @param w                              - the Widget_t to send the request 
- * @return void 
  */
 
 int have_paste(Widget_t *w);
@@ -741,7 +864,6 @@ int have_paste(Widget_t *w);
 /**
  * @brief request_paste_from_clipboard   - request textbuffer from clipboard
  * @param w                              - the Widget_t to send the request 
- * @return void 
  */
 
 void request_paste_from_clipboard(Widget_t *w);
@@ -750,7 +872,6 @@ void request_paste_from_clipboard(Widget_t *w);
  * @brief receive_paste_from_clipboard   - receive textbuffer from clipboard
  * @param w                              - the Widget_t which requested the buffer 
  * @param event                          - the event contain the request
- * @return void 
  */
 
 void receive_paste_from_clipboard(Widget_t *w, XEvent* event);

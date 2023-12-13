@@ -32,8 +32,8 @@ Widget_t* add_button(Widget_t *parent, const char * label,
     wid->adj = wid->adj_y;
     wid->scale.gravity = CENTER;
     wid->func.expose_callback = _draw_base_button;
-    wid->func.enter_callback = transparent_draw;
-    wid->func.leave_callback = transparent_draw;
+    wid->func.enter_callback = os_transparent_draw;
+    wid->func.leave_callback = os_transparent_draw;
     wid->func.button_press_callback = _button_pressed;
     wid->func.button_release_callback = _button_released;
     return wid;
@@ -48,8 +48,8 @@ Widget_t* add_image_button(Widget_t *parent, const char * label,
     wid->adj = wid->adj_y;
     wid->scale.gravity = CENTER;
     wid->func.expose_callback = _draw_button;
-    wid->func.enter_callback = transparent_draw;
-    wid->func.leave_callback = transparent_draw;
+    wid->func.enter_callback = os_transparent_draw;
+    wid->func.leave_callback = os_transparent_draw;
     wid->func.button_press_callback = _button_pressed;
     wid->func.button_release_callback = _button_released;
     return wid;
@@ -63,8 +63,8 @@ Widget_t* add_on_off_button(Widget_t *parent, const char * label,
     wid->adj = wid->adj_y;
     wid->scale.gravity = CENTER;
     wid->func.expose_callback = _draw_on_off_button;
-    wid->func.enter_callback = transparent_draw;
-    wid->func.leave_callback = transparent_draw;
+    wid->func.enter_callback = os_transparent_draw;
+    wid->func.leave_callback = os_transparent_draw;
     wid->func.button_press_callback = _toggle_button_pressed;
     wid->func.button_release_callback = _toggle_button_released;
     return wid;
@@ -79,8 +79,8 @@ Widget_t* add_toggle_button(Widget_t *parent, const char * label,
     wid->adj = wid->adj_y;
     wid->scale.gravity = CENTER;
     wid->func.expose_callback = _draw_base_button;
-    wid->func.enter_callback = transparent_draw;
-    wid->func.leave_callback = transparent_draw;
+    wid->func.enter_callback = os_transparent_draw;
+    wid->func.leave_callback = os_transparent_draw;
     wid->func.button_press_callback = _toggle_button_pressed;
     wid->func.button_release_callback = _toggle_button_released;
     return wid;
@@ -95,8 +95,8 @@ Widget_t* add_image_toggle_button(Widget_t *parent, const char * label,
     wid->adj = wid->adj_y;
     wid->scale.gravity = CENTER;
     wid->func.expose_callback = _draw_ti_button;
-    wid->func.enter_callback = transparent_draw;
-    wid->func.leave_callback = transparent_draw;
+    wid->func.enter_callback = os_transparent_draw;
+    wid->func.leave_callback = os_transparent_draw;
     wid->func.button_press_callback = _toggle_button_pressed;
     wid->func.button_release_callback = _toggle_button_released;
     return wid;
@@ -111,8 +111,8 @@ Widget_t* add_switch_image_button(Widget_t *parent, const char * label,
     wid->adj = wid->adj_y;
     wid->scale.gravity = ASPECT;
     wid->func.expose_callback = _draw_switch_image_button;
-    wid->func.enter_callback = transparent_draw;
-    wid->func.leave_callback = transparent_draw;
+    wid->func.enter_callback = os_transparent_draw;
+    wid->func.leave_callback = os_transparent_draw;
     wid->func.button_press_callback = _toggle_button_pressed;
     wid->func.button_release_callback = _toggle_button_released;
     return wid;
@@ -127,8 +127,8 @@ Widget_t* add_check_button(Widget_t *parent, const char * label,
     wid->adj = wid->adj_y;
     wid->scale.gravity = CENTER;
     wid->func.expose_callback = _draw_check_button;
-    wid->func.enter_callback = transparent_draw;
-    wid->func.leave_callback = transparent_draw;
+    wid->func.enter_callback = os_transparent_draw;
+    wid->func.leave_callback = os_transparent_draw;
     wid->func.button_press_callback = _toggle_button_pressed;
     wid->func.button_release_callback = _toggle_button_released;
     return wid;
@@ -147,8 +147,8 @@ Widget_t* add_check_box(Widget_t *parent, const char * label,
     wid->adj = wid->adj_y;
     wid->scale.gravity = CENTER;
     wid->func.expose_callback = _draw_check_box;
-    wid->func.enter_callback = transparent_draw;
-    wid->func.leave_callback = transparent_draw;
+    wid->func.enter_callback = os_transparent_draw;
+    wid->func.leave_callback = os_transparent_draw;
     wid->func.button_press_callback = _toggle_button_pressed;
     wid->func.button_release_callback = _toggle_button_released;
     return wid;

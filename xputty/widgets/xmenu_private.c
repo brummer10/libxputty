@@ -43,9 +43,9 @@ int _menu_remove_low_dash(char *str) {
 
 void _draw_menu_label(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int height = metrics.height;
 
     cairo_text_extents_t extents;
     use_text_color_scheme(w, get_color_state(w));
@@ -84,7 +84,11 @@ void _check_menu_state(void *w_, void* user_data) {
         Widget_t *wid = parent->childlist->childs[i];
         if (childlist_has_child(wid->childlist)) {
             if ((wid->childlist->childs[0] == w->app->hold_grab) && (wid !=w)) {
+#ifdef _WIN32   //SetCaptureDisabled//XUngrabPointer
+                //ReleaseCapture(); // SetCapture() is currently disabled in pop_menu_show()
+#else
                 XUngrabPointer(w->app->dpy,CurrentTime);
+#endif
                 widget_hide(w->app->hold_grab);
                 w->app->hold_grab = NULL;
                 if (w->app->submenu) {
@@ -96,7 +100,7 @@ void _check_menu_state(void *w_, void* user_data) {
             }
         }
     }
-    transparent_draw(w_, user_data);
+    os_transparent_draw(w_, user_data);
 }
 
 void _menu_released(void *w_, void* button_, void* user_data) {
@@ -129,11 +133,11 @@ void _draw_menu_slider(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     int v = (int)w->adj->max_value;
     if (!v) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    if (attrs.map_state != IsViewable) return;
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
+    if (!metrics.visible) return;
     float sliderstate = adj_get_state(w->adj);
     use_bg_color_scheme(w, get_color_state(w));
     cairo_rectangle(w->crb, 0,0,width,height);
@@ -155,11 +159,11 @@ void _draw_menu(void *w_, void* user_data) {
 void _draw_submenu(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width;
-    int height = attrs.height;
-    if (attrs.map_state != IsViewable) return;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
+    if (!metrics.visible) return;
 
     use_base_color_scheme(w, NORMAL_);
     cairo_rectangle(w->crb, 0, 0, width , height);
@@ -206,9 +210,9 @@ void _draw_submenu(void *w_, void* user_data) {
 
 void _enter_submenu(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    if (attrs.map_state != IsViewable) return;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    if (!metrics.visible) return;
     if (childlist_has_child(w->childlist)) {
         if (w->app->submenu) {
             if (w->app->submenu != w->childlist->childs[0]) {
@@ -218,13 +222,14 @@ void _enter_submenu(void *w_, void* user_data) {
         }
         pop_submenu_show(w, w->childlist->childs[0], 6, false);
     }
-    transparent_draw(w_, user_data);
+    os_transparent_draw(w_, user_data);
 }
 
 void _leave_submenu(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
 
     if (!w->data) {
+#ifdef __linux__ 
         XCrossingEvent notify;
         memset(&notify, 0, sizeof(notify));
         notify.type = LeaveNotify;
@@ -237,7 +242,7 @@ void _leave_submenu(void *w_, void* user_data) {
         notify.same_screen = True;
         notify.focus = False;
         XSendEvent(w->app->dpy, w->widget,True,LeaveWindowMask, (XEvent*)&notify);
-
+#endif
         w->data = 1;
         return;
     }
@@ -255,17 +260,17 @@ void _leave_submenu(void *w_, void* user_data) {
         }
         
     }
-    transparent_draw(w_, user_data);
+    os_transparent_draw(w_, user_data);
 }
 
 void _draw_item(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width;
-    int height = attrs.height;
-    if (attrs.map_state != IsViewable) return;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
+    if (!metrics.visible) return;
 
     use_base_color_scheme(w, NORMAL_);
     cairo_rectangle(w->crb, 0, 0, width , height);
@@ -294,11 +299,11 @@ void _draw_item(void *w_, void* user_data) {
 void _draw_value_item(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width;
-    int height = attrs.height;
-    if (attrs.map_state != IsViewable) return;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width-2;
+    int height = metrics.height-2;
+    if (!metrics.visible) return;
 
     use_base_color_scheme(w, NORMAL_);
     cairo_rectangle(w->crb, 0, 0, width , height);
@@ -336,11 +341,11 @@ void _draw_value_item(void *w_, void* user_data) {
 void _draw_accel_item(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width;
-    int height = attrs.height;
-    if (attrs.map_state != IsViewable) return;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
+    if (!metrics.visible) return;
 
     use_base_color_scheme(w, NORMAL_);
     cairo_rectangle(w->crb, 0, 0, width , height);
@@ -386,9 +391,9 @@ void _draw_accel_item(void *w_, void* user_data) {
 void _draw_accel_check_item(void *w_, void* user_data) {
     _draw_accel_item(w_, user_data);
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int height = metrics.height;
     if (w->flags & IS_RADIO) {
         cairo_arc(w->crb, height/3, height/2, height/6, 0, 2 * M_PI );
     } else {
@@ -410,9 +415,9 @@ void _draw_accel_check_item(void *w_, void* user_data) {
 void _draw_check_item(void *w_, void* user_data) {
     _draw_item(w_, user_data);
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int height = metrics.height;
     if (w->flags & IS_RADIO) {
         cairo_arc(w->crb, height/3, height/2, height/6, 0, 2 * M_PI );
     } else {
@@ -436,10 +441,10 @@ void _set_viewpoint(void *w_, void* user_data) {
     Widget_t *menu = (Widget_t*)w->parent;
     Widget_t* slider =  menu->childlist->childs[1];
     int v = (int)max(0,adj_get_value(w->adj));
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->childlist->childs[0]->widget, &attrs);
-    int height = attrs.height;
-    XMoveWindow(w->app->dpy,w->widget,0, -height*v);
+    Metrics_t metrics;
+    os_get_window_metrics(w->childlist->childs[0], &metrics);
+    int height = metrics.height;
+    os_move_window(w->app->dpy,w,0, -height*v);
     adj_set_state(slider->adj,adj_get_state(w->adj));
 }
 
@@ -474,14 +479,13 @@ void _configure_menu(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     Widget_t* view_port =  menu->childlist->childs[0];
     Widget_t *slider =  menu->childlist->childs[1];
     if (!view_port->childlist->elem) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(menu->app->dpy, (Window)view_port->childlist->childs[0]->widget, &attrs);
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(view_port->childlist->childs[0], &metrics);
+    int height = metrics.height;
     int x1, y1;
     int posy = (above) ? parent->height : 0;
     int posx = (above) ? 0 : parent->width ;
-    Window child;
-    XTranslateCoordinates( parent->app->dpy, parent->widget, DefaultRootWindow(parent->app->dpy), posx, posy, &x1, &y1, &child );
+    os_translate_coords(parent, parent->widget, os_get_root_window(parent->app, IS_WIDGET), posx, posy, &x1, &y1);
     int item_width = 1.0;
     cairo_text_extents_t extents;
     int i = view_port->childlist->elem-1;
@@ -504,12 +508,12 @@ void _configure_menu(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     }
     slider->adj->step = max(0.0,1.0/(view_port->childlist->elem-elem));
     adj_set_scale(slider->adj, ((float)view_port->childlist->elem/(float)elem)/25.0);
-    int snum = DefaultScreen(parent->app->dpy);
-    int screen_height = DisplayHeight(parent->app->dpy, snum);
+
+    int screen_height = os_get_screen_height(parent);
     if (y1+(height*elem) > screen_height) y1 = y1-((height*elem)+parent->height);
-    XResizeWindow (menu->app->dpy, menu->widget, item_width, height*elem);
-    XResizeWindow (view_port->app->dpy, view_port->widget, item_width, height*view_port->childlist->elem);
-    XMoveWindow(menu->app->dpy,slider->widget,item_width-10, 0);
-    XResizeWindow(menu->app->dpy,slider->widget,10,height*elem);
-    XMoveWindow(menu->app->dpy,menu->widget,x1, y1);
+    os_resize_window (menu->app->dpy, menu, item_width, height*elem);
+    os_resize_window (view_port->app->dpy, view_port, item_width, height*view_port->childlist->elem);
+    os_move_window(menu->app->dpy,slider,item_width-10, 0);
+    os_resize_window(menu->app->dpy,slider,10,height*elem);
+    os_move_window(menu->app->dpy,menu,x1, y1);
 }

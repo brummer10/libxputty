@@ -375,11 +375,12 @@ void use_matrix_color(Widget_t *w, int c) {
 
 static void draw_keyboard(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width_t = attrs.width;
-    int height_t = attrs.height;
-    if (attrs.map_state != IsViewable) return;
+    Metrics_t m;
+    int width_t, height_t;
+    os_get_window_metrics(w, &m);
+    width_t = m.width;
+    height_t = m.height;
+    if (!m.visible) return;
     MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
  
     int space = 2;
@@ -553,11 +554,12 @@ static void keyboard_motion(void *w_, void* xmotion_, void* user_data) {
     Widget_t *p = (Widget_t *)w->parent;
     MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
     XMotionEvent *xmotion = (XMotionEvent*)xmotion_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    if (attrs.map_state != IsViewable) return;
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t m;
+    int width, height;
+    os_get_window_metrics(w, &m);
+    if (!m.visible) return;
+    width = m.width;
+    height = m.height;
 
     bool catchit = false;
 
@@ -689,16 +691,23 @@ static void key_press(void *w_, void *key_, void *user_data) {
     MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
     XKeyEvent *key = (XKeyEvent*)key_;
     if (!key) return;
+#ifdef __linux__
     if (adj_get_value(keys->grab_keyboard->adj)) {
         char xkeys[32];
         XQueryKeymap(w->app->dpy, xkeys);
         if (!(xkeys[key->keycode>>3] & (0x1 << (key->keycode % 8)))) return;
     }
-    if (key->state & ControlMask) {
-        p->func.key_press_callback(p, key_, user_data);
-    } else {
+#endif
+   // if (key->state & ControlMask) {
+   //     p->func.key_press_callback(p, key_, user_data);
+   // } else {
         float outkey = 0.0;
+#ifdef _WIN32 //KeybHandler
+        KeySym sym = key->keycode;
+        if (key->vk_is_final_char) return; // only real KEY_DOWN, dead-key support not required/wanted
+#else
         KeySym sym = XLookupKeysym (key, 0);
+#endif
         get_outkey(keys, sym, &outkey);
 
         if ((int)outkey && !is_key_in_matrix(keys->key_matrix, (int)outkey+keys->octave)) {
@@ -715,7 +724,7 @@ static void key_press(void *w_, void *key_, void *user_data) {
             keys->mk_send_all_sound_off(p, NULL);
             expose_widget(w);
         }
-    }
+    //}
 }
 
 static void key_release(void *w_, void *key_, void *user_data) {
@@ -725,13 +734,17 @@ static void key_release(void *w_, void *key_, void *user_data) {
     MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
     XKeyEvent *key = (XKeyEvent*)key_;
     if (!key) return;
+#ifdef __linux__
     if (adj_get_value(keys->grab_keyboard->adj)) {
         char xkeys[32];
         XQueryKeymap(w->app->dpy, xkeys);
         if ((xkeys[key->keycode>>3] & (0x1 << (key->keycode % 8)))) return;
     }
-    float outkey = 0.0;
     KeySym sym = XLookupKeysym (key, 0);
+#else
+    KeySym sym = key->keycode;
+#endif
+    float outkey = 0.0;
     get_outkey(keys, sym, &outkey);
     if ((int)outkey && is_key_in_matrix(keys->key_matrix, (int)outkey+keys->octave)) {
         set_key_in_matrix(keys->key_matrix,(int)outkey+keys->octave,false);
@@ -850,6 +863,7 @@ static void velocity_changed(void *w_, void* user_data) {
 }
 
 static void grab_callback(void *w_, void* user_data) {
+#ifdef __linux__
     Widget_t *w = (Widget_t*)w_;
     MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
     if (adj_get_value(w->adj)) {
@@ -858,6 +872,7 @@ static void grab_callback(void *w_, void* user_data) {
     } else {
         XUngrabKeyboard(w->app->dpy, CurrentTime); 
     }
+#endif
 }
 
 void read_keymap(const char* keymapfile, long keys[128][2]) {
@@ -892,18 +907,14 @@ Widget_t *add_midi_keyboard(Widget_t *parent, const char * label,
                             int x, int y, int width, int height) {
     Widget_t *wid = create_widget(parent->app, parent, x, y, width, height);
     wid->label = label;
-    XSelectInput(parent->app->dpy, wid->widget,StructureNotifyMask|ExposureMask|KeyPressMask 
-                    |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask|KeyReleaseMask
-                    |ButtonPressMask|Button1MotionMask|PointerMotionMask);
+    os_set_input_mask(wid);
     add_keyboard(wid, label);
     return wid;
 }
 
 Widget_t *open_midi_keyboard(Widget_t *w, const char * label) {
-    Widget_t *wid = create_window(w->app, DefaultRootWindow(w->app->dpy), 0, 0, 700, 200);
-    XSelectInput(wid->app->dpy, wid->widget,StructureNotifyMask|ExposureMask|KeyPressMask 
-                    |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask|KeyReleaseMask
-                    |ButtonPressMask|Button1MotionMask|PointerMotionMask);
+    Widget_t *wid = create_window(w->app, os_get_root_window(w->app, IS_WINDOW), 0, 0, 700, 200);
+    os_set_input_mask(wid);
     add_keyboard(wid, label);
     wid->parent = w;
     return wid;

@@ -38,7 +38,6 @@ extern "C" {
  * childlist array to new size
  * \n You didn't need to call this
  * @param *childlist          - pointer to the Childlist_t
- * @return void 
  */
 
 void _childlist_add_elem(Childlist_t *childlist);

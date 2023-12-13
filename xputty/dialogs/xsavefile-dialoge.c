@@ -31,7 +31,9 @@
 #include <stdarg.h> 
 #include <string.h>
 #include <unistd.h>
+#ifdef __linux__
 #include <pwd.h>
+#endif
 
 #include <libgen.h>
 
@@ -45,11 +47,11 @@ static void set_selected_file(FileDialog *file_dialog, int reload);
 
 static void draw_window(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width;
-    int height = attrs.height;
-    if (attrs.map_state != IsViewable) return;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
+    if (!metrics.visible) return;
 
     cairo_rectangle(w->crb,0,0,width,height);
     set_pattern(w,&w->color_scheme->selected,&w->color_scheme->normal,BACKGROUND_);
@@ -150,16 +152,18 @@ static void set_selected_file(FileDialog *file_dialog, int reload) {
     file_dialog->fp->selected_file = NULL;
     get_entry(file_dialog->text_entry);
     if (strlen(file_dialog->text_entry->label)) {
-        asprintf(&file_dialog->fp->selected_file, "%s/%s", comboboxlist->list_names[(int)adj_get_value(file_dialog->ct->adj)],
+        asprintf(&file_dialog->fp->selected_file, "%s%s%s", comboboxlist->list_names[(int)adj_get_value(file_dialog->ct->adj)],
+            PATH_SEPARATOR,
             file_dialog->text_entry->label);
     } else if(file_dialog->fp->file_counter ) {
-        struct stat sb;
-        if (stat(file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)], &sb) == 0 && S_ISDIR(sb.st_mode)) {
+
+    if (os_is_directory(file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)])) {
             asprintf(&file_dialog->fp->path, "%s",file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)]);
             if (reload) reload_from_dir(file_dialog);
             return;
         }
-        asprintf(&file_dialog->fp->selected_file, "%s/%s", comboboxlist->list_names[(int)adj_get_value(file_dialog->ct->adj)],
+        asprintf(&file_dialog->fp->selected_file, "%s%s%s", comboboxlist->list_names[(int)adj_get_value(file_dialog->ct->adj)],
+            PATH_SEPARATOR,
             file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)]);
     }
 }
@@ -322,11 +326,11 @@ static void set_filter_callback(void *w_, void* user_data) {
 static void draw_entry(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width;
-    int height = attrs.height;
-    if (attrs.map_state != IsViewable) return;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width-2;
+    int height = metrics.height-2;
+    if (!metrics.visible) return;
 
     use_base_color_scheme(w, NORMAL_);
     cairo_rectangle(w->cr,0,0,width,height);
@@ -409,16 +413,14 @@ static void entry_get_text(void *w_, void *key_, void *user_data) {
     if (nk == 11) {
         entry_clip(w);
     } else {
-        Status status;
-        KeySym keysym;
         char buf[32];
-        Xutf8LookupString(w->xic, key, buf, sizeof(buf) - 1, &keysym, &status);
-        if (keysym == XK_Return) {
+        bool status = os_get_keyboard_input(w, key, buf, sizeof(buf) - 1);
+        if (key_mapping(w->app->dpy, key) == 10) {
             FileDialog *file_dialog = (FileDialog *)w->parent_struct;
             save_on_enter(file_dialog->w_okay);
             return;
         }
-        if(status == XLookupChars || status == XLookupBoth){
+        if(status){
             entry_add_text(w, buf);
         }
     }
@@ -434,6 +436,7 @@ static void fd_mem_free(void *w_, void* user_data) {
     free(file_dialog);
 }
 
+#ifdef __linux__
 static int starts_with(const char *restrict string, const char *restrict prefix) {
     while(*prefix)
     {
@@ -536,15 +539,17 @@ static void add_xdg_dirs(FileDialog *file_dialog) {
     file_dialog->xdg_dirs->func.button_release_callback = xdg_dir_select_callback;
     listview_unset_active_entry(file_dialog->xdg_dirs);
 }
+#endif
 
 Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     FileDialog *file_dialog = (FileDialog*)malloc(sizeof(FileDialog));
     
     file_dialog->xdg_user_dirs = NULL;
     file_dialog->xdg_dir_counter = 0;
-    parse_xdg_dirs(file_dialog);
     file_dialog->fp = (FilePicker*)malloc(sizeof(FilePicker));
 
+#ifdef __linux__
+    parse_xdg_dirs(file_dialog);
     struct stat sb;
     if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode)) {
         fp_init(file_dialog->fp, path);
@@ -553,19 +558,21 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     } else {
         fp_init(file_dialog->fp, "/");
     }
+#else
+    DWORD attr = GetFileAttributes(path);
+    if (attr&FILE_ATTRIBUTE_DIRECTORY) {
+        fp_init(file_dialog->fp, path);
+    } else {
+        fp_init(file_dialog->fp, "c:\\");
+    }
+
+#endif
 
     file_dialog->parent = w;
     file_dialog->send_clear_func = true;
 
-    file_dialog->w = create_window(w->app, DefaultRootWindow(w->app->dpy), 0, 0, 660, 420);
-    file_dialog->w->flags |= HAS_MEM;
-    file_dialog->w->parent_struct = file_dialog;
-    widget_set_title(file_dialog->w, _("File Save"));
-    file_dialog->w->func.expose_callback = draw_window;
-    file_dialog->w->func.key_press_callback = forward_key_press;
-    file_dialog->w->func.mem_free_callback = fd_mem_free;
-    widget_set_icon_from_png(file_dialog->w,LDVAR(directory_png));
-
+    file_dialog->w = create_window(w->app, os_get_root_window(w->app, IS_WINDOW), 0, 0, 660, 420);
+#ifdef __linux__
     XSizeHints* win_size_hints;
     win_size_hints = XAllocSizeHints();
     win_size_hints->flags =  PMinSize|PBaseSize|PMaxSize|PWinGravity;
@@ -578,6 +585,14 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     win_size_hints->win_gravity = CenterGravity;
     XSetWMNormalHints(file_dialog->w->app->dpy, file_dialog->w->widget, win_size_hints);
     XFree(win_size_hints);
+#endif
+    file_dialog->w->flags |= HAS_MEM;
+    file_dialog->w->parent_struct = file_dialog;
+    widget_set_title(file_dialog->w, _("File Save"));
+    file_dialog->w->func.expose_callback = draw_window;
+    file_dialog->w->func.key_press_callback = forward_key_press;
+    file_dialog->w->func.mem_free_callback = fd_mem_free;
+    widget_set_icon_from_png(file_dialog->w,LDVAR(directory_png));
 
     file_dialog->ct = add_combobox(file_dialog->w, "", 20, 40, 550, 30);
     file_dialog->ct->parent_struct = file_dialog;
@@ -609,8 +624,9 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     }
     file_dialog->ft->func.value_changed_callback = file_released_callback;
 
+#ifdef __linux__
     add_xdg_dirs(file_dialog);
-
+#endif
     file_dialog->text_entry = create_widget(file_dialog->w->app, file_dialog->w, 130, 320, 200, 30);
     memset(file_dialog->text_entry->input_label, 0, 32 * (sizeof file_dialog->text_entry->input_label[0]) );
     file_dialog->text_entry->func.expose_callback = entry_add_text;
@@ -618,9 +634,11 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->text_entry->flags &= ~USE_TRANSPARENCY;
     file_dialog->text_entry->scale.gravity = EASTWEST;
     file_dialog->text_entry->parent_struct = file_dialog;
+#ifdef __linux__
     Cursor c = XCreateFontCursor(file_dialog->w->app->dpy, XC_xterm);
     XDefineCursor (file_dialog->w->app->dpy, file_dialog->text_entry->widget, c);
     XFreeCursor(file_dialog->w->app->dpy, c);
+#endif
 
     file_dialog->w_quit = add_button(file_dialog->w, _("Cancel"), 580, 350, 60, 60);
     file_dialog->w_quit->parent_struct = file_dialog;

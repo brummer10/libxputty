@@ -24,10 +24,11 @@
 
 void _draw_label(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width-2;
+    int height = metrics.height-2;
+    if (!metrics.visible) return;
 
     cairo_text_extents_t extents;
     use_text_color_scheme(w, get_color_state(w));

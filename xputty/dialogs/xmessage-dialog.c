@@ -39,10 +39,10 @@ void hyperlink_pressed(void *w_, void* button_, void* user_data) {
 
 void draw_hyperlink(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
 
     cairo_text_extents_t extents;
     use_fg_color_scheme(w, get_color_state(w));
@@ -59,9 +59,11 @@ Widget_t *create_hyperlink(Widget_t *w, char*label, int x, int y,
     Widget_t *wid = create_widget(w->app, w, x, y, width, height);
     wid->label = label;
     wid->scale.gravity = ASPECT;
+#ifdef __linux__
     Cursor c = XCreateFontCursor(wid->app->dpy, XC_hand2);
     XDefineCursor (wid->app->dpy, wid->widget, c);
     XFreeCursor(wid->app->dpy, c);
+#endif
     wid->func.enter_callback = transparent_draw;
     wid->func.leave_callback = transparent_draw;
     wid->func.expose_callback = draw_hyperlink;
@@ -70,7 +72,7 @@ Widget_t *create_hyperlink(Widget_t *w, char*label, int x, int y,
 }
 
 static void draw_message_label(Widget_t *w, int width, int height) {
-    MessageBox *mb = (MessageBox *)w->parent_struct;
+    MessageDialog *mb = (MessageDialog *)w->parent_struct;
     cairo_text_extents_t extents;
     use_fg_color_scheme(w, NORMAL_);
     cairo_set_font_size (w->crb, 12.0);
@@ -89,19 +91,19 @@ static void draw_message_label(Widget_t *w, int width, int height) {
 
 static void draw_message_window(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width_t = attrs.width;
-    int height_t = attrs.height;
-    if (attrs.map_state != IsViewable) return;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width_t = metrics.width;
+    int height_t = metrics.height;
+    if (!metrics.visible) return;
 
     cairo_rectangle(w->crb,0,0,width_t,height_t);
     set_pattern(w,&w->color_scheme->selected,&w->color_scheme->normal,BACKGROUND_);
     cairo_fill (w->crb);
 
     widget_set_scale(w);
-    int width = cairo_xlib_surface_get_width(w->image);
-    int height = cairo_xlib_surface_get_height(w->image);
+    int width, height;
+    os_get_surface_size(w->image, &width, &height);
     double x = 64.0/(double)(width);
     double y = 64.0/(double)height;
     double x1 = (double)height/64.0;
@@ -119,11 +121,11 @@ static void draw_message_window(void *w_, void* user_data) {
 static void draw_entry(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width;
-    int height = attrs.height;
-    if (attrs.map_state != IsViewable) return;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
+    if (!metrics.visible) return;
 
     use_base_color_scheme(w, NORMAL_);
     cairo_rectangle(w->cr,0,0,width,height);
@@ -201,7 +203,7 @@ static void message_okay_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (w->flags & HAS_POINTER && !*(int*)user_data){
         Widget_t *p = (Widget_t*)w->parent;
-        MessageBox *mb = (MessageBox *)p->parent_struct;
+        MessageDialog *mb = (MessageDialog *)p->parent_struct;
         if(mb->message_type == QUESTION_BOX || mb->message_type == SELECTION_BOX) {
             Widget_t *pa = (Widget_t*)p->parent;
             pa->func.dialog_callback(pa,&mb->response);
@@ -220,7 +222,7 @@ static void message_no_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (w->flags & HAS_POINTER && !*(int*)user_data){
         Widget_t *p = (Widget_t*)w->parent;
-        MessageBox *mb = (MessageBox *)p->parent_struct;
+        MessageDialog *mb = (MessageDialog *)p->parent_struct;
         if(mb->message_type == QUESTION_BOX) {
             Widget_t *pa = (Widget_t*)p->parent;
             mb->response = -1;
@@ -232,7 +234,7 @@ static void message_no_callback(void *w_, void* user_data) {
 
 void radio_box_set_active(Widget_t *w) {
     Widget_t * p = (Widget_t*)w->parent;
-    MessageBox *mb = (MessageBox *)p->parent_struct;
+    MessageDialog *mb = (MessageDialog *)p->parent_struct;
     int response = 0;
     int i = 0;
     for(;i<p->childlist->elem;i++) {
@@ -253,7 +255,7 @@ static void radio_box_button_pressed(void *w_, void* button_, void* user_data) {
 }
 
 static void create_checkboxes(Widget_t *w) {
-    MessageBox *mb = (MessageBox *)w->parent_struct;
+    MessageDialog *mb = (MessageDialog *)w->parent_struct;
     int y = (mb->lin + 1) * 24 +12;
     int i = 0;
     for(;i<(int)mb->sel;i++) {
@@ -274,7 +276,7 @@ static void entry_get_text(void *w_, void *key_, void *user_data) {
             case 10: 
                 {
                 Widget_t *p = (Widget_t*)w->parent;
-                MessageBox *mb = (MessageBox *)p->parent_struct;
+                MessageDialog *mb = (MessageDialog *)p->parent_struct;
                 Widget_t *pa = (Widget_t*)p->parent;
                 if (strlen( mb->text_entry->input_label))
                     mb->text_entry->input_label[strlen( mb->text_entry->input_label)-1] = 0;
@@ -290,18 +292,17 @@ static void entry_get_text(void *w_, void *key_, void *user_data) {
             break;
         }
     } else {
-        Status status;
-        KeySym keysym;
         char buf[32];
-        Xutf8LookupString(w->xic, key, buf, sizeof(buf) - 1, &keysym, &status);
-        if(status == XLookupChars || status == XLookupBoth){
+        bool status = os_get_keyboard_input(w, key, buf, sizeof(buf) - 1);
+        if(status){
             entry_add_text(w, buf);
         }
     }
+    os_expose_widget(w);
 }
 
 static void create_entry_box(Widget_t *w) {
-    MessageBox *mb = (MessageBox *)w->parent_struct;
+    MessageDialog *mb = (MessageDialog *)w->parent_struct;
 
     mb->text_entry = create_widget(w->app, w, 20, mb->height-90, mb->width-40, 40);
     memset(mb->text_entry->input_label, 0, 32 * (sizeof mb->text_entry->input_label[0]) );
@@ -311,7 +312,7 @@ static void create_entry_box(Widget_t *w) {
     mb->text_entry->scale.gravity = CENTER;
 }
 
-static void check_for_message(MessageBox *mb, const char *message) {
+static void check_for_message(MessageDialog *mb, const char *message) {
     if(!message) return;
     if(!strlen(message)) return;
     int len = 0;
@@ -329,7 +330,7 @@ static void check_for_message(MessageBox *mb, const char *message) {
 }
 
 static void check_for_hyperlinks(Widget_t *w) {
-    MessageBox *mb = (MessageBox *)w->parent_struct;
+    MessageDialog *mb = (MessageDialog *)w->parent_struct;
     if(!mb->message) return;
     cairo_text_extents_t extents;
     cairo_set_font_size (w->crb, 12.0);
@@ -343,7 +344,7 @@ static void check_for_hyperlinks(Widget_t *w) {
     }    
 }
 
-static void check_for_choices(MessageBox *mb, const char *choices) {
+static void check_for_choices(MessageDialog *mb, const char *choices) {
     if(!choices) return;
     if(!strlen(choices)) return;
     int len = 0;
@@ -360,7 +361,7 @@ static void check_for_choices(MessageBox *mb, const char *choices) {
     mb->height += mb->sel*12+50;
 }
 
-static void check_for_style(MessageBox *mb, int style) {
+static void check_for_style(MessageDialog *mb, int style) {
     if(style == ENTRY_BOX) {
         mb->width = max(330,mb->width);
         mb->height = max(140,mb->height+60);
@@ -369,7 +370,7 @@ static void check_for_style(MessageBox *mb, int style) {
 
 static void mg_mem_free(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    MessageBox *mb = (MessageBox *)w->parent_struct;
+    MessageDialog *mb = (MessageDialog *)w->parent_struct;
     int i = 0;
     for(;i<(int)mb->lin;i++) {
         free(mb->message[i]);
@@ -385,7 +386,7 @@ static void mg_mem_free(void *w_, void* user_data) {
 Widget_t *open_message_dialog(Widget_t *w, int style, const char *title,
                               const char *message, const char *choices) {
 
-    MessageBox *mb = (MessageBox*)malloc(sizeof(MessageBox));
+    MessageDialog *mb = (MessageDialog*)malloc(sizeof(MessageDialog));
     mb->response = 0;
     mb->message_type = 0;
     mb->lin = 0;
@@ -397,7 +398,7 @@ Widget_t *open_message_dialog(Widget_t *w, int style, const char *title,
     check_for_message(mb, message);
     check_for_choices(mb, choices);
     check_for_style(mb, style);
-    Widget_t *wid = create_window(w->app, DefaultRootWindow(w->app->dpy), 0, 0, mb->width, mb->height);
+    Widget_t *wid = create_window(w->app, os_get_root_window(w->app, IS_WINDOW), 0, 0, mb->width, mb->height);
     wid->label = message;
     wid->flags |= HAS_MEM;
     wid->scale.gravity = CENTER;

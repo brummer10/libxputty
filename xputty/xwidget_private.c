@@ -139,7 +139,11 @@ void _check_grab(Widget_t * wid, XButtonEvent *xbutton, Xputty *main) {
         Widget_t *view_port = main->hold_grab->childlist->childs[0];
         if(xbutton->button == Button1) {
             //if (xbutton->window == view_port->widget) return;
+#ifdef _WIN32 //SetCaptureDisabled//XUngrabPointer
+            //ReleaseCapture(); // SetCapture() is currently disabled in pop_menu_show()
+#else
             XUngrabPointer(main->dpy,CurrentTime);
+#endif
             int i = view_port->childlist->elem-1;
             for(;i>-1;i--) {
                 Widget_t *w = view_port->childlist->childs[i];
@@ -198,7 +202,11 @@ void _propagate_child_expose(Widget_t *wid) {
             if ( w->flags & NO_PROPAGATE) continue;
             if (w->flags & USE_TRANSPARENCY) {
                 if(w->flags & FAST_REDRAW)
+#ifdef __linux__ //ForceRedraw
                     transparent_draw(w, NULL);
+#else
+                    expose_widget(w);
+#endif
                 else expose_widget(w);
             }
         }
@@ -262,10 +270,10 @@ void _hide_all_tooltips(Widget_t *wid) {
 }
 
 void _has_pointer(Widget_t *w, XButtonEvent *button) {
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
     
-    if ((button->x<attrs.width && button->y<attrs.height) &&
+    if ((button->x<metrics.width && button->y<metrics.height) &&
                                 (button->x>0 && button->y>0)){
         w->flags |= HAS_POINTER;
     } else {
@@ -309,7 +317,7 @@ void _dummy_callback(void *w_, void* user_data) {
 void _resize_surface(Widget_t *wid, int width, int height) {
     wid->width = width;
     wid->height = height;
-    cairo_xlib_surface_set_size( wid->surface, wid->width, wid->height);
+    os_set_widget_surface_size(wid, wid->width, wid->height);
     cairo_font_face_t *ff = cairo_get_font_face(wid->crb);
     cairo_destroy(wid->crb);
     cairo_surface_destroy(wid->buffer);
@@ -327,79 +335,79 @@ void _resize_childs(Widget_t *wid) {
         Widget_t *w = wid->childlist->childs[i];
         switch(w->scale.gravity) {
             case(NORTHWEST):
-                XResizeWindow (wid->app->dpy, w->widget, max(1,
+                os_resize_window (wid->app->dpy, w, max(1,
                     w->scale.init_width - (wid->scale.scale_x)), 
                     max(1,w->scale.init_height - (wid->scale.scale_y)));
             break;
             case(NORTHEAST):
-                XResizeWindow (wid->app->dpy, w->widget, max(1,
+                os_resize_window (wid->app->dpy, w, max(1,
                     w->scale.init_width - (wid->scale.scale_x)), w->height);
             break;
             case(SOUTHWEST):
-                XMoveWindow(wid->app->dpy,w->widget,w->scale.init_x-wid->scale.scale_x,
+                os_move_window(wid->app->dpy,w,w->scale.init_x-wid->scale.scale_x,
                                         w->scale.init_y-wid->scale.scale_y);
             break;
             case(SOUTHEAST):
-                XMoveWindow(wid->app->dpy,w->widget,w->scale.init_x,
+                os_move_window(wid->app->dpy,w,w->scale.init_x,
                                             w->scale.init_y-wid->scale.scale_y);
             break;
             case(SOUTHCENTER):
-                XMoveWindow(wid->app->dpy,w->widget,w->scale.init_x,
+                os_move_window(wid->app->dpy,w,w->scale.init_x,
                                             w->scale.init_y / wid->scale.cscale_y);
-                XResizeWindow (wid->app->dpy, w->widget, max(1,
+                os_resize_window (wid->app->dpy, w, max(1,
                     w->scale.init_width - (wid->scale.scale_x)), 
                     max(1,w->scale.init_height / (wid->scale.cscale_y)));
             break;
             case(EASTWEST):
-                XMoveWindow(wid->app->dpy,w->widget,w->scale.init_x,
+                os_move_window(wid->app->dpy,w,w->scale.init_x,
                                 w->scale.init_y-wid->scale.scale_y);
             break;
             case(EASTNORTH):
-                XResizeWindow (wid->app->dpy, w->widget, w->scale.init_width,
+                os_resize_window (wid->app->dpy, w, w->scale.init_width,
                     max(1,w->scale.init_height - (wid->scale.scale_y)));
             break;
             case(EASTSOUTH):
-                XMoveWindow(wid->app->dpy,w->widget,w->scale.init_x,
+                os_move_window(wid->app->dpy,w,w->scale.init_x,
                                             w->scale.init_y-wid->scale.scale_y);
-                XResizeWindow (wid->app->dpy, w->widget, max(1,
+                os_resize_window (wid->app->dpy, w, max(1,
                     w->scale.init_width - (wid->scale.scale_x)), w->height);
             break;
             case(WESTNORTH):
-                XMoveWindow(wid->app->dpy,w->widget,w->scale.init_x-wid->scale.scale_x,
+                os_move_window(wid->app->dpy,w,w->scale.init_x-wid->scale.scale_x,
                                                                     w->scale.init_y);
             break;
             case(WESTSOUTH):
-                XMoveWindow(wid->app->dpy,w->widget,w->scale.init_x-wid->scale.scale_x,
+                os_move_window(wid->app->dpy,w,w->scale.init_x-wid->scale.scale_x,
                                                                     w->scale.init_y);
-                XResizeWindow (wid->app->dpy, w->widget, w->scale.init_width,
+                os_resize_window (wid->app->dpy, w, w->scale.init_width,
                     max(1,w->scale.init_height - (wid->scale.scale_y)));
             break;
             case(CENTER):
-                XMoveWindow(wid->app->dpy,w->widget,w->scale.init_x /
+                os_move_window(wid->app->dpy,w,w->scale.init_x /
                     wid->scale.cscale_x,w->scale.init_y / wid->scale.cscale_y);
-                XResizeWindow (wid->app->dpy, w->widget, max(1,
+                os_resize_window (wid->app->dpy, w, max(1,
                     w->scale.init_width / (wid->scale.cscale_x)), 
                     max(1,w->scale.init_height / (wid->scale.cscale_y)));
             break;
             case(ASPECT):
-                XMoveWindow(wid->app->dpy,w->widget,(
+                os_move_window(wid->app->dpy,w,(
                     (w->scale.init_x + w->scale.init_width*0.5) /
                     wid->scale.cscale_x) - w->width*0.5,
                     ((w->scale.init_y + w->scale.init_height*0.5) /
                     wid->scale.cscale_y)- w->height*0.5) ;
-                XResizeWindow (wid->app->dpy, w->widget, max(1,
+                os_resize_window (wid->app->dpy, w, max(1,
                     w->scale.init_width / (wid->scale.ascale)), 
                     max(1,w->scale.init_height / (wid->scale.ascale)));
             break;
             case(FIXEDSIZE):
-                XMoveWindow(wid->app->dpy,w->widget,(
+                os_move_window(wid->app->dpy,w,(
                     (w->scale.init_x + w->scale.init_width*0.5) /
                     wid->scale.cscale_x) - w->width*0.5,
                     ((w->scale.init_y + w->scale.init_height*0.5) /
                     wid->scale.cscale_y)- w->height*0.5) ;
             break;
             case(MENUITEM):
-                XResizeWindow (wid->app->dpy, w->widget, max(1,
+                os_resize_window (wid->app->dpy, w, max(1,
                     w->scale.init_width - (wid->scale.scale_x)-5), w->scale.init_height);
             break;
             case(NONE):

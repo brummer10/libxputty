@@ -109,7 +109,6 @@ struct SystrayColor_t{
  * @brief set_dark_theme    - init the XColor_t struct to the default 
  * dark theme 
  * @param *main             - pointer to the main Xputty struct
- * @return void
  */
 
 void set_dark_theme(Xputty *main);
@@ -118,7 +117,6 @@ void set_dark_theme(Xputty *main);
  * @brief set_light_theme   - init the XColor_t struct to the default 
  * light theme 
  * @param *main             - pointer to the main Xputty struct
- * @return void
  */
 
 void set_light_theme(Xputty *main);
@@ -127,7 +125,6 @@ void set_light_theme(Xputty *main);
  * @brief color_scheme_to_childs    - copy a colorscheme to all childs 
  * light theme 
  * @param *wid                      - pointer to the Widget_t take the colorscheme from
- * @return void
  */
 
 void color_scheme_to_childs(Widget_t *wid);
@@ -142,7 +139,6 @@ void color_scheme_to_childs(Widget_t *wid);
  * @param g                 - the green color
  * @param b                 - the blue color
  * @param a                 - the alpha channel
- * @return void
  */
 
 void set_widget_color(Widget_t *w, Color_state st, Color_mod mod,
@@ -155,7 +151,6 @@ void set_widget_color(Widget_t *w, Color_state st, Color_mod mod,
  * @param g                 - the green color
  * @param b                 - the blue color
  * @param a                 - the alpha channel
- * @return void
  */
 
 void widget_set_color(double *c, double r, double g, double b, double a);
@@ -164,7 +159,6 @@ void widget_set_color(double *c, double r, double g, double b, double a);
  * @brief get_color_scheme  - get pointer to the Colors struct to use
  * in relation to the Color_state
  * @param *st               - the Color state to use
- * @return void
  */
 
 Colors *get_color_scheme(Widget_t *wid, Color_state st);
@@ -182,7 +176,6 @@ Color_state get_color_state(Widget_t *wid);
  * @brief use_fg_color_scheme  - use forground Colors to paint on Widget_t
  * @param *w                   - the Widget_t to set the Colors
  * @param st                   - the Color_state to use
- * @return void
  */
 
 void use_fg_color_scheme(Widget_t *w, Color_state st);
@@ -191,7 +184,6 @@ void use_fg_color_scheme(Widget_t *w, Color_state st);
  * @brief use_bg_color_scheme  - use background Colors to paint on Widget_t
  * @param w                    - the Widget_t to set the Colors
  * @param st                   - the Color_state to use
- * @return void
  */
 
 void use_bg_color_scheme(Widget_t *w, Color_state st);
@@ -200,7 +192,6 @@ void use_bg_color_scheme(Widget_t *w, Color_state st);
  * @brief use_base_color_scheme  - use base Colors to paint on Widget_t
  * @param w                      - the Widget_t to set the Colors
  * @param st                     - the Color_state to use
- * @return void
  */
 
 void use_base_color_scheme(Widget_t *w, Color_state st);
@@ -209,7 +200,6 @@ void use_base_color_scheme(Widget_t *w, Color_state st);
  * @brief use_text_color_scheme  - use text Colors to paint on Widget_t
  * @param w                      - the Widget_t to set the Colors
  * @param st                     - the Color_state to use
- * @return void
  */
 
 void use_text_color_scheme(Widget_t *w, Color_state st);
@@ -218,7 +208,6 @@ void use_text_color_scheme(Widget_t *w, Color_state st);
  * @brief use_shadow_color_scheme  - use shadow Colors to paint on Widget_t
  * @param w                        - the Widget_t to set the Colors
  * @param st                       - the Color_state to use
- * @return void
  */
 
 void use_shadow_color_scheme(Widget_t *w, Color_state st);
@@ -227,7 +216,6 @@ void use_shadow_color_scheme(Widget_t *w, Color_state st);
  * @brief use_frame_color_scheme   - use frame Colors to paint on Widget_t
  * @param w                        - the Widget_t to set the Colors
  * @param st                       - the Color_state to use
- * @return void
  */
 
 void use_frame_color_scheme(Widget_t *w, Color_state st);
@@ -236,7 +224,6 @@ void use_frame_color_scheme(Widget_t *w, Color_state st);
  * @brief use_light_color_scheme   - use light Colors to paint on Widget_t
  * @param w                        - the Widget_t to set the Colors
  * @param st                       - the Color_state to use
- * @return void
  */
 
 void use_light_color_scheme(Widget_t *w, Color_state st);
@@ -244,7 +231,6 @@ void use_light_color_scheme(Widget_t *w, Color_state st);
 /**
  * @brief use_systray_color        - use systray Colors to paint on Widget_t
  * @param w                        - the Widget_t to set the Colors
- * @return void
  */
 
 void use_systray_color(Widget_t *w);
@@ -256,7 +242,6 @@ void use_systray_color(Widget_t *w);
  * @param g                        - the green Color to use
  * @param b                        - the blue Color to use
  * @param a                        - the alpha Cannel to use
- * @return void
  */
 
 void set_systray_color(Xputty *main, double r, double g, double b, double a);
@@ -267,7 +252,6 @@ void set_systray_color(Xputty *main, double r, double g, double b, double a);
  * @param *from             - the Colors set to pattern from (0)
  * @param *to               - the Colors set to pattern to (1)
  * @param mod               - the Color_mod to use
- * @return void
  */
 
 void set_pattern(Widget_t *w, Colors *from, Colors *to, Color_mod mod);

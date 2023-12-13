@@ -33,7 +33,6 @@ extern "C" {
  * @brief widget_get_svg             - read svg into Widget_t xlib surface
  * @param *w                         - pointer to the Widget_t which should use the svg
  * @param *name                      - pointer to the base64 image data
- * @return void
  */
 
 void widget_get_svg(Widget_t *w, const char* name);
@@ -42,7 +41,6 @@ void widget_get_svg(Widget_t *w, const char* name);
  * @brief widget_get_scaled_svg      - read svg scaled into Widget_t xlib surface
  * @param *w                         - pointer to the Widget_t which should use the svg
  * @param *name                      - pointer to the base64 image data
- * @return void
  */
 
 void widget_get_scaled_svg(Widget_t *w, const char* name);
@@ -51,7 +49,6 @@ void widget_get_scaled_svg(Widget_t *w, const char* name);
  * @brief widget_get_svg_from_file   - read svg into Widget_t xlib surface
  * @param *w                         - pointer to the Widget_t which should use the svg
  * @param *filename                  - pointer to the image data file
- * @return void
  */
 
 void widget_get_svg_from_file(Widget_t *w, const char* filename);
@@ -62,7 +59,6 @@ void widget_get_svg_from_file(Widget_t *w, const char* filename);
  * @param *filename                          - pointer to the image data file
  * @param  width_t                           - the requested width
  * @param  height_t                          - the requested height
- * @return void
  */
 
 void widget_get_scaled_svg_from_file(Widget_t *w, const char* filename, int width_t, int height_t);

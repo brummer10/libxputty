@@ -43,14 +43,16 @@
 #ifndef XFILEPICKER_H_
 #define XFILEPICKER_H_
 
+/* comment out xdgmine.h will disable the file filter, you may implement your own.*/
+#ifdef __linux__
+#include "xdgmime.h"
+#endif
+/* comment out xasprintf and define _GNU_SOURCE on top of this file will remove this dependency.*/
+#include "xasprintf.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* comment out xdgmine.h will disable the file filter, you may implement your own.*/
-#include "xdgmime.h"
-/* comment out xasprintf and define _GNU_SOURCE on top of this file will remove this dependency.*/
-#include "xasprintf.h"
 
 #if defined(WIN32) || defined(_WIN32) 
 #define PATH_SEPARATOR "\\" 
@@ -87,7 +89,6 @@ int fp_get_files(FilePicker *filepicker, char *path, int get_dirs, int get_files
 /**
  * @brief fp_free                  - release all memory used by the filepicker
  * @param *filepicker              - pointer to the struct to be released
- * @return void
  */
 
 void fp_free(FilePicker *filepicker);
@@ -96,7 +97,6 @@ void fp_free(FilePicker *filepicker);
  * @brief fp_init                  - set default values used by the filepicker
  * @param *filepicker              - pointer to the struct to alocate
  * @param *path                    - the path to read from
- * @return void
  */
 
 void fp_init(FilePicker *filepicker, const char *path);

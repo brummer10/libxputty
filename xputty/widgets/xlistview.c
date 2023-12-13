@@ -45,9 +45,7 @@ void listview_unset_active_entry(Widget_t *w) {
 
 Widget_t* create_listview_viewport(Widget_t *parent, int elem, int width, int height) {
     Widget_t *wid = create_widget(parent->app, parent, 0, 0, width, height);
-    XSelectInput(wid->app->dpy, wid->widget,StructureNotifyMask|ExposureMask|KeyPressMask 
-                    |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask
-                    |ButtonPressMask|Button1MotionMask|PointerMotionMask);
+    os_set_input_mask(wid);
     wid->scale.gravity = NORTHWEST;
     ViewList_t *filelist;
     filelist = (ViewList_t*)malloc(sizeof(ViewList_t));
@@ -113,9 +111,9 @@ void listview_remove_list(Widget_t *listview) {
     ViewList_t *filelist = (ViewList_t*)view_port->parent_struct;
     filelist->list_names = NULL;
     filelist->list_size = 0;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(listview->app->dpy, (Window)listview->widget, &attrs);
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(listview, &metrics);
+    int height = metrics.height;
     float elem = height/25;
     set_adjustment(listview->adj,0.0, 0.0, 0.0, -1.0,1.0, CL_NONE);
     set_adjustment(view_port->adj,0.0, 0.0, 0.0, -elem,1.0, CL_VIEWPORT);

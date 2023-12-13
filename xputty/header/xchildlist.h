@@ -61,7 +61,6 @@ struct Childlist_t {
  * @brief childlist_init      - internal use to allocate the array to min size
  * \n You usually didn't need to call this
  * @param *childlist          - pointer to the Childlist_t
- * @return void 
  */
 
 void childlist_init(Childlist_t *childlist);
@@ -70,7 +69,6 @@ void childlist_init(Childlist_t *childlist);
  * @brief childlist_destroy   - internal use to free the Childlist_t
  * \n You usually didn't need to call this
  * @param *childlist          - pointer to the Childlist_t
- * @return void 
  */
 
 void childlist_destroy(Childlist_t *childlist);
@@ -80,7 +78,6 @@ void childlist_destroy(Childlist_t *childlist);
  * \n You usually didn't need to call this
  * @param *childlist          - pointer to the Childlist_t
  * @param *child              - pointer to the child to add
- * @return void 
  */
 
 void childlist_add_child(Childlist_t *childlist, Widget_t *child);
@@ -90,7 +87,6 @@ void childlist_add_child(Childlist_t *childlist, Widget_t *child);
  * \n You usually didn't need to call this
  * @param *childlist             - pointer to the Childlist_t
  * @param *child                 - pointer to the child to remove
- * @return void 
  */
 
 void childlist_remove_child(Childlist_t *childlist, Widget_t *child);

@@ -18,6 +18,13 @@
  *
  */
 
+/**
+ * @file xputty.h
+ * @brief This file contains definitions and structs used on all platforms.
+ * Platform specific definitions are located in xwidget-platform.h
+ * Xlib compatibility definitions for MSWindows are located in xputty-mswin.h.
+ */
+
 #pragma once
 
 #ifndef XPUTTY1_H_
@@ -33,11 +40,15 @@
 
 #include <math.h>
 #include <cairo.h>
+#include "xputty-mswin.h" // no ifdef needed
+
+#ifdef __linux__
 #include <cairo-xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h> 
+#endif //__linux__
 
 #ifdef ENABLE_NLS
 #include <libintl.h>
@@ -52,10 +63,12 @@
 extern "C" {
 #endif
 
+#ifdef __linux__
 #define DND_STATUS_ACCEPT(e) ((e)->xclient.data.l[1] & 0x1L)
 #define DND_VERSION(e) ((e)->xclient.data.l[1] >> 24)
 #define DND_SOURCE_WIN(e) ((e)->xclient.data.l[0])
 #define DND_DROP_TIME(e) ((e)->xclient.data.l[2])
+#endif //__linux__
 
 
 /*---------------------------------------------------------------------
@@ -78,8 +91,14 @@ extern "C" {
  * the -DLIBDEBUG flag
  */
 
+
+#ifdef NODEF // _WIN32 //DebugPrint
+#define debug_print(...) \
+            { char xxdeb[1024]; snprintf(xxdeb, 1024, __VA_ARGS__); OutputDebugString(xxdeb); }
+#else
 #define debug_print(...) \
             ((void)((LIBDEBUG) ? fprintf(stderr, __VA_ARGS__) : 0))
+#endif
 
 /*---------------------------------------------------------------------
 -----------------------------------------------------------------------    
@@ -162,7 +181,6 @@ typedef struct Xputty Xputty;
  * @brief *xfunc       - function pointer to connect XEvents from a Widget_t to a event handler
  * @param *widget      - void pointer to the widget
  * @param *user_data   - void pointer to attached user_data, maybe NULL
- * @return void
  */
 
 typedef void (*xfunc)(void * widget, void* user_data);
@@ -280,7 +298,6 @@ struct Xputty{
  * On main_quit() any remaining Widget_t from the main childlist will be destroyed,
  * to ensure that we leave the memory clean.
  * @param *main             - pointer to the main Xputty struct
- * @return void
  */
 
 void main_init(Xputty *main);
@@ -291,10 +308,13 @@ void main_init(Xputty *main);
  * \n You could create and destroy additional Widget_t's
  * at any time later during run.
  * @param *main             - pointer to the main Xputty struct
- * @return void
  */
 
 void main_run(Xputty *main);
+
+/**@example simple-example.c
+ * Simple example of how to use this
+ */
 
 /**
  * @brief run_embedded      - the main event loop to run embedded UI's.
@@ -302,7 +322,6 @@ void main_run(Xputty *main);
  * \n You could create and destroy additional Widget_t's
  * at any time later during run.
  * @param *main             - pointer to the main Xputty struct
- * @return void
  */
 
 void run_embedded(Xputty *main);
@@ -314,7 +333,6 @@ void run_embedded(Xputty *main);
  * and quit.
  * \n It should be called after main_run()/run_embedded();
  * @param *main             - pointer to the main Xputty struct
- * @return void
  */
 
 void main_quit(Xputty *main);

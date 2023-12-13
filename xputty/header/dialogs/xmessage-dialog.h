@@ -49,7 +49,7 @@ typedef struct {
     unsigned int height;
     unsigned int lin;
     unsigned int sel;
-} MessageBox;
+} MessageDialog;
 
 /**
  * @brief open_message_dialog  - open a non blocking dialog window,

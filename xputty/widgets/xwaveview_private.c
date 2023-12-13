@@ -39,10 +39,11 @@ void _rounded_view(cairo_t *cr,float x, float y, float w, float h, float lsize) 
 void _draw_waveview(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     WaveView_t *wave_view = (WaveView_t*)w->private_struct;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width_t = attrs.width;
-    int height_t = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width_t = metrics.width;
+    int height_t = metrics.height;
+    if (!metrics.visible) return;
     int half_height_t = height_t/2;
 
     cairo_text_extents_t extents;

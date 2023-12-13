@@ -120,7 +120,6 @@ cairo_surface_t *cairo_image_surface_create_from_stream ( const unsigned char* n
  * @brief widget_get_png             - read png into Widget_t xlib surface
  * @param *w                         - pointer to the Widget_t which should use the png
  * @param *name                      - pointer to the binary image data LDVAR(name)
- * @return void
  */
 
 void widget_get_png(Widget_t *w, const unsigned char* name);
@@ -129,7 +128,6 @@ void widget_get_png(Widget_t *w, const unsigned char* name);
  * @brief widget_get_scaled_png      - read scaled png into Widget_t xlib surface
  * @param *w                         - pointer to the Widget_t which should use the png
  * @param *name                      - pointer to the binary image data LDVAR(name)
- * @return void
  */
 
 
@@ -139,7 +137,6 @@ void widget_get_scaled_png(Widget_t *w, const unsigned char* name);
  * @brief widget_get_png_from_file   - read png from file into Widget_t xlib surface
  * @param *w                         - pointer to the Widget_t which should use the png
  * @param *filename                  - pointer to the image path/file
- * @return void
  */
 
 void widget_get_png_from_file(Widget_t *w, const char* filename);
@@ -148,7 +145,6 @@ void widget_get_png_from_file(Widget_t *w, const char* filename);
  * @brief widget_get_scaled_png_from_file  - read scaled png into Widget_t xlib surface
  * @param *w                               - pointer to the Widget_t which should use the png
  * @param *filename                        - pointer to the image path/file
- * @return void
  */
 
 void widget_get_scaled_png_from_file(Widget_t *w, const char* filename);
@@ -157,7 +153,6 @@ void widget_get_scaled_png_from_file(Widget_t *w, const char* filename);
  * @brief widget_get_surface_ptr     - set pointer to a 2. Widget_t xlib surface
  * @param *w                         - pointer to the Widget_t which should use the surface
  * @param *wid                       - pointer to the Widget_t which hold the surface
- * @return void
  */
 
 void widget_get_surface_ptr(Widget_t *w, Widget_t *wid);
@@ -177,7 +172,6 @@ cairo_surface_t * surface_get_png(Widget_t *w, cairo_surface_t *sf, const unsign
  * those icon will be used in the Window decoration and the toolbar (depending on the Widnow manager)
  * @param *w                           - pointer to the Widget_t which should use the icon
  * @param *image                       - pointer to the cairo_surface_t to use for the icon
- * @return void
  */
 
 void widget_set_icon_from_surface(Widget_t *w,  cairo_surface_t *image);
@@ -187,7 +181,6 @@ void widget_set_icon_from_surface(Widget_t *w,  cairo_surface_t *image);
  * those icon will be used in the Window decoration and the toolbar (depending on the Widnow manager)
  * @param *w                         - pointer to the Widget_t which should use the icon
  * @param *name                      - pointer to the binary image data LDVAR(name)
- * @return void
  */
 
 void widget_set_icon_from_png(Widget_t *w, const unsigned char* name);

@@ -24,10 +24,10 @@
 
 
 Widget_t* tabbox_add_tab(Widget_t *tabbox, const char * label) {
-    XWindowAttributes attrs;
-    XGetWindowAttributes(tabbox->app->dpy, (Window)tabbox->widget, &attrs);
-    int width = attrs.width;
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(tabbox, &metrics);
+    int width = metrics.width;
+    int height = metrics.height;
     Widget_t *wid = create_widget(tabbox->app,tabbox, 4, 20,  width-8, height-24);
     wid->scale.gravity = NORTHWEST;
     wid->label = label;

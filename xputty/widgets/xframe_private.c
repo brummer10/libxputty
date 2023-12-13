@@ -38,14 +38,14 @@ void _rounded_frame(cairo_t *cr,float x, float y, float w, float h, float lsize)
 
 void _draw_frame(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width_t = attrs.width;
-    int height_t = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width_t = metrics.width;
+    int height_t = metrics.height;
 
     if (w->image) {
-        int width = cairo_xlib_surface_get_width(w->image);
-        int height = cairo_xlib_surface_get_height(w->image);
+        int width, height;
+        os_get_surface_size(w->image, &width, &height);
         double x = (double)width_t/(double)(width);
         double y = (double)height_t/(double)height;
         double x1 = (double)(width)/(double)width_t;

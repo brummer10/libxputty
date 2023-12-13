@@ -70,8 +70,8 @@ Widget_t* listbox_add_entry(Widget_t *listbox, const char * label) {
     wid->scale.gravity = MENUITEM;
     wid->label = label;
     wid->func.expose_callback = _draw_listbox_item;
-    wid->func.enter_callback = transparent_draw;
-    wid->func.leave_callback = transparent_draw;
+    wid->func.enter_callback = os_transparent_draw;
+    wid->func.leave_callback = os_transparent_draw;
     wid->func.button_release_callback = _listbox_entry_released;
     return wid;
 }

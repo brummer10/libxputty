@@ -46,8 +46,8 @@ void _pattern_hslider(Widget_t *w, Color_state st, int height) {
 
 void _draw_image_slider(Widget_t *w, int width_t, int height_t) {
     Slider_t *slider = (Slider_t*)w->private_struct;
-    int width = cairo_xlib_surface_get_width(w->image);
-    int height = cairo_xlib_surface_get_height(w->image);
+    int width, height;
+    os_get_surface_size(w->image, &width, &height);
     int size = width/slider->frames;
     double x = (double)width_t/(double)size;
     double y = (double)height_t/(double)height;
@@ -71,14 +71,13 @@ void _draw_image_slider(Widget_t *w, int width_t, int height_t) {
 
 void _draw_vslider(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width-2;
-    int height = attrs.height-2;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width-2;
+    int height = metrics.height-2;
+    if (!metrics.visible) return;
     float center = (float)width/2;
     float upcenter = (float)width;
-    
-    if (attrs.map_state != IsViewable) return;
 
     if (w->image) {
         _draw_image_slider(w, width, height-10);
@@ -143,14 +142,14 @@ void _draw_vslider(void *w_, void* user_data) {
 
 void _draw_hslider(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(w->app->dpy, (Window)w->widget, &attrs);
-    int width = attrs.width-2;
-    int height = attrs.height-2;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width-2;
+    int height = metrics.height-2;
+    if (!metrics.visible) return;
     float center = (float)height/2;
     float upcenter = (float)height;
     
-    if (attrs.map_state != IsViewable) return;
     if (w->image) {
         _draw_image_slider(w, width, height);
     } else {

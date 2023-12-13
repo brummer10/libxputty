@@ -117,6 +117,9 @@ cairo_surface_t * surface_get_png(Widget_t *w, cairo_surface_t *sf, const unsign
 }
 
 void widget_set_icon_from_surface(Widget_t *w, cairo_surface_t *image) {
+#ifdef _WIN32 //PixmapIcon
+    return; // TODO
+#else
     int width_t = cairo_xlib_surface_get_width(image);
     int height_t = cairo_xlib_surface_get_height(image);
     cairo_surface_t *icon = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width_t, height_t);
@@ -150,9 +153,13 @@ void widget_set_icon_from_surface(Widget_t *w, cairo_surface_t *image) {
     cairo_surface_destroy(icon);
     cairo_destroy(cri);
     free(icon_data);
+#endif
 }
 
 void widget_set_icon_from_png(Widget_t *w, const unsigned char* name) {
+#ifdef _WIN32 //PixmapIcon
+    return; // TODO
+#else
     cairo_surface_t *image = cairo_image_surface_create_from_stream (name);
     int width_t = cairo_image_surface_get_width(image);
     int height_t = cairo_image_surface_get_height(image);
@@ -181,6 +188,7 @@ void widget_set_icon_from_png(Widget_t *w, const unsigned char* name) {
 
     cairo_surface_destroy(image);
     free(icon_data);
+#endif
 }
 
 /*

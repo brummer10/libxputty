@@ -86,9 +86,7 @@ void pop_combobox_menu_show(Widget_t *parent, Widget_t *menu, bool above) {
     if (!comboboxlist->list_size) return;
     _configure_combobox_menu(parent, menu, comboboxlist->show_items, above);
     pop_widget_show_all(menu);
-    int err = XGrabPointer(menu->app->dpy, DefaultRootWindow(parent->app->dpy), True,
-                 ButtonPressMask|ButtonReleaseMask|PointerMotionMask,
-                 GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
+    int err = os_grab_pointer(menu);
     menu->app->hold_grab = menu;
 
     if (err) debug_print("Error grap pointer\n");
@@ -97,9 +95,7 @@ void pop_combobox_menu_show(Widget_t *parent, Widget_t *menu, bool above) {
 
 Widget_t* create_combobox_viewport(Widget_t *parent, int elem, int width, int height) {
     Widget_t *wid = create_widget(parent->app, parent, 0, 0, width, height);
-    XSelectInput(wid->app->dpy, wid->widget,StructureNotifyMask|ExposureMask|KeyPressMask 
-                    |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask
-                    |ButtonPressMask|Button1MotionMask|PointerMotionMask);
+    os_set_input_mask(wid);
     wid->scale.gravity = CENTER;
     ComboBox_t *comboboxlist;
     comboboxlist = (ComboBox_t*)malloc(sizeof(ComboBox_t));
@@ -127,28 +123,14 @@ Widget_t* create_combobox_viewport(Widget_t *parent, int elem, int width, int he
 Widget_t* create_combobox_menu(Widget_t *parent, int height) {
 
     int x1, y1;
-    Window child;
-    XTranslateCoordinates( parent->app->dpy, parent->widget, DefaultRootWindow(parent->app->dpy), 0, 0, &x1, &y1, &child );
-    Widget_t *wid = create_window(parent->app, DefaultRootWindow(parent->app->dpy), x1, y1, 10, height);
+    os_translate_coords( parent, parent->widget, os_get_root_window(parent->app, IS_WIDGET), 0, 0, &x1, &y1);
+    Widget_t *wid = create_window(parent->app, os_get_root_window(parent->app, IS_WIDGET), x1, y1, 10, height);
     Widget_t *viewport = create_combobox_viewport(wid, 6, 10, 5*height);
     ComboBox_t *comboboxlist = (ComboBox_t*)viewport->parent_struct;
     comboboxlist->combobox = parent;
 
-    XSetWindowAttributes attributes;
-    attributes.override_redirect = True;
-    XChangeWindowAttributes(parent->app->dpy, wid->widget, CWOverrideRedirect, &attributes);
-
-    Atom window_type = XInternAtom(wid->app->dpy, "_NET_WM_WINDOW_TYPE", False);
-    Atom window_type_popup = XInternAtom(wid->app->dpy, "_NET_WM_WINDOW_TYPE_DROPDOWN_MENU", False);
-    XChangeProperty(wid->app->dpy, wid->widget, window_type,
-        XA_ATOM, 32, PropModeReplace, (unsigned char *) &window_type_popup,1 );
-
-    Atom window_state = XInternAtom(wid->app->dpy, "_NET_WM_STATE", False);
-    Atom window_state_modal = XInternAtom(wid->app->dpy, "_NET_WM_STATE_MODAL", False);
-    XChangeProperty(wid->app->dpy, wid->widget, window_state,
-        XA_ATOM, 32, PropModeReplace, (unsigned char *) &window_state_modal, 1);
-
-    XSetTransientForHint(parent->app->dpy,wid->widget,parent->widget);
+    os_set_window_attrb(wid);
+    os_set_transient_for_hint(parent, wid);
     wid->func.expose_callback = _draw_combobox_menu;
     wid->flags |= IS_POPUP;
     wid->scale.gravity = NONE;
@@ -176,8 +158,8 @@ Widget_t* add_combobox(Widget_t *parent, const char  * label, int x, int y, int 
     wid->adj = wid->adj_y;
     wid->func.adj_callback = _set_entry;
     wid->func.expose_callback = _draw_combobox;
-    wid->func.enter_callback = transparent_draw;
-    wid->func.leave_callback = transparent_draw;
+    wid->func.enter_callback = os_transparent_draw;
+    wid->func.leave_callback = os_transparent_draw;
     wid->func.button_release_callback = _combobox_button_released;
 
     Widget_t* button = add_button(wid, "", width-20, 0, 20, height);

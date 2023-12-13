@@ -45,9 +45,7 @@ void multi_listview_unset_active_entry(Widget_t *w) {
 
 Widget_t* create_multi_listview_viewport(Widget_t *parent, int elem, int width, int height) {
     Widget_t *wid = create_widget(parent->app, parent, 0, 0, width, height);
-    XSelectInput(wid->app->dpy, wid->widget,StructureNotifyMask|ExposureMask|KeyPressMask 
-                    |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask
-                    |ButtonPressMask|Button1MotionMask|PointerMotionMask);
+    os_set_input_mask(wid);
     wid->scale.gravity = NORTHWEST;
     ViewMultiList_t *filelist;
     filelist = (ViewMultiList_t*)malloc(sizeof(ViewMultiList_t));
@@ -85,6 +83,7 @@ Widget_t* add_multi_listview(Widget_t *parent, const char * label,
     Widget_t *viewport = create_multi_listview_viewport(wid, elem, width-10, height);
 
     ViewMultiList_t *filelist = (ViewMultiList_t*)viewport->parent_struct;
+    filelist->tooltip_text = NULL;
     filelist->folder = surface_get_png(wid, filelist->folder, LDVAR(directory_png));
     filelist->folder_select = surface_get_png(wid, filelist->folder_select, LDVAR(directory_select_png));
     filelist->file = surface_get_png(wid, filelist->file, LDVAR(file_png));
@@ -119,6 +118,7 @@ void multi_listview_mem_free(void *w_, void* user_data) {
     cairo_surface_destroy(filelist->folder_scaled);
     cairo_surface_destroy(filelist->folder_select_scaled);
     cairo_surface_destroy(filelist->file_scaled);
+    free(filelist->tooltip_text);
     free(filelist);
 }
 
@@ -127,9 +127,9 @@ void multi_listview_remove_list(Widget_t *listview) {
     ViewMultiList_t *filelist = (ViewMultiList_t*)view_port->parent_struct;
     filelist->list_names = NULL;
     filelist->list_size = 0;
-    XWindowAttributes attrs;
-    XGetWindowAttributes(listview->app->dpy, (Window)listview->widget, &attrs);
-    int height = attrs.height;
+    Metrics_t metrics;
+    os_get_window_metrics(listview, &metrics);
+    int height = metrics.height;
     float elem = height/filelist->item_height;
     set_adjustment(listview->adj,0.0, 0.0, 0.0, -1.0,1.0, CL_NONE);
     set_adjustment(view_port->adj,0.0, 0.0, 0.0, -elem,1.0, CL_VIEWPORT);
