@@ -231,7 +231,7 @@ void os_create_main_window_and_surface(Widget_t *w, Xputty *app, Window win,
     if (win == (HWND)-1) {
         // Dialogs with border
         dwStyle = WS_OVERLAPPEDWINDOW;
-        dwExStyle = WS_EX_CONTROLPARENT;
+        dwExStyle = WS_EX_CONTROLPARENT | WS_EX_ACCEPTFILES;
         win = HWND_DESKTOP;
         // include border widths
         RECT Rect = {0};
@@ -533,6 +533,30 @@ void build_xkey_event(XKeyEvent *ev, UINT msg, WPARAM wParam, LPARAM lParam) {
             else
                 ev->keycode = ev->vk;
     }
+}
+
+void HandleFiles(WPARAM wParam, Widget_t * wid)
+{
+    // DragQueryFile() takes a LPWSTR for the name so we need a TCHAR string
+    TCHAR szName[MAX_PATH];
+
+    // Here we cast the wParam as a HDROP handle to pass into the next functions
+    HDROP hDrop = (HDROP)wParam;
+
+    int count = DragQueryFile(hDrop, 0xFFFFFFFF, szName, MAX_PATH);
+
+    // Here we go through all the files that were drag and dropped then display them
+    for(int i = 0; i < count; i++) {
+        DragQueryFile(hDrop, i, szName, MAX_PATH);
+
+        // Bring up a message box that displays the current file being processed
+        // MessageBox(GetForegroundWindow(), szName, "Current file received", MB_OK);
+        char *dndfile = utf8_from_locale(szName);
+        wid->func.dnd_notify_callback(wid, (void*)&dndfile);
+        free(dndfile);
+    }
+
+    DragFinish(hDrop);
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -888,6 +912,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             wid->func.motion_callback((void*)wid, &xmotion, user_data);
             debug_print("Widget_t MotionNotify x = %li Y = %li hwnd=%p\n",pt.x,pt.y,hwnd );
             return 0;
+
+        case WM_DROPFILES:
+            HandleFiles(wParam, wid);
+            break;
 
         // X11:ClientMessage: not implemented (could be done with WM_USER / RegisterWindowMessage())
         case WM_USER + 01: // WM_DELETE_WINDOW

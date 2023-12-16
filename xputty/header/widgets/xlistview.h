@@ -56,17 +56,15 @@ typedef struct {
 
 /**
  * @brief listview_set_active_entry   - set the active listview entry
- * @param *w_                        - void pointer to the Widget_t listview
+ * @param *w                         - void pointer to the Widget_t listview
  * @param active                     - the active entry (int)
- * @return void
  */
 
 void listview_set_active_entry(Widget_t *w, int active);
 
 /**
  * @brief listview_unset_active_entry - unset the active listview entry
- * @param *w_                         - void pointer to the Widget_t listview
- * @return void
+ * @param *w                          - void pointer to the Widget_t listview
  */
 
 void listview_unset_active_entry(Widget_t *w);
@@ -74,6 +72,7 @@ void listview_unset_active_entry(Widget_t *w);
 /**
  * @brief create_listview_viewport     - create a viewport on a listview to a Widget_t
  * @param *parent             - pointer to the Widget_t the listview should pop over
+ * @param elem                - how many entries to show (max value)
  * @param width               - define the width of the viewport
  * @param height              - define the height of the viewport
  * @return Widget_t*          - pointer to the Widget_t viewport
@@ -96,7 +95,6 @@ Widget_t* add_listview(Widget_t *parent, const char * label,
  * @brief listview_mem_free        - release additional used memory when destroy the Widget_t
  * @param *w_                      - void pointer to the Widget_t
  * @param *user_data               - void pointer to attached user_data
- * @return void
  */
 
 void listview_mem_free(void *w_, void* user_data);
@@ -104,7 +102,6 @@ void listview_mem_free(void *w_, void* user_data);
 /**
  * @brief listview_remove_list - remove the list from a listview  Widget_t
  * @param *listview            - pointer to the Widget_t listview which should show the list
- * @return void
  */
 
 void listview_remove_list(Widget_t *listview);
@@ -114,7 +111,6 @@ void listview_remove_list(Widget_t *listview);
  * @param *listview           - pointer to the Widget_t listview which should show the list
  * @param **list              - pointer to the list
  * @param list_size           - how many items contain the list
- * @return void
  */
 
 void listview_set_list(Widget_t *listview, char **list, int list_size);
@@ -123,7 +119,6 @@ void listview_set_list(Widget_t *listview, char **list, int list_size);
  * @brief listview_set_check_dir - set optional check if list item is a directory
  * @param *listview              - pointer to the Widget_t listview which should show the list
  * @param set                    - 0 = no check (default); 1 = check
- * @return void
  */
 
 void listview_set_check_dir(Widget_t *listview, int set);

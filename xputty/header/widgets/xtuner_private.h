@@ -33,7 +33,6 @@ extern "C" {
  * @brief _draw_tuner          - draw the tuner on expose call
  * @param *w_                  - The Widget_t contain the tuner
  * @param *user_data           - attached user_data
- * @return void
  */
 
 void _draw_tuner(void *w_, void* user_data);

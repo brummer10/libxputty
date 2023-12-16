@@ -1,4 +1,6 @@
 
+include ./Build/Makefile.base
+
 SUBDIR := $(sort $(wildcard */))
 SUBDIR := $(filter-out  xputty/, $(SUBDIR))
 SUBDIR := $(filter-out  docs/, $(SUBDIR))
@@ -15,7 +17,7 @@ endif
 $(MAKECMDGOALS) recurse: $(SUBDIR)
 
 $(SUBDIR):
-	@exec $(MAKE) -C $@ $(MAKECMDGOALS)
+	@exec $(MAKE) --no-print-directory -C $@ $(MAKECMDGOALS)
 
 doc:
 	#@rm -rf ./docs

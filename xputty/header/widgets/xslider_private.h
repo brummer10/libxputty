@@ -31,20 +31,18 @@ extern "C" {
 
 /**
  * @brief _pattern_vslider  - set pattern for the slider base
- * @param *w_               - void pointer to the Widget_t button
+ * @param *w                - void pointer to the Widget_t button
  * @param st                - the Widget_t Color_t mode to use
  * @param width             - the width of the base
- * @return void
  */
 
 void _pattern_vslider(Widget_t *w, Color_state st, int width);
 
 /**
  * @brief _pattern_hslider  - set pattern for the slider base
- * @param *w_               - void pointer to the Widget_t button
+ * @param *w                - void pointer to the Widget_t button
  * @param st                - the Widget_t Color_t mode to use
  * @param width             - the width of the base
- * @return void
  */
 
 void _pattern_hslider(Widget_t *w, Color_state st, int width);
@@ -54,7 +52,6 @@ void _pattern_hslider(Widget_t *w, Color_state st, int width);
  * @param *w                  - pointer to the Widget_t button
  * @param width_t             - the width of the base
  * @param height_t            - the height of the base
- * @return void
  */
 
 void _draw_image_slider(Widget_t *w, int width_t, int height_t);
@@ -63,7 +60,6 @@ void _draw_image_slider(Widget_t *w, int width_t, int height_t);
  * @brief _draw_vslider          - internal draw the slider to the buffer
  * @param *w_                    - void pointer to the Widget_t button
  * @param *user_data             - void pointer to attached user_data
- * @return void
  */
 
 void _draw_vslider(void *w_, void* user_data);
@@ -72,7 +68,6 @@ void _draw_vslider(void *w_, void* user_data);
  * @brief _draw_hslider          - internal draw the slider to the buffer
  * @param *w_                    - void pointer to the Widget_t button
  * @param *user_data             - void pointer to attached user_data
- * @return void
  */
 
 void _draw_hslider(void *w_, void* user_data);
@@ -80,8 +75,8 @@ void _draw_hslider(void *w_, void* user_data);
 /**
  * @brief _slider_released  - redraw the slider when button released 
  * @param *w_               - void pointer to the Widget_t button
+ * @param *button_          - the XbuttonEvent
  * @param *user_data        - void pointer to attached user_data
- * @return void
  */
 
 void _slider_released(void *w_, void* button_, void* user_data);

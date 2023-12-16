@@ -36,7 +36,6 @@ extern "C" {
  * @param *w                                - pointer to the Widget_t meter
  * @param width                             - widget width
  * @param height                            - widget height
- * @return void
  */
 
 void _create_playhead_image(Widget_t *w, int width, int height);
@@ -45,7 +44,6 @@ void _create_playhead_image(Widget_t *w, int width, int height);
  * @brief _draw_playhead          - internal draw the playhead to the buffer
  * @param *w_                    - void pointer to the Widget_t button
  * @param *user_data             - void pointer to attached user_data
- * @return void
  */
 
 void _draw_playhead(void *w_, void* user_data);

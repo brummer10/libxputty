@@ -34,7 +34,6 @@ extern "C" {
  * @brief _get_width           - get the width of a tooltip text and resize the
  * tooltip widget to match the size
  * @param *w                   - the tooltip Widget_t
- * @return void
  */
 
 void _get_width(Widget_t *w);
@@ -43,7 +42,6 @@ void _get_width(Widget_t *w);
  * @brief _draw_tooltip        - draw tooltip on expose call
  * @param *w_                  - the tooltip to draw
  * @param *user_data           - attached user_data
- * @return void
  */
 
 void _draw_tooltip(void *w_, void* user_data);

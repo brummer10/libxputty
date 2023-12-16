@@ -35,6 +35,8 @@ extern "C" {
  * connect to func.value_changed_callback to implement your actions
  * @param *parent             - pointer to the Widget_t request the vumeter
  * @param *label              - Label to show on the vumeter
+ * @param *clip               - Adjustment_t used to clip the play section start
+ * @param *cut                - Adjustment_t used to cut the play section end
  * @param x,y,width,height    - the position/geometry to create the vumeter
  * @return Widget_t*          - pointer to the Widget_t meter struct
  */

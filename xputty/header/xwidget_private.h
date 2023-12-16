@@ -39,7 +39,6 @@ extern "C" {
  * on a motion event (POINTER_MOTION)
  * @param *wid              - pointer to the Widget_t receiving a event
  * @param direction         - up/down scroll diretion
- * @return void 
  */
 
 void _scroll_event(Widget_t * wid, int direction);
@@ -47,7 +46,6 @@ void _scroll_event(Widget_t * wid, int direction);
  * @brief _toggle_event     - internal check which Adjustment_t change it's value
  * on a Button press event (BUTTON_PRESS)
  * @param *wid              - pointer to the Widget_t receiving a event
- * @return void 
  */
 
 void _toggle_event(Widget_t * wid);
@@ -57,7 +55,6 @@ void _toggle_event(Widget_t * wid);
  * and handle events acordingly
  * @param *wid              - pointer to the Widget_t receiving a event
  * @param *xbutton          - pointer to the XButtonEvent
- * @return void 
  */
 
 void _check_enum(Widget_t * wid, XButtonEvent *xbutton);
@@ -67,7 +64,6 @@ void _check_enum(Widget_t * wid, XButtonEvent *xbutton);
  * @param *wid              - pointer to the Widget_t receiving a event
  * @param *xbutton          - pointer to the XButtonEvent
  * @param *user_data        - void pointer to attached user_data
- * @return void 
  */
 
 void _button_press(Widget_t * wid, XButtonEvent *xbutton, void* user_data);
@@ -79,7 +75,6 @@ void _button_press(Widget_t * wid, XButtonEvent *xbutton, void* user_data);
  * @param *wid              - pointer to the Widget_t receiving a event
  * @param *xbutton          - pointer to the XButtonEvent
  * @param *main             - pointer to main struct
- * @return void 
  */
 
 void _check_grab(Widget_t * wid, XButtonEvent *xbutton, Xputty *main);
@@ -91,7 +86,6 @@ void _check_grab(Widget_t * wid, XButtonEvent *xbutton, Xputty *main);
  * @param *wid              - pointer to the Widget_t receiving a event
  * @param *xbutton          - pointer to the XButtonEvent
  * @param *main             - pointer to main struct
- * @return void 
  */
 
 void _check_submenu(Widget_t * wid, XButtonEvent *xbutton, Xputty *main);
@@ -99,14 +93,13 @@ void _check_submenu(Widget_t * wid, XButtonEvent *xbutton, Xputty *main);
 /**
  * @brief _propagate_child_expose - send expose to any child Widget_t
  * @param *wid                    - pointer to the Widget_t send the event
- * @return void 
  */
 
 void _propagate_child_expose(Widget_t *wid);
 
 /**
  * @brief _check_keymap     - check if key is in map, send requests if so 
- * @param *w                - pointer to the Widget_t receiving the event
+ * @param *w_               - pointer to the Widget_t receiving the event
  * @param xkey              - the XKeyEvent to check
  */
 
@@ -129,26 +122,26 @@ void _has_pointer(Widget_t *w, XButtonEvent *button);
 
 /**
  * @brief _set_adj_value    - set value to adjustment from key event
- * @param *w                - pointer to the Widget_t receiving the event
+ * @param *w_               - pointer to the Widget_t receiving the event
  * @param x                 - use x or y-axis
+ * @param direction         - add or subtract Adjustment_t steps * direction
  */
 
 void _set_adj_value(void *w_, bool x, int direction);
 
 /**
  * @brief _dummy1_callback   - default debuging callback for evfunc's
- * @param *w                 - pointer to the Widget_t receive the event
+ * @param *w_                - pointer to the Widget_t receive the event
+ * @param _data              - void pointer to attached data
  * @param user_data          - void pointer to attached user_data
- * @return void 
  */
 
 void _dummy1_callback(void *w_, void* _data, void* user_data);
 
 /**
  * @brief _dummy1_callback    - default debuging callback for xevfunc's
- * @param *w                 - pointer to the Widget_t receive the event
+ * @param *w_                - pointer to the Widget_t receive the event
  * @param user_data          - void pointer to attached user_data
- * @return void 
  */
 
 void _dummy_callback(void *w_, void* user_data);
@@ -158,7 +151,6 @@ void _dummy_callback(void *w_, void* user_data);
  * @param *wid               - pointer to the Widget_t receive the event
  * @param width              - the new width
  * @param height             - the new height
- * @return void 
  */
 
 void _resize_surface(Widget_t *wid, int width, int height);
@@ -166,7 +158,6 @@ void _resize_surface(Widget_t *wid, int width, int height);
 /**
  * @brief _resize_childs     - intern check if child widgets needs resizing
  * @param *wid               - pointer to the Widget_t receive the event
- * @return void 
  */
 
 void _resize_childs(Widget_t *wid);

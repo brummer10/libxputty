@@ -112,7 +112,7 @@ void os_destroy_window(Widget_t *w);
  * @param *w                       - Widget_t pointer
  * @param from_window              - source Window
  * @param to_window                - destination Window
- * @param x, y                     - point from the source Window
+ * @param from_x, from_y           - point from the source Window
  * @param *to_x, *to_y             - (Pointer) point in the destination Window
  */
 
@@ -125,7 +125,7 @@ void os_translate_coords(Widget_t *w, Window from_window, Window to_window,
  * @param *metrics                 - Pointer to the Metrics_t struct to hold the info for widget 
  */
 
-void os_get_window_metrics(Widget_t *w_, Metrics_t *metrics);
+void os_get_window_metrics(Widget_t *w, Metrics_t *metrics);
 
 /**
  * @brief os_set_window_min_size   - Set the min and base size of a Widget_t
@@ -149,7 +149,7 @@ void os_move_window(Display *dpy, Widget_t *w, int x, int y);
 /**
  * @brief os_resize_window         - Resize a  Widget_t
  * @param *dpy                     - Pointer to the Display the widget belongs to
- * @param *w                       - Pointer to the widget 
+ * @param *w                       - Pointer to the Widget_t
  * @param x, y                     - the new size
  */
 
@@ -165,7 +165,7 @@ void os_get_surface_size(cairo_surface_t *surface, int *width, int *height);
 
 /**
  * @brief os_set_widget_surface_size  - set the size of a Widget_t cairo surface
- * @param *surface                    - the cairo surface 
+ * @param *w                          - Pointer to the Widget_t the surface belongs to
  * @param *width, *height             - the size to set
  */
 
@@ -229,7 +229,7 @@ void os_show_tooltip(Widget_t *wid, Widget_t *w);
 
 /**
  * @brief os_transparent_draw      - Draw the Widget_t to the back buffer
- * @param *w                       - Pointer to the widget 
+ * @param *w_                      - Pointer to the widget 
  * @param *user_data               - additional user data or NULL
  */
 
@@ -278,7 +278,7 @@ void os_send_systray_message(Widget_t *w);
 /**
  * @brief os_adjustment_callback        - called when a adjustment value have changed
  * used internal for redraw the Widget_t
- * @param *w                            - Pointer to the widget 
+ * @param *w_                           - Pointer to the widget 
  * @param *user_data                    - additional user data or NULL
  */
 
@@ -422,7 +422,7 @@ Atom os_register_wm_delete_window(Widget_t * wid);
 /**
  * @brief os_widget_event_loop     - the Widget_t event loop
  * on windows all messges goes into WndProc, so stub here
- * @param *w                       - Pointer to the widget 
+ * @param *w_                      - Pointer to the widget 
  * @param *event                   - the event to handle
  * @param *main                    - pointer to the Xputty struct
  * @param *user_data               - additional user data could be NULL 

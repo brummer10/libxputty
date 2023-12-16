@@ -158,6 +158,7 @@ void widget_set_color(double *c, double r, double g, double b, double a);
 /**
  * @brief get_color_scheme  - get pointer to the Colors struct to use
  * in relation to the Color_state
+ * @param *wid              - pointer to the Widget_t
  * @param *st               - the Color state to use
  */
 
@@ -248,7 +249,7 @@ void set_systray_color(Xputty *main, double r, double g, double b, double a);
 
 /**
  * @brief set_pattern       - set pattern for the selected Colors
- * @param *w_               - pointer to the Widget_t to set the pattern
+ * @param *w                - pointer to the Widget_t to set the pattern
  * @param *from             - the Colors set to pattern from (0)
  * @param *to               - the Colors set to pattern to (1)
  * @param mod               - the Color_mod to use

@@ -1,0 +1,151 @@
+
+# info colors
+ifneq ($(TERM),)
+  export red :=$(shell tput setaf 1)
+  export green :=$(shell tput setaf 2)
+  export yellow :=$(shell tput setaf 3)
+  export blue :=$(shell tput setaf 4)
+  export purple :=$(shell tput setaf 5)
+  export cyan :=$(shell tput setaf 6)
+  export reset :=$(shell tput sgr0)
+  export ceol :=$(shell tput cuu1 && tput el)
+  export ceol2 :=$(shell tput cuu 2 && tput el)
+else
+  export red :=$()
+  export green :=$()
+  export yellow :=$()
+  export blue :=$()
+  vpurple :=$()
+  export cyan :=$()
+  export reset :=$()
+  export ceol :=$()
+  export ceol2 :=$()
+  export ECHO :=echo
+endif
+
+# counter
+ifndef ECHO
+	export ECHO = echo "${purple}"
+endif
+
+# build with "V=1" for verbose builds
+ifeq ($(V), 1)
+	export QUIET =
+else
+	export QUIET = @
+endif
+
+# check if we need LD to implement images
+# in order of preference: xxd -i, xxdi.pl, ld, ld.gold
+
+# check for xxd (tool from vim)
+ifeq ($(shell which xxd 2>&1 >/dev/null; echo $$?),0)
+	ifneq ($(shell xxd --version 2>&1 | head -n 1 | grep xxd),)
+		HAVE_XXD = 1
+	endif
+endif
+
+# check for xxdi.pl, a simple alternative to vim's 'xxd -i' mode
+# https://github.com/gregkh/xxdi
+#
+ifeq ($(shell which xxdi.pl 2>&1 >/dev/null; echo $$?),0)
+	HAVE_XXDI_PL = 1
+endif
+
+ifneq ($(shell $(LD) --version 2>&1 | head -n 1 | grep ld),)
+	ifneq ($(shell uname -a | grep  x86_64), )
+		LDEMULATION := elf_x86_64 -z noexecstack
+	else ifneq ($(shell uname -a | grep amd64), )
+		LDEMULATION := elf_x86_64 -z noexecstack
+	else ifneq ($(shell uname -a | grep i386), )
+		LDEMULATION := elf_i386 -z noexecstack
+	else ifeq ($(shell uname -m),aarch64)
+		LDEMULATION := aarch64elf -z noexecstack
+	endif
+	ifneq ($(LDEMULATION),)
+		HAVE_KNOWN_LDEMULATION = 1
+	endif
+else ifneq ($(shell gold --version 2>&1 | head -n 1 | grep gold),)
+	HAVE_LD_GOLD = 1
+	LD = gold
+endif
+
+	# check OS specific stuff
+	OS := $(shell echo $$OS)
+	UNAME_S := $(shell uname -s)
+	# cross compilation (e.g.: PKG_CONFIG_PATH=/usr/local/pkgconfig make CROSS=x86_64-w64-mingw32- mod)
+	ifneq (,$(findstring mingw,$(CROSS)))
+		# Found
+		export TARGET = Windows
+		export STRIP = $(CROSS)strip
+		export PKGCONFIG = $(CROSS)pkg-config
+		export CC = $(CROSS)cc
+		export CXX = $(CROSS)g++
+		export LD = $(CROSS)ld
+	else ifneq (,$(findstring mingw,$(CXX)))
+		# Found
+		export TARGET = Windows
+	else
+		# Not found
+		ifeq ($(UNAME_S), Linux) #LINUX
+			export TARGET = Linux
+		endif
+		ifeq ($(OS), Windows_NT) #WINDOWS
+			export TARGET = Windows
+		endif
+		ifeq ($(UNAME_S), Darwin) #APPLE
+			export TARGET = Apple
+		endif
+	endif
+	ifeq ($(TARGET), Linux)
+		export ABI_CFLAGS = -Wl,-z,nodelete
+		export ABI_CXXFLAGS = -Wl,-z,relro,-z,now
+		export ABI_LDFLAGS = -Wl,-z,noexecstack
+		export STRIP = strip
+		export PKGCONFIG = pkg-config
+		export XELF = x11
+		export LIB_EXT = so
+		export STATIC_LIB_EXT = a
+		export XDG_DIR := ../xputty/xdgmime/
+	endif
+	ifeq ($(TARGET), Windows)
+		#ECHO += -e
+		export ABI_LDFLAGS = -static -lpthread
+		export GUI_LIBS = -liconv -lstdc++
+		export STRIP = x86_64-w64-mingw32-strip
+		export PKGCONFIG = x86_64-w64-mingw32-pkg-config
+		export PKGCONFIG_FLAGS = --static
+		export LIB_EXT = dll
+		export STATIC_LIB_EXT = lib
+		export LDEMULATION = i386pep
+		export XDG_DIR := .
+		export EXE_EXT = .exe
+	endif
+
+# generic link flags when build with PawPaw
+ifneq (,$(findstring PawPawBuilds,$(PATH)))
+	export PAWPAW_LFLAGS = -L $(HOME)/PawPawBuilds/targets/win64/lib -lcairo -lpixman-1 \
+	-lfreetype -lpng16 -lz  -lcomdlg32 -ldwmapi -lgdi32 -lm -lole32 -lwinmm \
+	-lksuser -lmfplat -lmfuuid -lwmcodecdspuuid -lpthread -Wl,-subsystem,windows
+endif
+
+$(info Build for OS $(yellow)$(TARGET)$(reset))
+$(info Build with $(yellow)$(CC)$(reset))
+ifeq ($(HAVE_XXD),1)
+$(info Using xxd -i)
+export XXDI = xxd -i
+else ifeq ($(HAVE_XXDDI_PL),1)
+$(info Using xxdi.pl)
+export XXDI = xxdi.pl
+else ifeq ($(HAVE_KNOWN_LDEMULATION),1)
+$(info Using $(LD) with LDEMULATION=$(LDEMULATION))
+export USE_LDD = 1
+export RCFLAG = -DUSE_LD=1
+RESOURCES_C = $(RESOURCES_OBJ)
+else ifeq ($(HAVE_LD_GOLD),1)
+$(info Using $(LD) (gold))
+export RCFLAG = -DUSE_LD=1
+RESOURCES_C = $(RESOURCES_OBJ)
+else
+$(error Neither xxd, nor xxdi.pl, nor suitable ld found)
+endif

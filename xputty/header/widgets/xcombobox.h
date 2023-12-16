@@ -58,6 +58,7 @@ void pop_combobox_menu_show(Widget_t *parent, Widget_t *menu, bool above);
 /**
  * @brief add_combobox        - add a combobox
  * @param *parent             - pointer to the Widget_t request the button
+ * @param *label              - Label to show over the combobox
  * @param x,y,width,height    - the position/geometry to create the button
  * @return Widget_t*          - pointer to the Widget_t button struct
  */
@@ -68,7 +69,6 @@ Widget_t* add_combobox(Widget_t *parent, const char  * label, int x, int y, int 
  * @brief combobox_add_entry    - add a entry to the combobox
  * @param *wid                  - pointer to the Widget_t combobox
  * @param *label                - Label to show on the menu
- * @return void
  */
 
 void combobox_add_entry(Widget_t *wid, const char  * label);
@@ -78,7 +78,6 @@ void combobox_add_entry(Widget_t *wid, const char  * label);
  * @param *wid                  - pointer to the Widget_t combobox
  * @param active                - the entry to rename (int)
  * @param *label                - new Label to show on the menu
- * @return void
  */
 
 void combobox_rename_entry(Widget_t *wid, int active, const char* label);
@@ -88,16 +87,14 @@ void combobox_rename_entry(Widget_t *wid, int active, const char* label);
  * @param *wid                       - pointer to the Widget_t combobox
  * @param *imin                      - the low number of the numeric items
  * @param *imax                      - the high number of the numeric items
- * @return void
  */
 
 void combobox_add_numeric_entrys(Widget_t *wid, int imin, int imax);
 
 /**
  * @brief combobox_set_active_entry  - set the active combobox entry
- * @param *w_                        - void pointer to the Widget_t combobox
+ * @param *w                         - void pointer to the Widget_t combobox
  * @param active                     - the active entry (int)
- * @return void
  */
 
 void combobox_set_active_entry(Widget_t *w, int active);
@@ -106,7 +103,6 @@ void combobox_set_active_entry(Widget_t *w, int active);
  * @brief combobox_mem_free        - release additional used memory when destroy the Widget_t
  * @param *w_                      - void pointer to the Widget_t
  * @param *user_data               - void pointer to attached user_data
- * @return void
  */
 
 void combobox_mem_free(void *w_, void* user_data);
@@ -114,7 +110,6 @@ void combobox_mem_free(void *w_, void* user_data);
 /**
  * @brief combobox_delete_entrys   - free the list hold the combobox entrys
  * @param *combobox                - void pointer to the Widget_t combobox
- * @return void
  */
 
 void combobox_delete_entrys(Widget_t *combobox);
@@ -123,7 +118,6 @@ void combobox_delete_entrys(Widget_t *combobox);
  * @brief combobox_set_menu_size     - set the number of entrys shown in the pop menu
  * @param *combobox                  - pointer to the Widget_t combobox
  * @param v                          - the max entry count (int)
- * @return void
  */
 
 void combobox_set_menu_size(Widget_t *combobox, int v);

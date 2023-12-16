@@ -555,7 +555,7 @@ Widget_t *create_window(Xputty *app, Window win,
  * \n To create a Widget_t you need to create a Widget_t with create_window()
  * before.
  * @param *app                - pointer to the Xputty *main struct to use
- * @param *parent             - pointer to the Parrent Widget_t
+ * @param *win                - pointer to the Parrent Widget_t
  * @param x,y,width,height    - the position/geometry to create the widget
  * @return Widget_t*          - pointer to the Widget_t struct
  */
@@ -672,7 +672,7 @@ void transparent_draw(void * wid, void* user_data);
 
 /**
  * @brief widget_draw       - redraw only the widget,not the child widgets
- * @param *wid              - pointer to the Widget_t receiving the event
+ * @param *w_               - pointer to the Widget_t receiving the event
  * @param *user_data        - void pointer to attached user_data
  */
 
@@ -714,7 +714,7 @@ void destroy_widget(Widget_t *w, Xputty *main);
 
 /**
  * @brief widget_event_loop - the internal widget event loop
- * @param *w                - void pointer to the Widget_t receiving the event
+ * @param *w_               - void pointer to the Widget_t receiving the event
  * @param *event            - void pointer to the XEvent
  * @param *main             - void pointer to the Xputty *main struct running 
  * the event loop

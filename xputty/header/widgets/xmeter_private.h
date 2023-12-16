@@ -32,16 +32,16 @@ extern "C" {
 
 /**
  * @brief _draw_meter_scale    - draw a meter scale beside the meter widget
- * @param w                    - the widget to draw to
- * @return void
+ * @param w_                   - the widget to draw to
+ * @param *user_data             - void pointer to attached user_data
  */
 
 void _draw_vmeter_scale(void *w_, void* user_data);
 
 /**
  * @brief _draw_hmeter_scale   - draw a hmeter scale beside the meter widget
- * @param w                    - the widget to draw to
- * @return void
+ * @param w_                   - the widget to draw to
+ * @param *user_data             - void pointer to attached user_data
  */
 
 void _draw_hmeter_scale(void *w_, void* user_data);
@@ -60,7 +60,6 @@ float _log_meter (float db);
  * @param *w                                - pointer to the Widget_t meter
  * @param width                             - widget width
  * @param height                            - widget height
- * @return void
  */
 
 void _create_vertical_meter_image(Widget_t *w, int width, int height);
@@ -71,7 +70,6 @@ void _create_vertical_meter_image(Widget_t *w, int width, int height);
  * @param *w                                - pointer to the Widget_t meter
  * @param width                             - widget width
  * @param height                            - widget height
- * @return void
  */
 
 void _create_horizontal_meter_image(Widget_t *w, int width, int height);
@@ -80,7 +78,6 @@ void _create_horizontal_meter_image(Widget_t *w, int width, int height);
  * @brief _draw_v_meter          - internal draw the meter to the buffer
  * @param *w_                    - void pointer to the Widget_t button
  * @param *user_data             - void pointer to attached user_data
- * @return void
  */
 
 void _draw_v_meter(void *w_, void* user_data);
@@ -89,7 +86,6 @@ void _draw_v_meter(void *w_, void* user_data);
  * @brief _draw_h_meter          - internal draw the meter to the buffer
  * @param *w_                    - void pointer to the Widget_t button
  * @param *user_data             - void pointer to attached user_data
- * @return void
  */
 
 void _draw_h_meter(void *w_, void* user_data);

@@ -34,7 +34,6 @@ extern "C" {
  * @brief _draw_listbox           - draw listbox on expose call
  * @param *w_                  - the listbox to draw
  * @param *user_data           - attached user_data
- * @return void
  */
 
 void _draw_listbox(void *w_, void* user_data);
@@ -43,7 +42,6 @@ void _draw_listbox(void *w_, void* user_data);
  * @brief _draw_listbox_item   - draw item on expose call
  * @param *w_                  - the item to draw
  * @param *user_data           - attached user_data
- * @return void
  */
 
 void _draw_listbox_item(void *w_, void* user_data);
@@ -53,7 +51,6 @@ void _draw_listbox_item(void *w_, void* user_data);
  * to indicate the view point
  * @param *w_                      - void pointer to view_port
  * @param *user_data               - attached user_data
- * @return void
  */
 
 void _draw_listbox_viewslider(void *w_, void* user_data);
@@ -63,7 +60,6 @@ void _draw_listbox_viewslider(void *w_, void* user_data);
  * on size changes
  * @param *w_                      - void pointer to view_port
  * @param *user_data               - attached user_data
- * @return void
  */
 
 void _reconfigure_listbox_viewport(void *w_, void* user_data);
@@ -72,7 +68,6 @@ void _reconfigure_listbox_viewport(void *w_, void* user_data);
  * @brief _configure_listbox       - configure the viewport on mapping
  * @param *w_                      - void pointer to view_port
  * @param *user_data               - attached user_data
- * @return void
  */
 
 void _configure_listbox(void *w_, void* user_data);
@@ -81,7 +76,6 @@ void _configure_listbox(void *w_, void* user_data);
  * @brief _set_listbox_viewpoint  - move the view_port to position
  * @param *w_                     - void pointer to view_port
  * @param *user_data              - attached user_data
- * @return void
  */
 
 void _set_listbox_viewpoint(void *w_, void* user_data);
@@ -91,7 +85,6 @@ void _set_listbox_viewpoint(void *w_, void* user_data);
  * @param *w_                      - void pointer to the Widget_t entry
  * @param *button_                 - void pointer to the XButtonEvent
  * @param *user_data               - void pointer to attached user_data
- * @return void
  */
 
 void _listbox_entry_released(void *w_, void* button_, void* user_data);

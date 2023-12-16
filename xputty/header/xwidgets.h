@@ -24,9 +24,16 @@
 #define XWIDGETS_H_
 
 
-/** xwidgets.h include some predefined widgets for libxputty, include this to use them 
+/** 
+ * @file xwidgets.h
+ * @brief xwidgets.h include some predefined widgets for libxputty, include this to use them 
  * if you would only use libxputty and define your own widgets, include xputt.h 
  * instead this one in your project.
+ */
+
+
+/**@example Makefile
+ * Simple example of how to build this
  */
 
 // widget header

@@ -41,6 +41,16 @@ extern "C" {
 Widget_t* add_valuedisplay(Widget_t *parent, const char * label,
                 int x, int y, int width, int height);
 
+/**
+ * @brief add_popup_spinbox   - add a popup spinbox to a valuedisplay
+ * this is implemented in the valuedisplay via double click
+ * @param *parent             - pointer to the Widget_t  valuedisplay
+ * @param *label              - Label to show on the valuedisplay stub
+ * @param x,y,width,height    - the position/geometry to create the spinbox
+ * the spinbox will popup above the valuedisplay anyway
+ * @return Widget_t*          - pointer to the Widget_t valuedisplay struct
+ */
+
 Widget_t* add_popup_spinbox(Widget_t *parent, const char * label,
                 int x, int y, int width, int height);
 

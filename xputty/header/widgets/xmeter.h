@@ -32,6 +32,7 @@ extern "C" {
 
 /**
  * @brief power2db             - power (db) input to db output consider falloff
+ * @param *w                   - pointer to the Widget_t belongs to the vumeter
  * @param power                - mesured power
  * @return float               - calculated db
  */
@@ -43,6 +44,7 @@ float power2db(Widget_t *w, float power);
  * connect to func.value_changed_callback to implement your actions
  * @param *parent             - pointer to the Widget_t request the vumeter
  * @param *label              - Label to show on the vumeter
+ * @param show_scale          - show a Db scale on the vumeter
  * @param x,y,width,height    - the position/geometry to create the vumeter
  * @return Widget_t*          - pointer to the Widget_t mete struct
  */
@@ -55,6 +57,7 @@ Widget_t* add_vmeter(Widget_t *parent, const char * label, bool show_scale,
  * connect to func.value_changed_callback to implement your actions
  * @param *parent             - pointer to the Widget_t request the vumeter
  * @param *label              - Label to show on the vumeter
+ * @param show_scale          - show a Db scale on the vumeter
  * @param x,y,width,height    - the position/geometry to create the vumeter
  * @return Widget_t*          - pointer to the Widget_t meter struct
  */

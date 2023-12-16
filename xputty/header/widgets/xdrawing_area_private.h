@@ -34,7 +34,6 @@ extern "C" {
  * @brief _draw_image            - internal draw the image to the buffer
  * @param *w_                    - void pointer to the Widget_t image
  * @param *user_data             - void pointer to attached user_data
- * @return void
  */
 
 void _draw_image(void *w_, void* user_data);

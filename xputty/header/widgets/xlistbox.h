@@ -32,9 +32,8 @@ extern "C" {
 
 /**
  * @brief listbox_set_active_entry   - set the active listbox entry
- * @param *w_                        - void pointer to the Widget_t listbox
+ * @param *w                         - void pointer to the Widget_t listbox
  * @param active                     - the active entry (int)
- * @return void
  */
 
 void listbox_set_active_entry(Widget_t *w, int active);
@@ -42,6 +41,7 @@ void listbox_set_active_entry(Widget_t *w, int active);
 /**
  * @brief create_listbox_viewport     - create a viewport on a listbox to a Widget_t
  * @param *parent             - pointer to the Widget_t the listbox should pop over
+ * @param elem                - how many entries to show (max value)
  * @param width               - define the width of the viewport
  * @param height              - define the height of the viewport
  * @return Widget_t*          - pointer to the Widget_t viewport

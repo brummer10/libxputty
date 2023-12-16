@@ -1084,7 +1084,8 @@ EXAMPLE_PATH           = /home/brummer/projecte/libxputty/examples
 # *.h) to filter out the source-files in the directories. If left blank all
 # files are included.
 
-EXAMPLE_PATTERNS       = *.c
+EXAMPLE_PATTERNS       = *.c \
+                        Makefile
 
 # If the EXAMPLE_RECURSIVE tag is set to YES then subdirectories will be
 # searched for input files to be used with the \include or \dontinclude commands
@@ -1158,7 +1159,8 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE =
+INPUT += Instructions.md
+USE_MDFILE_AS_MAINPAGE = Instructions.md
 
 # The Fortran standard specifies that for fixed formatted Fortran code all
 # characters from position 72 are to be considered as comment. A common

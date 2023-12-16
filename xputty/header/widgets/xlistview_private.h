@@ -34,7 +34,6 @@ extern "C" {
  * @brief _draw_listview           - draw listview on expose call
  * @param *w_                  - the listview to draw
  * @param *user_data           - attached user_data
- * @return void
  */
 
 void _draw_listview(void *w_, void* user_data);
@@ -43,7 +42,6 @@ void _draw_listview(void *w_, void* user_data);
  * @brief _draw_list           - draw list on expose call
  * @param *w_                  - the Widget_t to draw
  * @param *user_data           - attached user_data
- * @return void
  */
 
 void _draw_list(void *w_, void* user_data);
@@ -53,7 +51,6 @@ void _draw_list(void *w_, void* user_data);
  * @param *w_                      - void pointer to the Widget_t listview
  * @param *xmotion_                - void pointer to the XMotionEvent
  * @param *user_data               - void pointer to attached user_data
- * @return void
  */
 
 void _list_motion(void *w_, void* xmotion_, void* user_data);
@@ -61,9 +58,8 @@ void _list_motion(void *w_, void* xmotion_, void* user_data);
 /**
  * @brief _list_key_pressed        - move listview or set active entry 
  * @param *w_                      - void pointer to the Widget_t listview
- * @param *button_                 - void pointer to the XButtonEvent
+ * @param *xkey_                   - void pointer to the XKeyEvent
  * @param *user_data               - void pointer to attached user_data
- * @return void
  */
 
 void _list_key_pressed(void *w_, void* xkey_, void* user_data);
@@ -73,7 +69,6 @@ void _list_key_pressed(void *w_, void* xkey_, void* user_data);
  * @param *w_                      - void pointer to the Widget_t listview
  * @param *button_                 - void pointer to the XButtonEvent
  * @param *user_data               - void pointer to attached user_data
- * @return void
  */
 
 void _list_entry_released(void *w_, void* button_, void* user_data);
@@ -83,7 +78,6 @@ void _list_entry_released(void *w_, void* button_, void* user_data);
  * @param *w_                       - void pointer to the Widget_t listview
  * @param *button_                  - void pointer to the XButtonEvent
  * @param *user_data                - void pointer to attached user_data
- * @return void
  */
 
 void _list_entry_double_clicked(void *w_, void* button_, void* user_data);
@@ -92,7 +86,6 @@ void _list_entry_double_clicked(void *w_, void* button_, void* user_data);
  * @brief _leave_list          - draw list on pointer leave
  * @param *w_                  - the Widget_t to draw
  * @param *user_data           - attached user_data
- * @return void
  */
 
 void _leave_list(void *w_, void* user_data);
@@ -102,7 +95,6 @@ void _leave_list(void *w_, void* user_data);
  * on size changes
  * @param *w_                      - void pointer to view_port
  * @param *user_data               - attached user_data
- * @return void
  */
 
 void _reconfigure_listview_viewport(void *w_, void* user_data);
@@ -111,7 +103,6 @@ void _reconfigure_listview_viewport(void *w_, void* user_data);
  * @brief _configure_listview       - configure the viewport on mapping
  * @param *w_                      - void pointer to view_port
  * @param *user_data               - attached user_data
- * @return void
  */
 
 void _configure_listview(void *w_, void* user_data);
@@ -121,7 +112,6 @@ void _configure_listview(void *w_, void* user_data);
  * to indicate the view point
  * @param *w_                      - void pointer to view_port
  * @param *user_data               - attached user_data
- * @return void
  */
 
 void _draw_listviewslider(void *w_, void* user_data);
@@ -130,7 +120,6 @@ void _draw_listviewslider(void *w_, void* user_data);
  * @brief _set_listview_viewpoint  - move the view_port to position
  * @param *w_                      - void pointer to view_port
  * @param *user_data               - attached user_data
- * @return void
  */
 
 void _set_listview_viewpoint(void *w_, void* user_data);
@@ -139,7 +128,6 @@ void _set_listview_viewpoint(void *w_, void* user_data);
  * by listviewslider state
  * @param *w_                      - void pointer to view_port
  * @param *user_data               - attached user_data
- * @return void
  */
 
 void _set_listviewport(void *w_, void* user_data);

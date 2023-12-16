@@ -34,7 +34,6 @@ extern "C" {
  * @brief tooltip_set_text     - set a (new) text to a tooltip for Widget_t
  * @param *w                   - pointer to the Widget_t request the tooltip
  * @param *label               - the tooltip text
- * @return void
  */
 
 void tooltip_set_text(Widget_t *w, const char* label);
@@ -43,7 +42,6 @@ void tooltip_set_text(Widget_t *w, const char* label);
  * @brief add_tooltip          - add a tooltip to Widget_t
  * @param *w                   - pointer to the Widget_t request the tooltip
  * @param *label               - the tooltip text
- * @return void
  */
 
 void add_tooltip(Widget_t *w, const char* label);

@@ -33,7 +33,7 @@ extern "C" {
  * @brief _draw_image_knob       - internal draw the knob from image
  * to the buffer
  * @param *w                     - pointer to the Widget_t knob
- * @return void
+ * @param width_t, height_t      - the size to scale the Image to
  */
 
 void _draw_image_knob(Widget_t *w, int width_t, int height_t);
@@ -42,7 +42,6 @@ void _draw_image_knob(Widget_t *w, int width_t, int height_t);
  * @brief _draw_knob_image       - internal draw the knob to the buffer
  * @param *w_                    - void pointer to the Widget_t button
  * @param *user_data             - void pointer to attached user_data
- * @return void
  */
 
 void _draw_knob_image(void *w_, void* user_data);
@@ -51,7 +50,6 @@ void _draw_knob_image(void *w_, void* user_data);
  * @brief _draw_knob             - internal draw the knob to the buffer
  * @param *w_                    - void pointer to the Widget_t button
  * @param *user_data             - void pointer to attached user_data
- * @return void
  */
 
 void _draw_knob(void *w_, void* user_data);
@@ -59,8 +57,8 @@ void _draw_knob(void *w_, void* user_data);
 /**
  * @brief _knob_released  - redraw the slider when buttob released 
  * @param *w_               - void pointer to the Widget_t button
+ * @param *button_          - void pointer to the XButtonEvent
  * @param *user_data        - void pointer to attached user_data
- * @return void
  */
 
 void _knob_released(void *w_, void* button_, void* user_data);

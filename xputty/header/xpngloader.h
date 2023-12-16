@@ -59,12 +59,12 @@ extern "C" {
 
 
 #define EXTLD(NAME) \
-  extern const unsigned char binary_ ## NAME ## _start[]; \
-  extern const unsigned char binary_ ## NAME ## _end[];
+  extern const unsigned char _binary_ ## NAME ## _start[]; \
+  extern const unsigned char _binary_ ## NAME ## _end[];
 #define LDVAR(NAME) \
-  binary_ ## NAME ## _start
+  _binary_ ## NAME ## _start
 #define LDLEN(NAME) \
-  ((binary_ ## NAME ## _end) - (binary_ ## NAME ## _start))
+  ((_binary_ ## NAME ## _end) - (_binary_ ## NAME ## _start))
 
 #else /* gnu/linux ld */
 

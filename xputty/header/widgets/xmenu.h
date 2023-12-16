@@ -34,7 +34,8 @@ extern "C" {
  * @brief pop_menu_show       - pop up a menu to a Widget_t
  * @param *parent             - pointer to the Widget_t the menu should pop over
  * @param *menu               - the menu to show
- * @return void
+ * @param elem                - how many entries to show (max value)
+ * @param above               - show menu above or below the parent Widget_t
  */
 
 void pop_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above);
@@ -43,7 +44,8 @@ void pop_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above);
  * @brief pop_submenu_show    - pop up a submenu to a Widget_t
  * @param *parent             - pointer to the Widget_t the menu should pop over
  * @param *menu               - the menu to show
- * @return void
+ * @param elem                - how many entries to show (max value)
+ * @param above               - show menu above or below the parent Widget_t
  */
 
 void pop_submenu_show(Widget_t *parent, Widget_t *menu, int elem, bool above);
@@ -82,7 +84,7 @@ Widget_t *add_menubar(Widget_t *parent, const char * label,
 
 /**
  * @brief menubar_add_menu    - add a menu to a menubar
- * @param *wid                - pointer to the Widget_t menu
+ * @param *parent             - pointer to the parent Widget_t (menubar)
  * @param *label              - Label to show on the menu
  * @return Widget_t*          - pointer to the Widget_t menu_item struct
  */
@@ -136,7 +138,7 @@ Widget_t* menu_add_value_entry(Widget_t *wid,const char * label);
 
 /**
  * @brief menu_add_submenu    - add a submenu to a Widget_t
- * @param *parent             - pointer to the Widget_t the menu should pop over
+ * @param *wid                - pointer to the Widget_t the submenu belongs to
  * @param *label              - the label of the menu
  * @return Widget_t*          - pointer to the Widget_t submenu struct
  */
@@ -144,8 +146,8 @@ Widget_t* menu_add_value_entry(Widget_t *wid,const char * label);
 Widget_t *menu_add_submenu(Widget_t *wid, const char  * label);
 
 /**
- * @brief cmenu_add_submenu   - add a submenu to a create_menu
- * @param *parent             - pointer to the Widget_t the menu should pop over
+ * @brief cmenu_add_submenu   - add a submenu to a cmenu
+ * @param *wid                - pointer to the Widget_t the submenu belongs to
  * @param *label              - the label of the menu
  * @return Widget_t*          - pointer to the Widget_t submenu struct
  */
@@ -173,8 +175,7 @@ Widget_t* menu_add_item(Widget_t *menu, const char * label);
 /**
  * @brief menu_remove_item    - remove a item from menu
  * @param *menu               - pointer to the Widget_t menu
- * @return Widget_t*          - pointer to the Widget_t menu_item to be removed
- * @return void
+ * @param *item               - pointer to the Widget_t item to be removed
  */
 
 void menu_remove_item(Widget_t *menu, Widget_t *item);
@@ -209,7 +210,6 @@ Widget_t* menu_add_value_item(Widget_t *menu,const char * label);
 /**
  * @brief radio_item_set_active       - activate selected radio item
  * @param *w                          - the Widget_t to activate
- * @return void
  */
 
 void radio_item_set_active(Widget_t *w);
@@ -217,7 +217,7 @@ void radio_item_set_active(Widget_t *w);
 /**
  * @brief set_active_radio_item       - activate selected radio item by number
  * @param *w                          - the Widget_t hold the menu
- * @return void
+ * @param active                      - the menu entry to activate
  */
 
 void set_active_radio_entry_num(Widget_t *w, int active);
@@ -236,7 +236,6 @@ Widget_t* menu_add_radio_item(Widget_t *menu, const char * label);
  * @param *menu                  - pointer to the Widget_t menu
  * @param *imin                  - the low number of the numeric items
  * @param *imax                  - the high number of the numeric items
- * @return void
  */
 
 void menu_add_numeric_items(Widget_t *menu, int *imin, int *imax);

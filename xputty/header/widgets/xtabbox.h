@@ -53,7 +53,6 @@ Widget_t* add_tabbox(Widget_t *parent, const char * label,
  * @brief tabbox_remove_tab   - remove a tab from a tabbox Widget_t
  * @param *tabbox             - pointer to the tabbox Widget_t the tab should removed from
  * @param tab                 - the number of the tab
- * @return void
  */
 
 void tabbox_remove_tab(Widget_t *tabbox, int tab);

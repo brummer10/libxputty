@@ -38,7 +38,6 @@ typedef struct {
  *  in the Slider Image
  * @param *w                            - pointer to the Slider Widget_t 
  * @param count                         - frames in the image
- * @return void
  */
 
 void set_slider_image_frame_count(Widget_t *w, int count);

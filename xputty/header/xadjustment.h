@@ -122,8 +122,8 @@ Adjustment_t *add_adjustment(Widget_t *w, float std_value, float value,
 
 /**
  * @brief *set_adjustment    - set a new range to a existing Adjustment_t
- * it will be created if it not exsits yet
- * @param *w                 - pointer to the Widget_t request a Adjustment_t
+ * or create if it not exists yet
+ * @param *adj               - pointer to the Adjustment_t
  * @param std_value          - standard value of the Adjustment_t
  * @param value              - current value of the Adjustment_t
  * @param min_value          - minimum value of the Adjustment_t

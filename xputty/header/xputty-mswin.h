@@ -19,7 +19,7 @@
  */
 
 /**
- * @file xputty-platform.h
+ * @file xputty-mswin.h
  * @brief compatibility definitions (Linux, MSWindows):
  * This file contains definitions and structs used to provide
  * Xlib compatibility definitions for MSWindows.
