@@ -77,7 +77,9 @@ updatepot:
 po:
 
 clean:
-	@$(ECHO) "Clean up $(reset)"
+ifndef EXTRAQUIET
+	$(QUIET)@$(ECHO) "Clean up $(reset)"
+endif
 	$(QUIET)rm -f libxputty.$(STATIC_LIB_EXT) libxputty.$(LIB_EXT) libxputty.$(LIB_EXT).1 libxputty.$(LIB_EXT).1.0 xputty.pc $(RESOURCES_C) $(SVGRESOURCES_C) \
 	$(LIB_OBJ) $(WIDGET_OBJ) $(RESOURCES_OBJ) $(SVGRESOURCES_OBJ) $(DIALOG_OBJ) $(XDG_OBJ) $(DEP) $(RESOURCEHEADER)
 	$(QUIET)rm -rf $(RELEASE_DIR)
@@ -142,7 +144,7 @@ $(LIB_OBJ): $(LIB_SOURCES)
 xputty.pc: xputty.pc.in
 
 libxputty.$(STATIC_LIB_EXT): $(SVGRESOURCES_C) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
-	@$(ECHO) "Build static library $@ $(reset)"
+	@$(B_ECHO) "Build static library $@ $(reset)"
 	$(QUIET)$(AR) rcs libxputty.$(STATIC_LIB_EXT) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ)  $(SVGRESOURCES_OBJ) $(XDG_OBJ)
 	$(QUIET)mkdir -p $(RELEASE_DIR)include/
 	$(QUIET)cp $(HEADER_DIR)*.h $(RELEASE_DIR)include/
@@ -154,7 +156,7 @@ ifeq ($(TARGET), Linux)
 endif
 	$(QUIET)cp -r $(LIB_DIR)lv2_plugin $(RELEASE_DIR)
 	$(QUIET)cp libxputty.$(STATIC_LIB_EXT) $(RELEASE_DIR)
-	@$(ECHO) "================================================$(reset)"
+	@$(B_ECHO) "================================================$(reset)"
 
 libxputty.$(LIB_EXT): xputty.pc libxputty.$(STATIC_LIB_EXT)
 	@$(ECHO) "Build shared library $@ $(reset)"

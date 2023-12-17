@@ -1,31 +1,41 @@
 
+# Makefile.base checking for the build environment and setup some useful variables.
+# This should be included from the top based Makefile. The Guard MKBASE avoid issues
+# when it is implemented multiple times. Only the top implementation will have effect.
+
+ifndef MKBASE
+
 # info colors
 ifneq ($(TERM),)
-  export red :=$(shell tput setaf 1)
-  export green :=$(shell tput setaf 2)
-  export yellow :=$(shell tput setaf 3)
-  export blue :=$(shell tput setaf 4)
-  export purple :=$(shell tput setaf 5)
-  export cyan :=$(shell tput setaf 6)
-  export reset :=$(shell tput sgr0)
-  export ceol :=$(shell tput cuu1 && tput el)
-  export ceol2 :=$(shell tput cuu 2 && tput el)
+	export red :=$(shell tput setaf 1)
+	export green :=$(shell tput setaf 2)
+	export yellow :=$(shell tput setaf 3)
+	export blue :=$(shell tput setaf 4)
+	export purple :=$(shell tput setaf 5)
+	export cyan :=$(shell tput setaf 6)
+	export reset :=$(shell tput sgr0)
+	export ceol :=$(shell tput cuu1 && tput el)
+	export ceol2 :=$(shell tput cuu 2 && tput el)
 else
-  export red :=$()
-  export green :=$()
-  export yellow :=$()
-  export blue :=$()
-  vpurple :=$()
-  export cyan :=$()
-  export reset :=$()
-  export ceol :=$()
-  export ceol2 :=$()
-  export ECHO :=echo
+	export red :=$()
+	export green :=$()
+	export yellow :=$()
+	export blue :=$()
+	vpurple :=$()
+	export cyan :=$()
+	export reset :=$()
+	export ceol :=$()
+	export ceol2 :=$()
+	export ECHO :=echo
+	export B_ECHO :=echo
+	export R_ECHO :=echo
 endif
 
-# counter
+# echo
 ifndef ECHO
 	export ECHO = echo "${purple}"
+	export B_ECHO = echo "${blue}"
+	export R_ECHO = echo "${red}"
 endif
 
 # build with "V=1" for verbose builds
@@ -122,30 +132,46 @@ endif
 		export EXE_EXT = .exe
 	endif
 
-# generic link flags when build with PawPaw
+# generic link flags when build for windows with PawPaw
 ifneq (,$(findstring PawPawBuilds,$(PATH)))
-	export PAWPAW_LFLAGS = -L $(HOME)/PawPawBuilds/targets/win64/lib -lcairo -lpixman-1 \
+ifeq ($(TARGET), Windows)
+	export PAWPAW_LFLAGS = -lcairo -lpixman-1 \
 	-lfreetype -lpng16 -lz  -lcomdlg32 -ldwmapi -lgdi32 -lm -lole32 -lwinmm \
 	-lksuser -lmfplat -lmfuuid -lwmcodecdspuuid -lpthread -Wl,-subsystem,windows
 endif
+endif
 
-$(info Build for OS $(yellow)$(TARGET)$(reset))
-$(info Build with $(yellow)$(CC)$(reset))
+ifndef EXTRAQUIET
+$(info for         $(yellow)$(TARGET)$(reset))
+$(info with        $(yellow)$(CC)$(reset))
+$(info using       $(yellow)$(LD)$(reset))
+endif
 ifeq ($(HAVE_XXD),1)
-$(info Using xxd -i)
+ifndef EXTRAQUIET
+$(info and         $(yellow)xxd -i$(reset))
+endif
 export XXDI = xxd -i
 else ifeq ($(HAVE_XXDDI_PL),1)
-$(info Using xxdi.pl)
+ifndef EXTRAQUIET
+$(info Using        $(yellow)xxdi.pl$(reset))
+endif
 export XXDI = xxdi.pl
 else ifeq ($(HAVE_KNOWN_LDEMULATION),1)
-$(info Using $(LD) with LDEMULATION=$(LDEMULATION))
+ifndef EXTRAQUIET
+$(info Using        $(yellow)$(LD) with LDEMULATION=$(LDEMULATION)$(reset))
+endif
 export USE_LDD = 1
 export RCFLAG = -DUSE_LD=1
 RESOURCES_C = $(RESOURCES_OBJ)
 else ifeq ($(HAVE_LD_GOLD),1)
-$(info Using $(LD) (gold))
+ifndef EXTRAQUIET
+$(info Using        $(yellow)$(LD) (gold)$(reset))
+endif
 export RCFLAG = -DUSE_LD=1
 RESOURCES_C = $(RESOURCES_OBJ)
 else
-$(error Neither xxd, nor xxdi.pl, nor suitable ld found)
+$($(red)error Neither xxd, nor xxdi.pl, nor suitable ld found$(reset))
 endif
+
+export MKBASE=1
+endif #MKBASE

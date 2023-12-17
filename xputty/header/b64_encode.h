@@ -29,7 +29,19 @@
 extern "C" {
 #endif
 
+/**
+ * @brief b64_encode             - encode a b64 based char
+ * @param *clrstr                - the char to encode
+ * @param *b64dst                - the encoded char
+ */
+
 void b64_encode(char *clrstr, char *b64dst);
+
+/**
+ * @brief b64_decode             - decode to a b64 based char
+ * @param *b64src                - the char to decode
+ * @param *clrdst                - the decoded char
+ */
 
 void b64_decode(char *b64src, char *clrdst);
 
