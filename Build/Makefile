@@ -21,7 +21,7 @@
 	# include path for library headers
 	INCLUDES := -I. -I$(HEADER_DIR) -I$(WIDGET_HEADER_DIR) -I$(RESOURCES_DIR) -I$(DIALOG_HEADER_DIR) -I$(XDG_DIR)
 	# link flags to dynamic link cairo and X11 (default)
-	LDFLAGS += -fPIC `$(PKGCONFIG) $(PKGCONFIG_FLAGS) --cflags --libs cairo $(XELF)` -lm $(RCFLAG)
+	LDFLAGS += -fPIC `$(PKGCONFIG) $(PKGCONFIG_FLAGS) --cflags --libs cairo $(XELF)` -lm 
 	# set link flags to static link cairo and X11
 	# (you could ignore ld warnings, but the resulting binary is huge
 	# (6.4Mb for x11 and cairo) NOT RECOMMENDED!!
@@ -55,16 +55,21 @@
 	XDG_OBJ := $(notdir $(patsubst %.c,%.o,$(XDG_SOURCES)))
 
 	DEP = $(LIB_OBJ:%.o=%.d) $(WIDGET_OBJ:%.o=%.d) $(DIALOG_OBJ:%.o=%.d) $(XDG_OBJ:%.o=%.d)
+	CONFIG_H := $(shell cat config.h 2>/dev/null | grep 'USE_LD =' )
+	CONFIG_X := $(shell cat config.h 2>/dev/null | grep '#undef' )
 
 ifdef USE_LDD
-	RESOURCES_C = $(RESOURCES_OBJ)
+	RESOURCES_O = $(RESOURCES_OBJ)
+else
+	RESOURCES_O = $(RESOURCES_C)
 endif
 
 .PHONY: all clean debug nls updatepot po shared
 
 .NOTPARALLEL:
 
-all:  $(RESOURCEHEADER) libxputty.$(STATIC_LIB_EXT)
+all: config $(RESOURCEHEADER) libxputty.$(STATIC_LIB_EXT)
+	@$(B_ECHO) "=================== DONE =======================$(reset)"
 
 debug: LDFLAGS += $(DEBUG_LDFLAGS)
 debug: all
@@ -80,11 +85,32 @@ clean:
 ifndef EXTRAQUIET
 	$(QUIET)@$(ECHO) "Clean up $(reset)"
 endif
-	$(QUIET)rm -f libxputty.$(STATIC_LIB_EXT) libxputty.$(LIB_EXT) libxputty.$(LIB_EXT).1 libxputty.$(LIB_EXT).1.0 xputty.pc $(RESOURCES_C) $(SVGRESOURCES_C) \
+	$(QUIET)rm -f libxputty.$(STATIC_LIB_EXT) libxputty.$(LIB_EXT) libxputty.$(LIB_EXT).1 \
+	libxputty.$(LIB_EXT).1.0 libxputty.lib xputty.pc $(RESOURCES_C) $(SVGRESOURCES_C) \
 	$(LIB_OBJ) $(WIDGET_OBJ) $(RESOURCES_OBJ) $(SVGRESOURCES_OBJ) $(DIALOG_OBJ) $(XDG_OBJ) $(DEP) $(RESOURCEHEADER)
 	$(QUIET)rm -rf $(RELEASE_DIR)
+	$(QUIET)rm -f config.h
 
-$(RESOURCEHEADER): $(RESOURCES_C)
+config:
+	@$(B_ECHO) "================================================$(reset)"
+ifdef USE_LDD
+ifeq (,$(findstring 1,$(CONFIG_H)))
+	$(QUIET)@rm -f config.h
+	$(QUIET)echo '#ifndef USE_LD \n#define USE_LD = 1 \n#endif' >> config.h ;
+endif
+else ifdef USE_GOLD
+ifeq (,$(findstring 1,$(CONFIG_H)))
+	$(QUIET)@rm -f config.h
+	$(QUIET)echo '#ifndef USE_LD \n#define USE_LD = 1 \n#endif' >> config.h ;
+endif
+else
+ifeq (,$(findstring undef,$(CONFIG_X)))
+	$(QUIET)@rm -f config.h
+	$(QUIET)echo '#ifdef USE_LD \n#undef USE_LD \n#endif' >> config.h ;
+endif
+endif
+
+$(RESOURCEHEADER): $(RESOURCES_O)
 	$(QUIET)rm -f $(RESOURCEHEADER)
 	$(QUIET)for f in $(RESOURCE_EXTLD); do \
 		echo 'EXTLD('$${f}')' >> $(RESOURCEHEADER) ; \
@@ -98,7 +124,7 @@ $(XDG_OBJ): $(XDG_SOURCES)
 	$(QUIET)$(CC) $(CFLAGS) -MMD -Wall -DHAVE_MMAP -c $(addprefix $(XDG_DIR),$(patsubst %.o,%.c,$@)) -o $@ $(INCLUDES) $(LDFLAGS)
 
 ifdef XXDI
-$(RESOURCES_C): $(RESOURCES)
+$(RESOURCES_O): $(RESOURCES)
 	@$(ECHO) "Building object file for Resources $(reset)"
 	$(QUIET)$(foreach f, $(RESOURCES_OBJ), \
 		cd $(RESOURCES_DIR) ; \
@@ -110,18 +136,18 @@ $(RESOURCES_C): $(RESOURCES)
 	)
 else ifdef USE_LDD
 LDFLAGS += -DUSE_LD=1
-$(RESOURCES_C): $(RESOURCES)
-	@$(ECHO) "Building object file for Resources $(reset)"
+$(RESOURCES_O): $(RESOURCES)
+	@$(ECHO) "Building Resource object $@$(reset)"
 	$(QUIET)cd $(RESOURCES_DIR) && $(LD) -r -b binary -m $(LDEMULATION) $(patsubst %.o,%.png,$@) -o ../../Build/$@
 else
 LDFLAGS += -DUSE_LD=1
-$(RESOURCES_C): $(RESOURCES)
-	@$(ECHO) "Building object file for Resources $(reset)"
+$(RESOURCES_O): $(RESOURCES)
+	@$(ECHO) "Building Resource object $@$(reset)"
 	$(QUIET)cd $(RESOURCES_DIR) && $(LD) -r -b binary -z noexecstack $(patsubst %.o,%.png,$@) -o ../../Build/$@
 endif
 
 $(SVGRESOURCES_C): $(SVGRESOURCES)
-	@$(ECHO) "Building object file for SVG Resources $@ $(reset)"
+	@$(ECHO) "Building SVG Resource object $@ $(reset)"
 	$(QUIET)@cd $(RESOURCES_DIR) && echo "const char* $(patsubst %.o,%_svg,$@) = \""| tr -d '\r\n' > ../../Build/$(patsubst %.o,%.c,$@)
 	$(QUIET)@cd $(RESOURCES_DIR) && base64  $(patsubst %.o,%.svg,$@) | tr -d '\r\n' >> ../../Build/$(patsubst %.o,%.c,$@)
 	$(QUIET)@cd $(RESOURCES_DIR) && echo "\";" >> ../../Build/$(patsubst %.o,%.c,$@)
@@ -151,12 +177,12 @@ libxputty.$(STATIC_LIB_EXT): $(SVGRESOURCES_C) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG
 	$(QUIET)cp $(WIDGET_HEADER_DIR)*.h $(RELEASE_DIR)include/
 	$(QUIET)cp $(DIALOG_HEADER_DIR)*.h $(RELEASE_DIR)include/
 	$(QUIET)cp $(RESOURCEHEADER) $(RELEASE_DIR)include/
+	$(QUIET)cp config.h $(RELEASE_DIR)include/
 ifeq ($(TARGET), Linux)
 	$(QUIET)cp $(XDG_DIR)*.h $(RELEASE_DIR)include/
 endif
 	$(QUIET)cp -r $(LIB_DIR)lv2_plugin $(RELEASE_DIR)
 	$(QUIET)cp libxputty.$(STATIC_LIB_EXT) $(RELEASE_DIR)
-	@$(B_ECHO) "================================================$(reset)"
 
 libxputty.$(LIB_EXT): xputty.pc libxputty.$(STATIC_LIB_EXT)
 	@$(ECHO) "Build shared library $@ $(reset)"

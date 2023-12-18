@@ -33,6 +33,11 @@ extern "C" {
 /**
  * 
  * @brief Color_state         - select color mode to use on Widget_t
+ * @param NORMAL_             - normal state 
+ * @param PRELIGHT_           - prelight state (mouse is hover) 
+ * @param SELECTED_           - selected state 
+ * @param ACTIVE_             - active state (mouse is pressed) 
+ * @param INSENSITIVE_        - Widget_t can't react on mouse/key input
  */
 
 typedef enum {
@@ -45,7 +50,14 @@ typedef enum {
 
 /**
  * 
- * @brief Color_set         - select color set to use on draw
+ * @brief Color_mod            - select color mod to use on draw
+ * @param FORGROUND_           - use the foreground color set 
+ * @param BACKGROUND_          - use the background color set 
+ * @param BASE_                - use the base color set 
+ * @param TEXT_                - use the text color set 
+ * @param SHADOW_              - use the shadow color set 
+ * @param FRAME_               - use the frame color set 
+ * @param LIGHT_               - use the light color set 
  */
 
 typedef enum {
@@ -82,7 +94,12 @@ typedef struct {
 
 /**
  * @brief XColor_t           - the Widget_t Color struct
- * \n XColor_t could be used for theming you Widget_t set
+ * XColor_t could be used for theming you Widget_t set
+ * @param normal             - Colors for normal state 
+ * @param prelight           - Colors for prelight state (mouse is hover) 
+ * @param selected           - Colors for selected state 
+ * @param active             - Colors for active state (mouse is pressed) 
+ * @param insensitive        - Colors for Widget_t can't react on mouse/key input
  */
 
 struct XColor_t {
@@ -95,7 +112,11 @@ struct XColor_t {
 
 /**
  * @brief SystrayColor         - the Systray Color struct
- * \n SystrayColor could be used for the backgroung color of the SystrayIcon
+ * SystrayColor could be used for the backgroung color of the SystrayIcon
+ * @param r             - red channel
+ * @param g             - green channel
+ * @param b             - blue channel
+ * @param a             - alpha channel 
  */
 
 struct SystrayColor_t{
@@ -160,6 +181,7 @@ void widget_set_color(double *c, double r, double g, double b, double a);
  * in relation to the Color_state
  * @param *wid              - pointer to the Widget_t
  * @param *st               - the Color state to use
+ * @return *Colors          - pointer to the Widget_t Colors struct 
  */
 
 Colors *get_color_scheme(Widget_t *wid, Color_state st);

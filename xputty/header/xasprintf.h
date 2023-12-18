@@ -1,9 +1,10 @@
 
 #ifndef _GNU_SOURCE
 
-/*  Multiplatform implementation of asprintf() from:
-    https://stackoverflow.com/questions/40159892/using-asprintf-on-windows
-    define _GNU_SOURCE to use the GNU asprintf extension instead this one.
+/** @file xasprintf.h
+ * @brief  Multiplatform implementation of asprintf() from:
+ *  https://stackoverflow.com/questions/40159892/using-asprintf-on-windows
+ *  define _GNU_SOURCE to use the GNU asprintf extension instead this one.
 */
 
 #pragma once

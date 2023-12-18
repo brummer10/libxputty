@@ -7,6 +7,9 @@ with cairo surfaces for MSWindows (HWND) and Linux (X11).
 This repository contain only the library files to allow easily and lightweight 
 embedding into other projects.
 
+API Documentation is here: [Documentation](https://brummer10.github.io/libxputty-docs/docs/html/files.html)
+
+A simple example is here: [EXAMPLE](https://brummer10.github.io/libxputty-docs/docs/html/simple-example_8c-example.html)
 
 ## Features
 

@@ -24,6 +24,7 @@
 #define XPNGLOADER_H_
 
 #include "xputty.h"
+#include "config.h"
 
 #ifdef __cplusplus
 extern "C" {
