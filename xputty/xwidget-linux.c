@@ -747,8 +747,8 @@ int os_grab_pointer(Widget_t *w) {
 }
 
 void os_set_input_mask(Widget_t *w) {
-    XSelectInput(w->app->dpy, w->widget,StructureNotifyMask|ExposureMask|KeyPressMask 
-                |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask
+    XSelectInput(w->app->dpy, w->widget,StructureNotifyMask|ExposureMask|KeyPressMask
+                |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask|KeyReleaseMask
                 |ButtonPressMask|Button1MotionMask|PointerMotionMask);    
 }
 
