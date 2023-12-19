@@ -907,8 +907,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
             // hovering, etc.
             if (wid->state == 4) return 0;
-            if (wParam & MK_LBUTTON) // TODO: why is this if() required here, but not on linux?
+            if (wParam & MK_LBUTTON) {// TODO: why is this if() required here, but not on linux?
                 adj_set_motion_state(wid, xmotion.x, xmotion.y);
+                xmotion.state |= Button1Mask;
+            }
             wid->func.motion_callback((void*)wid, &xmotion, user_data);
             debug_print("Widget_t MotionNotify x = %li Y = %li hwnd=%p\n",pt.x,pt.y,hwnd );
             return 0;
