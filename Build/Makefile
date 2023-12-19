@@ -56,7 +56,7 @@
 
 	DEP = $(LIB_OBJ:%.o=%.d) $(WIDGET_OBJ:%.o=%.d) $(DIALOG_OBJ:%.o=%.d) $(XDG_OBJ:%.o=%.d)
 	CONFIG_H := $(shell cat config.h 2>/dev/null | grep 'USE_LD =' )
-	CONFIG_X := $(shell cat config.h 2>/dev/null | grep '#undef' )
+	CONFIG_X := $(shell cat config.h 2>/dev/null | grep 'undef' )
 
 ifdef USE_LDD
 	RESOURCES_O = $(RESOURCES_OBJ)
