@@ -179,8 +179,8 @@ void _draw_combobox_entrys(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
-    int width = metrics.width-2;
-    int height = metrics.height-2;
+    int width = metrics.width;
+    int height = metrics.height;
     if (!metrics.visible) return;
     ComboBox_t *comboboxlist = (ComboBox_t*)w->parent_struct;
 
@@ -243,7 +243,7 @@ void _combobox_motion(void *w_, void* xmotion_, void* user_data) {
     XMotionEvent *xmotion = (XMotionEvent*)xmotion_;
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
-    int height = metrics.height-2;
+    int height = metrics.height;
     int _items = height/(height/25);
     int prelight_item = (xmotion->y/_items)  + (int)max(0,adj_get_value(w->adj));
     if(prelight_item != comboboxlist->prelight_item) {
@@ -258,7 +258,7 @@ void _combobox_key_pressed(void *w_, void* xkey_, void* user_data) {
     ComboBox_t *comboboxlist = (ComboBox_t*)w->parent_struct;
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
-    int height = metrics.height-2;
+    int height = metrics.height;
     int _items = height/(height/25);
     comboboxlist->prelight_item = xkey->y/_items  + (int)max(0,adj_get_value(w->adj));
     int nk = key_mapping(w->app->dpy, xkey);
@@ -282,7 +282,7 @@ void _combobox_entry_released(void *w_, void* button_, void* user_data) {
         XButtonEvent *xbutton = (XButtonEvent*)button_;
         Metrics_t metrics;
         os_get_window_metrics(w, &metrics);
-        int height = metrics.height-2;
+        int height = metrics.height;
         int _items = height/(height/25);
         int prelight_item = xbutton->y/_items  + (int)max(0,adj_get_value(w->adj));
         if(xbutton->button == Button4) {
@@ -342,8 +342,8 @@ void _draw_combobox_menu_slider(void *w_, void* user_data) {
     if (!v) return;
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
-    int width = metrics.width-2;
-    int height = metrics.height-2;
+    int width = metrics.width;
+    int height = metrics.height;
     if (!metrics.visible) return;
     int show_items = height/25;
     float slidersize = 1.0;
