@@ -148,10 +148,10 @@ endif
 
 $(SVGRESOURCES_C): $(SVGRESOURCES)
 	@$(ECHO) "Building SVG Resource object $@ $(reset)"
-	$(QUIET)@cd $(RESOURCES_DIR) && echo "const char* $(patsubst %.o,%_svg,$@) = \""| tr -d '\r\n' > ../../Build/$(patsubst %.o,%.c,$@)
-	$(QUIET)@cd $(RESOURCES_DIR) && base64  $(patsubst %.o,%.svg,$@) | tr -d '\r\n' >> ../../Build/$(patsubst %.o,%.c,$@)
-	$(QUIET)@cd $(RESOURCES_DIR) && echo "\";" >> ../../Build/$(patsubst %.o,%.c,$@)
-	$(QUIET)$(CC) $(CFLAGS) -c $(patsubst %.o,%.c,$@) -o $@
+	$(QUIET)@cd $(RESOURCES_DIR) && echo "const char* $(patsubst %.c,%_svg,$@) = \""| tr -d '\r\n' > ../../Build/$@
+	$(QUIET)@cd $(RESOURCES_DIR) && base64  $(patsubst %.c,%.svg,$@) | tr -d '\r\n' >> ../../Build/$@
+	$(QUIET)@cd $(RESOURCES_DIR) && echo "\";" >> ../../Build/$@
+	$(QUIET)$(CC) $(CFLAGS) -c $@ -o $(patsubst %.c,%.o,$@)
 
 $(DIALOG_OBJ): $(DIALOG_SOURCES)
 	@$(ECHO) "Building object file $@ $(reset)"
