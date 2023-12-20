@@ -168,6 +168,9 @@ $(LIB_OBJ): $(LIB_SOURCES)
 -include $(DEP)
 
 xputty.pc: xputty.pc.in
+ifeq ($(TARGET), Linux)
+	$(QUIET)sed 's;PATH;$(PREFIX);' $< >$@
+endif
 
 libxputty.$(STATIC_LIB_EXT): $(SVGRESOURCES_C) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
 	@$(B_ECHO) "Build static library $@ $(reset)"
@@ -192,7 +195,9 @@ libxputty.$(LIB_EXT): xputty.pc libxputty.$(STATIC_LIB_EXT)
 	$(QUIET)ln -sf libxputty.$(LIB_EXT).1 libxputty.$(LIB_EXT)
 	$(QUIET)cp -Pf libxputty.$(LIB_EXT).1 $(RELEASE_DIR)
 	$(QUIET)cp -Pf libxputty.$(LIB_EXT) $(RELEASE_DIR)
+ifeq ($(TARGET), Linux)
 	$(QUIET)cp xputty.pc $(RELEASE_DIR)
+endif
 	@$(ECHO) "================================================$(reset)"
 
 shared: libxputty.$(LIB_EXT)
