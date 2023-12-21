@@ -200,7 +200,6 @@ ifeq ($(TARGET), Linux)
 endif
 
 shared: libxputty.$(LIB_EXT)
-	$(QUIET)sed 's;PATH;$(PREFIX);' $< >$@
 
 doc:
 
