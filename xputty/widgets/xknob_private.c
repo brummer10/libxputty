@@ -68,7 +68,7 @@ void _draw_knob(void *w_, void* user_data) {
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
     int width = metrics.width-2;
-    int height = metrics.height-2;
+    int height = metrics.height - (w->app->small_font + 7);
     if (!metrics.visible) return;
 
     const double scale_zero = 20 * (M_PI/180); // defines "dead zone" for knobs
@@ -81,48 +81,35 @@ void _draw_knob(void *w_, void* user_data) {
     knob_y = grow-1;
     /** get values for the knob **/
 
-    int knobx = (width - knob_x) * 0.5;
-    int knobx1 = width* 0.5;
+    const int knobx1 = width* 0.5;
 
-    int knoby = (height - knob_y) * 0.5;
-    int knoby1 = height * 0.5;
+    const int knoby1 = height * 0.5;
     if (w->image) {
         _draw_image_knob(w, width, height);
     } else {
 
-        double knobstate = adj_get_state(w->adj_y);
-        double angle = scale_zero + knobstate * 2 * (M_PI - scale_zero);
+        const double knobstate = adj_get_state(w->adj_y);
+        const double angle = scale_zero + knobstate * 2 * (M_PI - scale_zero);
 
-        double pointer_off =knob_x/6;
-        double radius = min(knob_x-pointer_off, knob_y-pointer_off) / 2;
-        double lengh_x = (knobx+radius+pointer_off/2) - radius * sin(angle);
-        double lengh_y = (knoby+radius+pointer_off/2) + radius * cos(angle);
-        double radius_x = (knobx+radius+pointer_off/2) - radius/ 1.24 * sin(angle);
-        double radius_y = (knoby+radius+pointer_off/2) + radius/ 1.24 * cos(angle);
+        const double pointer_off =knob_x/6;
+        const double radius = min(knob_x-pointer_off, knob_y-pointer_off) / 2;
 
-        cairo_arc(w->crb,knobx1+arc_offset, knoby1+arc_offset, knob_x/2.1, 0, 2 * M_PI );
+        const double add_angle = 90 * (M_PI / 180.);
 
-        use_shadow_color_scheme(w, get_color_state(w));
-        cairo_fill (w->crb);
-        cairo_new_path (w->crb);
-
-        use_bg_color_scheme(w, get_color_state(w));
-        cairo_arc(w->crb,knobx1+arc_offset, knoby1+arc_offset, knob_x/3.1, 0, 2 * M_PI );
-        cairo_fill_preserve(w->crb);
-        use_fg_color_scheme(w, NORMAL_);
-        cairo_set_line_width(w->crb, min(3.0, knobx1/15));
+        // base
+        use_base_color_scheme(w, INSENSITIVE_);
+        cairo_set_line_width(w->crb,  w->app->small_font/w->scale.ascale);
+        cairo_arc (w->crb, knobx1+arc_offset, knoby1+arc_offset, radius,
+              add_angle + scale_zero, add_angle + scale_zero + 320 * (M_PI/180));
         cairo_stroke(w->crb);
-        cairo_new_path (w->crb);
 
-        /** create a rotating pointer on the kob**/
-        cairo_set_line_cap(w->crb, CAIRO_LINE_CAP_ROUND); 
-        cairo_set_line_join(w->crb, CAIRO_LINE_JOIN_BEVEL);
-        cairo_move_to(w->crb, radius_x, radius_y);
-        cairo_line_to(w->crb,lengh_x,lengh_y);
-        cairo_set_line_width(w->crb,min(6.0, knobx1/7));
+        // indicator
+        cairo_new_sub_path(w->crb);
         use_fg_color_scheme(w, NORMAL_);
+        cairo_arc (w->crb,knobx1+arc_offset, knoby1+arc_offset, radius,
+              add_angle + scale_zero, add_angle + angle);
         cairo_stroke(w->crb);
-        cairo_new_path (w->crb);
+
     }
     use_text_color_scheme(w, get_color_state(w));
     cairo_text_extents_t extents;
@@ -145,7 +132,7 @@ void _draw_knob(void *w_, void* user_data) {
         cairo_new_path (w->crb);
     }
 
-    _show_label(w, width, height);
+    _show_label(w, width, height + (w->app->small_font + 7));
 }
 
 void _knob_released(void *w_, void* button_, void* user_data) {

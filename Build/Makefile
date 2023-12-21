@@ -188,7 +188,7 @@ endif
 	$(QUIET)cp libxputty.$(STATIC_LIB_EXT) $(RELEASE_DIR)
 
 libxputty.$(LIB_EXT): xputty.pc libxputty.$(STATIC_LIB_EXT)
-	@$(ECHO) "Build shared library $@ $(reset)"
+	@$(B_ECHO) "Compile shared library $@ $(reset)"
 	$(QUIET)$(CC) -shared -Wl,-soname,libxputty.$(LIB_EXT).1 -o libxputty.$(LIB_EXT).1.0 $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ) $(XDG_OBJ)
 	$(QUIET)cp libxputty.$(LIB_EXT).1.0 $(RELEASE_DIR)
 	$(QUIET)ln -sf libxputty.$(LIB_EXT).1.0 libxputty.$(LIB_EXT).1
@@ -198,7 +198,6 @@ libxputty.$(LIB_EXT): xputty.pc libxputty.$(STATIC_LIB_EXT)
 ifeq ($(TARGET), Linux)
 	$(QUIET)cp xputty.pc $(RELEASE_DIR)
 endif
-	@$(ECHO) "================================================$(reset)"
 
 shared: libxputty.$(LIB_EXT)
 	$(QUIET)sed 's;PATH;$(PREFIX);' $< >$@
