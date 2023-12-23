@@ -207,6 +207,7 @@ mod:
 
 install: shared
 ifneq ("$(wildcard $(RELEASE_DIR))","")
+	@$(B_ECHO) "Install libxputty libraries $(reset)"
 	$(QUIET)mkdir -p $(DESTDIR)$(INCLUDE_DIR)xputty/
 	$(QUIET)mkdir -p $(DESTDIR)$(INSTALL_DIR)
 	$(QUIET)mkdir -p $(DESTDIR)$(SHARE_DIR)pkgconfig/
@@ -216,8 +217,9 @@ ifneq ("$(wildcard $(RELEASE_DIR))","")
 	$(QUIET)cp -Pf $(RELEASE_DIR)*.$(LIB_EXT) $(DESTDIR)$(INSTALL_DIR)
 	$(QUIET)cp $(RELEASE_DIR)libxputty.$(STATIC_LIB_EXT) $(DESTDIR)$(INSTALL_DIR)
 	$(QUIET)cp $(RELEASE_DIR)xputty.pc $(DESTDIR)$(SHARE_DIR)pkgconfig/
+	@$(B_ECHO) "=================== DONE =======================$(reset)"
 else
-	$(QUIET)echo "you must run 'make' first"
+	@$(R_ECHO) "you must run 'make' first$(reset)"
 endif
 
 uninstall:

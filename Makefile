@@ -23,3 +23,6 @@ doc:
 	#@rm -rf ./docs
 	#doxygen Doxyfile
 	#cp ./examples/index.html ./docs/
+
+install:
+	@$(B_ECHO) "================================================$(reset)"
