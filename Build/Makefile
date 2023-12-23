@@ -78,8 +78,10 @@ nls: LDFLAGS += -DENABLE_NLS
 nls: all
 
 updatepot:
+	@:
 
 po:
+	@:
 
 clean:
 ifndef EXTRAQUIET
@@ -200,10 +202,13 @@ ifeq ($(TARGET), Linux)
 endif
 
 shared: libxputty.$(LIB_EXT)
+	@:
 
 doc:
+	@:
 
 mod:
+	@:
 
 install: shared
 ifneq ("$(wildcard $(RELEASE_DIR))","")
