@@ -182,8 +182,7 @@ void combobox_add_entry(Widget_t *wid, const char  * label) {
     asprintf(&comboboxlist->list_names[comboboxlist->list_size-1],"%s",label);
     assert(comboboxlist->list_names != NULL);
     float max_value = wid->adj->max_value+1.0;
-    set_adjustment(wid->adj,0.0, max_value, 0.0, max_value,1.0, CL_ENUM);
-
+    set_adjustment(wid->adj,0.0, 0.0, 0.0, max_value,1.0, CL_ENUM);
 }
 
 void combobox_add_numeric_entrys(Widget_t *wid, int imin, int imax) {

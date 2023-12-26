@@ -28,7 +28,7 @@
 	STATIC_LDFLAGS += -fPIC -static `pkg-config --static --cflags --libs cairo ` \
 	 -lX11 -ldl -lxcb -lpthread -lXau -lXdmcp
 	# debug flags, use this to indicate a problem with libxputty
-	DEBUG_LDFLAGS += -g -DDEBUG -DLIBDEBUG
+	DEBUG_LDFLAGS += -g -DDEBUG 
 
 
 	LIB_SOURCES := $(wildcard $(LIB_DIR)*.c)

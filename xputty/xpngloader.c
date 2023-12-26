@@ -128,8 +128,8 @@ void widget_set_icon_from_surface(Widget_t *w, cairo_surface_t *image) {
     cairo_paint (cri);
     
     int stride = cairo_image_surface_get_stride (icon);
-    unsigned long* icon_data = malloc(2+width_t*height_t * sizeof(unsigned long));
-    memset(icon_data, 0, 2+width_t*height_t * sizeof(unsigned long));
+    unsigned long* icon_data = malloc((2+width_t*height_t) * sizeof(unsigned long));
+    memset(icon_data, 0, (2+width_t*height_t) * sizeof(unsigned long));
     const unsigned char *data = cairo_image_surface_get_data(icon);
     icon_data[0] = width_t;
     icon_data[1] = height_t;
