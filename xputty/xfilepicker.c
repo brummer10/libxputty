@@ -106,7 +106,7 @@ bool is_root_directory(char *path) {
 }
 
 void add_root_directory(FilePicker *filepicker, char *path) {
-    DWORD drives = GetLogicalDrives();
+   /* DWORD drives = GetLogicalDrives();
     int i;
     for (i=0; i<='Z'-'A'; i++) {
       if ((drives & (1 << i)) != 0) {
@@ -115,12 +115,12 @@ void add_root_directory(FilePicker *filepicker, char *path) {
           (filepicker->dir_counter) * sizeof(char *));
         asprintf(&filepicker->dir_names[filepicker->dir_counter-1], "%c:\\", 'A'+i);
       }
-    }
-   /* filepicker->dir_names = (char **)realloc(filepicker->dir_names,
+    }*/
+    filepicker->dir_names = (char **)realloc(filepicker->dir_names,
       (filepicker->dir_counter + 1) * sizeof(char *));
     assert(filepicker->dir_names != NULL);
-    asprintf(&filepicker->dir_names[filepicker->dir_counter++], "c:%s", PATH_SEPARATOR);
-    assert(&filepicker->dir_names[filepicker->dir_counter] != NULL);*/
+    asprintf(&filepicker->dir_names[filepicker->dir_counter++], "%s", path);
+    assert(&filepicker->dir_names[filepicker->dir_counter] != NULL);
     
 }
 
@@ -163,7 +163,7 @@ static inline int fp_prefill_dirbuffer(FilePicker *filepicker, char *path) {
         char *ho;
         asprintf(&ho, "%s",path);
         assert(ho != NULL);
-        while (strcmp (ho, PATH_SEPARATOR) != 0) {
+        while (!is_root_directory (ho)) {
             filepicker->dir_names = (char **)realloc(filepicker->dir_names,
               (filepicker->dir_counter + 1) * sizeof(char *));
             assert(filepicker->dir_names != NULL);
@@ -171,7 +171,7 @@ static inline int fp_prefill_dirbuffer(FilePicker *filepicker, char *path) {
             assert(&filepicker->dir_names[filepicker->dir_counter-1] != NULL);
             ret++;
         }
-        if (strcmp (path, PATH_SEPARATOR) != 0) {
+        if (!is_root_directory (path)) {
             filepicker->dir_names = (char **)realloc(filepicker->dir_names,
               (filepicker->dir_counter + 1) * sizeof(char *));
             assert(filepicker->dir_names != NULL);
@@ -261,8 +261,8 @@ int fp_get_files(FilePicker *filepicker, char *path, int get_dirs, int get_files
             filepicker->file_names = (char **)realloc(filepicker->file_names,
               (filepicker->file_counter + 1) * sizeof(char *));
             assert(filepicker->file_names != NULL);
-            asprintf(&filepicker->file_names[filepicker->file_counter++], (strcmp(path, PATH_SEPARATOR) != 0) ?
-              "%s" PATH_SEPARATOR "%s" : "%s%s" , path,dp->d_name);
+            asprintf(&filepicker->file_names[filepicker->file_counter++], is_root_directory(path) ?
+              "%s%s" : "%s" PATH_SEPARATOR "%s"  , path,dp->d_name);
             //asprintf(&filepicker->file_names[filepicker->file_counter++],"%s%s" , path,dp->d_name);
             assert(&filepicker->dir_names[filepicker->file_counter-1] != NULL);
         }
@@ -291,7 +291,22 @@ void fp_init(FilePicker *filepicker, const char *path) {
     filepicker->path = NULL;
     filepicker->filter = NULL;
 #ifdef _WIN32 //file/drive functions
-    asprintf(&filepicker->path, "%s", "C:\\");
+    bool is_dir = false;
+    WIN32_FIND_DATA data;
+    HANDLE hFile = FindFirstFile(path, &data);
+    if ( hFile == INVALID_HANDLE_VALUE ) {
+        is_dir = false;
+    } else {
+        FindClose(hFile);
+        if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+            is_dir = true;
+        is_dir = false;
+    }
+    if (is_dir) {
+        asprintf(&filepicker->path, "%s", path);
+    } else {
+        asprintf(&filepicker->path, "%s\\", getenv("SYSTEMDRIVE"));
+    }
 #else
     asprintf(&filepicker->path, "%s", path);
 #endif

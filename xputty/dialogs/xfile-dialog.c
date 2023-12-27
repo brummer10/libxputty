@@ -176,6 +176,7 @@ static void reload_from_dir(FileDialog *file_dialog) {
         multi_listview_remove_list(file_dialog->ft);
     }
     combobox_delete_entrys(file_dialog->ct);
+
     int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1, 1);
     int set_f = set_files(file_dialog);
     set_dirs(file_dialog);
@@ -196,11 +197,11 @@ static void reload_from_dir(FileDialog *file_dialog) {
             multi_listview_unset_active_entry(file_dialog->ft);
         }
     }
-    //listview_unset_active_entry(file_dialog->xdg_dirs);
+    listview_unset_active_entry(file_dialog->xdg_dirs);
     
     expose_widget(file_dialog->ft);
     expose_widget(file_dialog->ct);
-   // expose_widget(file_dialog->xdg_dirs);
+    expose_widget(file_dialog->xdg_dirs);
 }
 
 static void show_preview(FileDialog *file_dialog, const char* file_name) {
@@ -472,7 +473,6 @@ static void fd_mem_free(void *w_, void* user_data) {
         file_dialog->parent->func.dialog_callback(file_dialog->parent,NULL);
     fp_free(file_dialog->fp);
     free(file_dialog->fp);
-#ifdef __linux__
     for (int i = 0; i<sizeof(file_dialog->xdg_user_dirs);i++) {
         free(file_dialog->xdg_user_dirs[i]);
     }
@@ -481,7 +481,6 @@ static void fd_mem_free(void *w_, void* user_data) {
         free(file_dialog->xdg_user_dirs_path[i]);
     }
     free(file_dialog->xdg_user_dirs_path);
-#endif
     free(file_dialog);
 }
 
@@ -595,7 +594,119 @@ static void add_xdg_dirs(FileDialog *file_dialog) {
     file_dialog->xdg_dirs->func.button_release_callback = xdg_dir_select_callback;
     listview_unset_active_entry(file_dialog->xdg_dirs);
 }
+
+#elif defined _WIN32
+
+static void parse_win_dirs(FileDialog *file_dialog) {
+    int p = 1;
+    if (getenv("APPDATA")) {
+        file_dialog->xdg_user_dirs = (char **)realloc(file_dialog->xdg_user_dirs,
+            p * sizeof(char *));
+        assert(file_dialog->xdg_user_dirs != NULL);
+        asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter], "%s", "APPDATA");
+        file_dialog->xdg_user_dirs_path = (char **)realloc(file_dialog->xdg_user_dirs_path,
+            p * sizeof(char *));
+        assert(file_dialog->xdg_user_dirs_path != NULL);
+        asprintf(&file_dialog->xdg_user_dirs_path[file_dialog->xdg_dir_counter++], "%s", getenv("APPDATA"));
+        p++;
+    }
+    if (getenv("PROGRAMFILES")) {
+        file_dialog->xdg_user_dirs = (char **)realloc(file_dialog->xdg_user_dirs,
+            p * sizeof(char *));
+        assert(file_dialog->xdg_user_dirs != NULL);
+        asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter], "%s", "PROGRAMS");
+        file_dialog->xdg_user_dirs_path = (char **)realloc(file_dialog->xdg_user_dirs_path,
+            p * sizeof(char *));
+        assert(file_dialog->xdg_user_dirs_path != NULL);
+        asprintf(&file_dialog->xdg_user_dirs_path[file_dialog->xdg_dir_counter++], "%s", getenv("PROGRAMFILES"));
+        p++;
+    }
+    if (getenv("COMMONPROGRAMFILES")) {
+        file_dialog->xdg_user_dirs = (char **)realloc(file_dialog->xdg_user_dirs,
+            p * sizeof(char *));
+        assert(file_dialog->xdg_user_dirs != NULL);
+        asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter], "%s", "COMMON");
+        file_dialog->xdg_user_dirs_path = (char **)realloc(file_dialog->xdg_user_dirs_path,
+            p * sizeof(char *));
+        assert(file_dialog->xdg_user_dirs_path != NULL);
+        asprintf(&file_dialog->xdg_user_dirs_path[file_dialog->xdg_dir_counter++], "%s", getenv("COMMONPROGRAMFILES"));
+        p++;
+    }
+    if (getenv("COMMONPROGRAMFILES(X86)")) {
+        file_dialog->xdg_user_dirs = (char **)realloc(file_dialog->xdg_user_dirs,
+            p * sizeof(char *));
+        assert(file_dialog->xdg_user_dirs != NULL);
+        asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter], "%s", "COMMON(X86)");
+        file_dialog->xdg_user_dirs_path = (char **)realloc(file_dialog->xdg_user_dirs_path,
+            p * sizeof(char *));
+        assert(file_dialog->xdg_user_dirs_path != NULL);
+        asprintf(&file_dialog->xdg_user_dirs_path[file_dialog->xdg_dir_counter++], "%s", getenv("COMMONPROGRAMFILES(X86)"));
+        p++;
+    }
+    if (getenv("CSIDL_DESKTOPDIRECTORY")) {
+        file_dialog->xdg_user_dirs = (char **)realloc(file_dialog->xdg_user_dirs,
+            p * sizeof(char *));
+        assert(file_dialog->xdg_user_dirs != NULL);
+        asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter], "%s", "DESKTOP");
+        file_dialog->xdg_user_dirs_path = (char **)realloc(file_dialog->xdg_user_dirs_path,
+            p * sizeof(char *));
+        assert(file_dialog->xdg_user_dirs_path != NULL);
+        asprintf(&file_dialog->xdg_user_dirs_path[file_dialog->xdg_dir_counter++], "%s", getenv("CSIDL_DESKTOPDIRECTORY"));
+        p++;
+    }
+    if (getenv("SYSTEMROOT")) {
+        file_dialog->xdg_user_dirs = (char **)realloc(file_dialog->xdg_user_dirs,
+            p * sizeof(char *));
+        assert(file_dialog->xdg_user_dirs != NULL);
+        asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter], "%s", "SYSTEM");
+        file_dialog->xdg_user_dirs_path = (char **)realloc(file_dialog->xdg_user_dirs_path,
+            p * sizeof(char *));
+        assert(file_dialog->xdg_user_dirs_path != NULL);
+        asprintf(&file_dialog->xdg_user_dirs_path[file_dialog->xdg_dir_counter++], "%s", getenv("SYSTEMROOT"));
+        p++;
+        
+    }
+    DWORD drives = GetLogicalDrives();
+    int i;
+    for (i=0; i<='Z'-'A'; i++) {
+        if ((drives & (1 << i)) != 0) {
+            file_dialog->xdg_user_dirs = (char **)realloc(file_dialog->xdg_user_dirs,
+                p * sizeof(char *));
+            assert(file_dialog->xdg_user_dirs != NULL);
+            asprintf(&file_dialog->xdg_user_dirs[file_dialog->xdg_dir_counter], "%c:\\", 'A'+i);
+            file_dialog->xdg_user_dirs_path = (char **)realloc(file_dialog->xdg_user_dirs_path,
+                p * sizeof(char *));
+            assert(file_dialog->xdg_user_dirs_path != NULL);
+            asprintf(&file_dialog->xdg_user_dirs_path[file_dialog->xdg_dir_counter++], "%c:\\", 'A'+i);
+        }
+        p++;
+    }
+
+}
+
+static void win_dir_select_callback(void *w_, void *button, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+    int v = (int)adj_get_value(w->adj);
+    free(file_dialog->fp->path);
+    file_dialog->fp->path = NULL;
+    asprintf(&file_dialog->fp->path, "%s",file_dialog->xdg_user_dirs_path[v]);
+    assert(file_dialog->fp->path != NULL);
+    reload_from_dir(file_dialog);
+}
+
+static void add_win_dirs(FileDialog *file_dialog) {
+    file_dialog->xdg_dirs = add_listview(file_dialog->w, "", 20, 90, 100, 225);
+    file_dialog->xdg_dirs->parent_struct = file_dialog;
+    file_dialog->xdg_dirs->scale.gravity = EASTNORTH;
+    file_dialog->xdg_dirs->flags |= NO_PROPAGATE;
+    listview_set_list(file_dialog->xdg_dirs, file_dialog->xdg_user_dirs, (int)file_dialog->xdg_dir_counter);
+    file_dialog->xdg_dirs->func.button_release_callback = win_dir_select_callback;
+    listview_unset_active_entry(file_dialog->xdg_dirs);
+}
+
 #endif
+
 Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     FileDialog *file_dialog = (FileDialog*)malloc(sizeof(FileDialog));
 
@@ -615,12 +726,13 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     } else {
         fp_init(file_dialog->fp, "/");
     }
-#else
-    DWORD attr = GetFileAttributes(path);
-    if (attr&FILE_ATTRIBUTE_DIRECTORY) {
+#elif defined _WIN32
+    parse_win_dirs(file_dialog);
+
+    if (os_is_directory(path)) {
         fp_init(file_dialog->fp, path);
     } else {
-        fp_init(file_dialog->fp, "C:\\");
+        fp_init(file_dialog->fp, " ");
     }
 
 #endif
@@ -656,6 +768,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->ct->parent_struct = file_dialog;
     file_dialog->ct->scale.gravity = NORTHEAST;
     file_dialog->ct->flags |= NO_PROPAGATE;
+    combobox_set_menu_size(file_dialog->ct, 8);
 
     file_dialog->sel_dir = add_button(file_dialog->w, _("Open"), 580, 40, 60, 30);
     file_dialog->sel_dir->parent_struct = file_dialog;
@@ -694,7 +807,10 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
 
 #ifdef __linux__
     add_xdg_dirs(file_dialog);
+#elif defined _WIN32
+    add_win_dirs(file_dialog);
 #endif
+
     file_dialog->w_quit = add_button(file_dialog->w, _("Cancel"), 580, 340, 60, 60);
     file_dialog->w_quit->parent_struct = file_dialog;
     file_dialog->w_quit->scale.gravity = SOUTHWEST;
