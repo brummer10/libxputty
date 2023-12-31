@@ -572,7 +572,11 @@ static void xdg_dir_select_callback(void *w_, void *button, void* user_data) {
     file_dialog->fp->path = NULL;
     asprintf(&file_dialog->fp->path, "%s",file_dialog->xdg_user_dirs_path[v]);
     assert(file_dialog->fp->path != NULL);
+    free(file_dialog->fp->selected_file);
+    file_dialog->fp->selected_file = NULL;
+    asprintf(&file_dialog->fp->selected_file, "%s",file_dialog->fp->path);
     reload_from_dir(file_dialog);
+    expose_widget(file_dialog->w);
 }
 
 static void add_xdg_dirs(FileDialog *file_dialog) {
@@ -682,7 +686,11 @@ static void win_dir_select_callback(void *w_, void *button, void* user_data) {
     file_dialog->fp->path = NULL;
     asprintf(&file_dialog->fp->path, "%s",file_dialog->xdg_user_dirs_path[v]);
     assert(file_dialog->fp->path != NULL);
+    free(file_dialog->fp->selected_file);
+    file_dialog->fp->selected_file = NULL;
+    asprintf(&file_dialog->fp->selected_file, "%s",file_dialog->fp->path);
     reload_from_dir(file_dialog);
+    expose_widget(file_dialog->w);
 }
 
 static void add_win_dirs(FileDialog *file_dialog) {
