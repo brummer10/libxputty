@@ -67,40 +67,75 @@ typedef struct {
     char pad[7];
 } FileButton;
 
-Widget_t *open_directory_dialog(Widget_t *w, const char *path);
+/**
+ * @brief open_directory_dialog  - open a non blocking dialog window,
+ * to select a directory. The path to open the Directory-selector could be NULL
+ * It will open then in $HOME.
+ * The filter to use could be NULL, then the file-selector will show all files.
+ * @param *path                  - the path to open or NULL
+ * @param *filter                - the filter to use or NULL
+ * @return Widget_t*             - pointer to the Widget_t struct
+ */
+
+Widget_t *open_directory_dialog(Widget_t *w, const char *path, const char *filter);
 
 /**
- * @brief open_file_dialog  - open a non blocking dialog window,
+ * @brief open_file_dialog      - open a non blocking dialog window,
  * to select a file. The path to open the file-selector could be NULL
  * It will open then in $HOME.
  * The filter to use could be NULL, then the file-selector will show all files.
- * @return Widget_t*           - pointer to the Widget_t struct
+ * @param *path                  - the path to open or NULL
+ * @param *filter                - the filter to use or NULL
+ * @return Widget_t*             - pointer to the Widget_t struct
  */
 
 Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter);
 
 /**
- * @brief save_file_dialog  - open a non blocking dialog window,
+ * @brief save_file_dialog       - open a non blocking dialog window,
  * to select a file. The path to open the file-selector could be NULL
  * It will open then in $HOME.
  * The filter to use could be NULL, then the file-selector will show all files.
- * @return Widget_t*           - pointer to the Widget_t struct
+ * @param *path                  - the path to open or NULL
+ * @param *filter                - the filter to use or NULL
+ * @return Widget_t*             - pointer to the Widget_t struct
  */
 
 Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter);
 
 /**
- * @brief add_file_button      - add a pre-defined button which will pop-up a file dialog
+ * @brief add_file_button        - add a pre-defined button which will pop-up a file dialog
  * when pressed. path and filter will e hand over to the file selector.
- * @return Widget_t*           - pointer to the Widget_t struct
+ * @param x, y                   - the position relative to parent Widget_t
+ * @param width, height          - the size
+ * @param *path                  - the path to open or NULL
+ * @param *filter                - the filter to use or NULL
+ * @return Widget_t*             - pointer to the Widget_t struct
  */
 
 Widget_t *add_file_button(Widget_t *parent, int x, int y, int width, int height,
                            const char *path, const char *filter);
 
 /**
+ * @brief add_directory_button - add a pre-defined button which will pop-up a directory dialog
+ * when pressed. path and filter will e hand over to the file selector.
+ * @param x, y                   - the position relative to parent Widget_t
+ * @param width, height          - the size
+ * @param *path                  - the path to open or NULL
+ * @param *filter                - the filter to use or NULL
+ * @return Widget_t*           - pointer to the Widget_t struct
+ */
+
+Widget_t *add_directory_button(Widget_t *parent, int x, int y, int width, int height,
+                           const char *path, const char *filter);
+
+/**
  * @brief add_save_file_button - add a pre-defined button which will pop-up a file dialog
  * when pressed. path and filter will e hand over to the file selector.
+ * @param x, y                   - the position relative to parent Widget_t
+ * @param width, height          - the size
+ * @param *path                  - the path to open or NULL
+ * @param *filter                - the filter to use or NULL
  * @return Widget_t*           - pointer to the Widget_t struct
  */
 

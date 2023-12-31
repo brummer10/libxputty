@@ -284,6 +284,7 @@ static void entry_get_text(void *w_, void *key_, void *user_data) {
                 pa->func.dialog_callback(pa,&mb->text_entry->label);
 
                 destroy_widget(p, p->app);
+                return;
                 }
             break;
             case 11: entry_clip(w);
@@ -293,12 +294,19 @@ static void entry_get_text(void *w_, void *key_, void *user_data) {
         }
     } else {
         char buf[32];
+        memset(buf, 0, 32);
         bool status = os_get_keyboard_input(w, key, buf, sizeof(buf) - 1);
         if(status){
             entry_add_text(w, buf);
         }
     }
     os_expose_widget(w);
+}
+
+static void mb_entry_get_text(void *w_, void *key_, void *user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    MessageDialog *mb = (MessageDialog *)w->parent_struct;
+    entry_get_text(mb->text_entry, key_, user_data);
 }
 
 static void create_entry_box(Widget_t *w) {
@@ -451,6 +459,7 @@ Widget_t *open_message_dialog(Widget_t *w, int style, const char *title,
             alternate_title = (char*)_("TEXT ENTRY");
             mb->message_type = ENTRY_BOX;
             create_entry_box(wid);
+            wid->func.key_press_callback = mb_entry_get_text;
             widget_set_icon_from_surface(wid, wid->image);
         break;
     }

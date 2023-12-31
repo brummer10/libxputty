@@ -23,13 +23,13 @@
 
 
 void _rounded_rectangle(cairo_t *cr,float x, float y, float width, float height) {
+    float r = height * 0.33334;
     cairo_new_path (cr);
-    cairo_move_to  (cr, x, (y + height)/2);
-    cairo_curve_to (cr, x ,y, x, y, (x + width)/2, y);
-    cairo_curve_to (cr, width, y, width, y, width, (y + height)/2);
-    cairo_curve_to (cr, width, height, width, height, (width + x)/2, height);
-    cairo_curve_to (cr, x, height, x, height, x, (y + height)/2);
-    cairo_close_path (cr);
+    cairo_arc(cr, x+r, y+r, r, M_PI, 3*M_PI/2);
+    cairo_arc(cr, x+width-1-r, y+r, r, 3*M_PI/2, 0);
+    cairo_arc(cr, x+width-1-r, y+height-1-r, r, 0, M_PI/2);
+    cairo_arc(cr, x+r, y+height-1-r, r, M_PI/2, M_PI);
+    cairo_close_path(cr);
 }
 
 void _pattern_out(Widget_t *w, Color_state st, int height) {
@@ -116,8 +116,8 @@ void _draw_switch_image_button(void *w_, void* user_data) {
     if (!w) return;
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
-    int width = metrics.width-2;
-    int height = metrics.height-2;
+    int width = metrics.width-5;
+    int height = metrics.height-5;
     if (!metrics.visible) return;
     if(strlen(w->label)) {
         _draw_image_button_with_label(w, width, height);
@@ -193,8 +193,8 @@ void _draw_button(void *w_, void* user_data) {
     if (!w) return;
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
-    int width = metrics.width-2;
-    int height = metrics.height-2;
+    int width = metrics.width-5;
+    int height = metrics.height-5;
     if (!metrics.visible) return;
 
     float offset = 0.0;
@@ -222,8 +222,8 @@ void _draw_base_button(void *w_, void* user_data) {
     if (!w) return;
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
-    int width = metrics.width-2;
-    int height = metrics.height-2;
+    int width = metrics.width-5;
+    int height = metrics.height-5;
     if (!metrics.visible) return;
     _draw_button_base(w, width, height);
 
@@ -276,8 +276,8 @@ void _draw_on_off_button(void *w_, void* user_data) {
     if (!w) return;
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
-    int width = metrics.width-2;
-    int height = metrics.height-2;
+    int width = metrics.width-5;
+    int height = metrics.height-5;
     if (!metrics.visible) return;
 
     _draw_button_base(w, width, height);
@@ -318,8 +318,8 @@ void _draw_ti_button(void *w_, void* user_data) {
     if (!w) return;
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
-    int width = metrics.width-2;
-    int height = metrics.height-2;
+    int width = metrics.width-5;
+    int height = metrics.height-5;
     if (!metrics.visible) return;
     _draw_button_base(w, width, height);
     if (w->image) {
@@ -343,8 +343,8 @@ void _draw_check_button(void *w_, void* user_data) {
     if (!w) return;
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
-    int width = metrics.width-2;
-    int height = metrics.height-2;
+    int width = metrics.width-5;
+    int height = metrics.height-5;
     if (!metrics.visible) return;
     if (w->image) {
         _draw_image_button(w, width, height,0.0);
@@ -376,7 +376,7 @@ void _draw_check_box(void *w_, void* user_data) {
     if (!w) return;
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
-    int height = metrics.height-2;
+    int height = metrics.height-5;
     if (!metrics.visible) return;
     if (w->image) {
         _draw_image_button(w, height, height,0.0);

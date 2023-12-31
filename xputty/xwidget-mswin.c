@@ -362,7 +362,11 @@ void os_set_window_attrb(Widget_t *w) {
 }
 
 void os_set_transient_for_hint(Widget_t *parent, Widget_t *w) {
-    // STUB
+    POINT pt;
+    if (GetCursorPos(&pt)) {
+        SetWindowPos(w->widget, NULL, //hWnd, hWndInsertAfter
+          pt.x+10, pt.y-10, 0, 0, SWP_NOSIZE|SWP_NOZORDER); //X, Y, width, height, uFlags
+    }
 }
 
 int os_get_screen_height(Widget_t *w) {

@@ -390,8 +390,10 @@ static void open_dir_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     if (w->flags & HAS_POINTER && !*(int*)user_data){
-        reload_from_dir(file_dialog);
+        combobox_set_active_entry(file_dialog->ct, 
+            (int)(adj_get_value(file_dialog->ct->adj) - 1));
     }
+    adj_set_value(w->adj,0.0);
 }
 
 static void button_hidden_callback(void *w_, void* user_data) {
@@ -770,11 +772,12 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->ct->flags |= NO_PROPAGATE;
     combobox_set_menu_size(file_dialog->ct, 8);
 
-    file_dialog->sel_dir = add_button(file_dialog->w, _("Open"), 580, 40, 60, 30);
+    file_dialog->sel_dir = add_image_toggle_button(file_dialog->w, _("Open"), 580, 40, 60, 30);
     file_dialog->sel_dir->parent_struct = file_dialog;
     file_dialog->sel_dir->scale.gravity = WESTNORTH;
     file_dialog->sel_dir->flags |= NO_PROPAGATE;
-    add_tooltip(file_dialog->sel_dir,_("Open sub-directory's"));
+    widget_get_png(file_dialog->sel_dir, LDVAR(arrow_png));
+    add_tooltip(file_dialog->sel_dir,_("Go back one sub-directory"));
     file_dialog->sel_dir->func.value_changed_callback = open_dir_callback;
 
     file_dialog->scale_size = add_hslider(file_dialog->w, "", 580, 10, 60, 15);
@@ -895,6 +898,8 @@ static void fbutton_callback(void *w_, void* user_data) {
         Atom wmNetWmState = XInternAtom(w->app->dpy, "_NET_WM_STATE", 1 );
         XChangeProperty(w->app->dpy, filebutton->w->widget, wmNetWmState, XA_ATOM, 32, 
             PropModeReplace, (unsigned char *) &wmStateAbove, 1); 
+#elif defined _WIN32
+        os_set_transient_for_hint(w, filebutton->w);
 #endif
         filebutton->is_active = true;
     } else if (w->flags & HAS_POINTER && !adj_get_value(w->adj)){
