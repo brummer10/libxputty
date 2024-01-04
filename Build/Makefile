@@ -98,17 +98,23 @@ config:
 ifdef USE_LDD
 ifeq (,$(findstring 1,$(CONFIG_H)))
 	$(QUIET)@rm -f config.h
-	$(QUIET)echo '#ifndef USE_LD \n#define USE_LD = 1 \n#endif' >> config.h ;
+	$(QUIET)echo '#ifndef USE_LD' >> config.h ;
+	$(QUIET)echo '#define USE_LD = 1' >> config.h ;
+	$(QUIET)echo '#endif' >> config.h ;
 endif
 else ifdef USE_GOLD
 ifeq (,$(findstring 1,$(CONFIG_H)))
 	$(QUIET)@rm -f config.h
-	$(QUIET)echo '#ifndef USE_LD \n#define USE_LD = 1 \n#endif' >> config.h ;
+	$(QUIET)echo '#ifndef USE_LD' >> config.h ;
+	$(QUIET)echo '#define USE_LD = 1' >> config.h ;
+	$(QUIET)echo '#endif' >> config.h ;
 endif
 else
 ifeq (,$(findstring undef,$(CONFIG_X)))
 	$(QUIET)@rm -f config.h
-	$(QUIET)echo '#ifdef USE_LD \n#undef USE_LD \n#endif' >> config.h ;
+	$(QUIET)echo '#ifdef USE_LD' >> config.h ;
+	$(QUIET)echo '#undef USE_LD' >> config.h ;
+	$(QUIET)echo '#endif' >> config.h ;
 endif
 endif
 
