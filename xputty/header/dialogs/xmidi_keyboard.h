@@ -47,7 +47,7 @@ typedef struct {
     int prelight_key;
     int active_key;
     int send_key;
-    unsigned long key_matrix[4];
+    unsigned long key_matrix[5];
 
     mk_midikeyfunc mk_send_note;
     mk_midiwheelfunc mk_send_pitch;

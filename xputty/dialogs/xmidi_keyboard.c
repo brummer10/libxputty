@@ -163,9 +163,12 @@ void mk_keysym_qwerty_to_midi_key(unsigned int inkey, float *midi_key) {
 static void set_key_in_matrix(unsigned long *key_matrix, int key, bool set) {
     unsigned long *use_matrix = &key_matrix[0];
     
-    if(key>94) {
+    if(key>124) {
+        use_matrix = &key_matrix[4];
+        key -=124;
+    } else if(key>93) {
         use_matrix = &key_matrix[3];
-        key -=94;
+        key -=93;
     } else if(key>62) {
         use_matrix = &key_matrix[2];
         key -=62;
@@ -184,9 +187,12 @@ bool mk_is_key_in_matrix(unsigned long *key_matrix, int key) {
     unsigned long *use_matrix = &key_matrix[0];
     
     
-    if(key>94) {
+    if(key>124) {
+        use_matrix = &key_matrix[4];
+        key -=124;
+    } else if(key>93) {
         use_matrix = &key_matrix[3];
-        key -=94;
+        key -=93;
     } else if(key>62) {
         use_matrix = &key_matrix[2];
         key -=62;
@@ -206,7 +212,7 @@ bool mk_have_key_in_matrix(unsigned long *key_matrix) {
     bool ret = false;
     int i = 0;
     int j = 0;
-    for(;j<4;j++) {
+    for(;j<5;j++) {
         for(;i<32;i++) {
             if(key_matrix[j] & (1<<i)) {
                 ret = true;
@@ -221,7 +227,7 @@ bool mk_have_key_in_matrix(unsigned long *key_matrix) {
 void mk_clear_key_matrix(unsigned long *key_matrix) {
     int i = 0;
     int j = 0;
-    for(;j<4;j++) {
+    for(;j<5;j++) {
         for(;i<32;i++) {
             key_matrix[j] &= (~(1 << i));
         }
@@ -810,7 +816,7 @@ Widget_t *mk_open_midi_keyboard(Widget_t *w) {
     keys->octave = 12*2;
     keys->layout = 0;
     int j = 0;
-    for(;j<4;j++) {
+    for(;j<5;j++) {
         keys->key_matrix[j] = 0;
     }
 

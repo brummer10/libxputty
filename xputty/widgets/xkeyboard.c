@@ -284,10 +284,13 @@ void custom_to_midi_key(long custom_keys[128][2], long inkey, float *midi_key) {
 
 void set_key_in_matrix(unsigned long *key_matrix, int key, bool set) {
     unsigned long *use_matrix = &key_matrix[0];
-
-    if(key>94) {
+    
+    if(key>124) {
+        use_matrix = &key_matrix[4];
+        key -=124;
+    } else if(key>93) {
         use_matrix = &key_matrix[3];
-        key -=94;
+        key -=93;
     } else if(key>62) {
         use_matrix = &key_matrix[2];
         key -=62;
@@ -297,18 +300,20 @@ void set_key_in_matrix(unsigned long *key_matrix, int key, bool set) {
     }
     if (set) {
         (*use_matrix) |= (1 << key);
-    }else {
+    } else {
         (*use_matrix) &= (~(1 << key));
     }
 }
 
 bool is_key_in_matrix(unsigned long *key_matrix, int key) {
     unsigned long *use_matrix = &key_matrix[0];
-    
-    
-    if(key>94) {
+
+    if(key>124) {
+        use_matrix = &key_matrix[4];
+        key -=124;
+    } else if(key>93) {
         use_matrix = &key_matrix[3];
-        key -=94;
+        key -=93;
     } else if(key>62) {
         use_matrix = &key_matrix[2];
         key -=62;
@@ -338,7 +343,7 @@ bool have_key_in_matrix(unsigned long *key_matrix) {
     bool ret = false;
     int i = 0;
     int j = 0;
-    for(;j<4;j++) {
+    for(;j<5;j++) {
         for(;i<32;i++) {
             if(key_matrix[j] & (1<<i)) {
                 ret = true;
@@ -353,7 +358,7 @@ bool have_key_in_matrix(unsigned long *key_matrix) {
 void clear_key_matrix(unsigned long *key_matrix) {
     int i = 0;
     int j = 0;
-    for(;j<4;j++) {
+    for(;j<5;j++) {
         for(;i<32;i++) {
             key_matrix[j] &= (~(1 << i));
         }
@@ -941,13 +946,13 @@ void add_keyboard(Widget_t *wid, const char * label) {
     keys->keyboard = wid;
     memset(keys->custom_keys, 0, 128*2*sizeof keys->custom_keys[0][0]);
     int j = 0;
-    for(;j<4;j++) {
+    for(;j<5;j++) {
         keys->key_matrix[j] = 0;
     }
     int i = 0;
     for(;i<16;i++) {
         j = 0;
-        for(;j<4;j++) {
+        for(;j<5;j++) {
             keys->in_key_matrix[i][j] = 0;
         }
     }

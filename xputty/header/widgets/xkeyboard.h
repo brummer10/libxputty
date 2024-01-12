@@ -50,8 +50,8 @@ typedef struct {
     int in_motion;
     int key_size;
     int key_offset;
-    unsigned long key_matrix[4];
-    unsigned long in_key_matrix[16][4];
+    unsigned long key_matrix[5];
+    unsigned long in_key_matrix[16][5];
     long custom_keys[128][2];
 
     midikeyfunc mk_send_note;
