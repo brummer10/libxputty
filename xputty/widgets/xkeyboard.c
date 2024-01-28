@@ -928,7 +928,7 @@ Widget_t *open_midi_keyboard(Widget_t *w, const char * label) {
 void add_keyboard(Widget_t *wid, const char * label) {
     MidiKeyboard *keys = (MidiKeyboard*)malloc(sizeof(MidiKeyboard));
     wid->private_struct = keys;
-    wid->flags |= HAS_MEM | NO_AUTOREPEAT;
+    wid->flags |= HAS_MEM | NO_AUTOREPEAT | MOUSE_CAPTURE;
     wid->scale.gravity = EASTSOUTH;
     keys->prelight_key = -1;
     keys->active_key = -1;

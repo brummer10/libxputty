@@ -612,9 +612,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case WM_SIZE:
             if (!wid) return DefWindowProc(hwnd, msg, wParam, lParam);
             else {
-                if(wid->app->hold_grab && wid != wid->app->hold_grab) {
+                if(wid->app->hold_grab && wid == get_toplevel_widget(wid->app)) {
                     widget_hide(wid->app->hold_grab);
                     wid->app->hold_grab = NULL;
+                    if (wid->app->submenu) {
+                        widget_hide(wid->app->submenu);
+                        wid->app->submenu = NULL;
+                    }
                 }
                 // Limit window size:
                 // The plugin doesnt receive WM_MINMAXINFO or WM_SIZING.
@@ -640,9 +644,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         case WM_MOVE:
             if (!wid) return DefWindowProc(hwnd, msg, wParam, lParam);
-            if(wid->app->hold_grab && wid != wid->app->hold_grab) {
+            if(wid->app->hold_grab && wid == get_toplevel_widget(wid->app)) {
                 widget_hide(wid->app->hold_grab);
                 wid->app->hold_grab = NULL;
+                if (wid->app->submenu) {
+                    widget_hide(wid->app->submenu);
+                    wid->app->submenu = NULL;
+                }
             }
         // X11:Expose
         case WM_PAINT:
@@ -711,10 +719,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             wid->func.double_click_callback(wid, &xbutton, user_data);
             return 0;
         case WM_LBUTTONUP:
+        case WM_MBUTTONUP:
         case WM_RBUTTONUP:
             ReleaseCapture();
             if (msg == WM_LBUTTONUP)
                 xbutton.button = Button1;
+            else if (msg == WM_MBUTTONUP)
+                xbutton.button = Button2;
             else
                 xbutton.button = Button3;
             _check_grab(wid, &xbutton, wid->app);
@@ -761,6 +772,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 // so the retrigger check has to take place in WM_KEYDOWN instead
                 wid->func.key_release_callback((void *)wid, &xkey, user_data);
                 debug_print("Widget_t KeyRelease %x\n", xkey.keycode);
+            }
+            return 0;
+
+        case WM_CAPTURECHANGED:
+            if (!wid) return DefWindowProc(hwnd, msg, wParam, lParam);
+            if (wid->flags & MOUSE_CAPTURE) {
+                xbutton.button = Button1;
+                wid->func.button_release_callback((void*)wid, &xbutton, user_data);
+                wid->mouse_inside = false;
+                wid->flags &= ~HAS_FOCUS;
+                wid->func.leave_callback((void*)wid, user_data);
+                debug_print("WM_CAPTURECHANGED\n");
             }
             return 0;
 
@@ -864,8 +887,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 wid->state = 0;
                 wid->flags &= ~HAS_FOCUS;
                 wid->func.leave_callback((void*)wid, user_data);
-               // if (!(wid->flags & IS_WINDOW))
-               //     RedrawWindow(hwnd, NULL, NULL, RDW_NOERASE | RDW_INVALIDATE | RDW_UPDATENOW);
+                if (!(wid->flags & IS_WINDOW))
+                    RedrawWindow(hwnd, NULL, NULL, RDW_NOERASE | RDW_INVALIDATE | RDW_UPDATENOW);
             }
             if (wid->flags & HAS_TOOLTIP) hide_tooltip(wid);
             debug_print("Widget_t LeaveNotify:hwnd=%p",hwnd);

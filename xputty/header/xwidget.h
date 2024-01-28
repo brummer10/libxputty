@@ -283,6 +283,8 @@ enum {
     IS_SUBMENU        = 1<<15,
     /** Widget_t didn't send redraw events to child widgets  */
     DONT_PROPAGATE    = 1<<16,
+    /** Widget_t need information about WM_CAPTURECHANGED (Windows only)  */
+    MOUSE_CAPTURE     = 1<<17,
 
 };
 

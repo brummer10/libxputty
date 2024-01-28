@@ -809,7 +809,7 @@ Widget_t *mk_open_midi_keyboard(Widget_t *w) {
     MidiKeyboard_mk *keys = (MidiKeyboard_mk*)malloc(sizeof(MidiKeyboard_mk));
     wid->parent_struct = keys;
     wid->parent = w;
-    wid->flags |= HAS_MEM | NO_AUTOREPEAT;
+    wid->flags |= HAS_MEM | NO_AUTOREPEAT | MOUSE_CAPTURE;
     keys->prelight_key = -1;
     keys->active_key = -1;
     keys->send_key = -1;
