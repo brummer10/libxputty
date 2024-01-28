@@ -201,7 +201,7 @@ void _draw_combobox_entrys(void *w_, void* user_data) {
             use_base_color_scheme(w, SELECTED_);
         else
             use_base_color_scheme(w,NORMAL_ );
-        cairo_rectangle(w->crb, 0, a*25, width, 25);
+        cairo_rectangle(w->crb, 0, a*comboboxlist->item_height, width, comboboxlist->item_height);
         cairo_fill_preserve(w->crb);
         cairo_set_line_width(w->crb, 1.0);
         use_frame_color_scheme(w, PRELIGHT_);
@@ -217,12 +217,12 @@ void _draw_combobox_entrys(void *w_, void* user_data) {
         else
             use_text_color_scheme(w,NORMAL_ );
 
-        cairo_set_font_size (w->crb, 12);
+        cairo_set_font_size (w->crb, (int)(12/comboboxlist->sc));
         cairo_text_extents(w->crb,"Ay", &extents);
         double h = extents.height;
         cairo_text_extents(w->crb,comboboxlist->list_names[i] , &extents);
 
-        cairo_move_to (w->crb, 15, (25*(a+1)) - h +2);
+        cairo_move_to (w->crb, 15, (comboboxlist->item_height*(a+1)) - h +2);
         cairo_show_text(w->crb, comboboxlist->list_names[i]);
         cairo_new_path (w->crb);
         if (i == comboboxlist->prelight_item && extents.width > (float)width-20) {
@@ -244,7 +244,7 @@ void _combobox_motion(void *w_, void* xmotion_, void* user_data) {
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
     int height = metrics.height;
-    int _items = height/(height/25);
+    int _items = height/(height/comboboxlist->item_height);
     int prelight_item = (xmotion->y/_items)  + (int)max(0,adj_get_value(w->adj));
     if(prelight_item != comboboxlist->prelight_item) {
         comboboxlist->prelight_item = prelight_item;
@@ -259,7 +259,7 @@ void _combobox_key_pressed(void *w_, void* xkey_, void* user_data) {
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
     int height = metrics.height;
-    int _items = height/(height/25);
+    int _items = height/(height/comboboxlist->item_height);
     comboboxlist->prelight_item = xkey->y/_items  + (int)max(0,adj_get_value(w->adj));
     int nk = key_mapping(w->app->dpy, xkey);
     if (nk) {
@@ -283,7 +283,7 @@ void _combobox_entry_released(void *w_, void* button_, void* user_data) {
         Metrics_t metrics;
         os_get_window_metrics(w, &metrics);
         int height = metrics.height;
-        int _items = height/(height/25);
+        int _items = height/(height/comboboxlist->item_height);
         int prelight_item = xbutton->y/_items  + (int)max(0,adj_get_value(w->adj));
         if(xbutton->button == Button4) {
             if(prelight_item != comboboxlist->prelight_item) {
@@ -319,11 +319,11 @@ void _reconfigure_combobox_viewport(void *w_, void* user_data) {
     Metrics_t metrics;
     os_get_window_metrics(combobox, &metrics);
     int height = metrics.height;
-    comboboxlist->show_items = height/25;
+    comboboxlist->show_items = height/comboboxlist->item_height;
     set_adjustment(comboboxlist->slider->adj,0.0, 0.0, 0.0,
         (float)(comboboxlist->list_size-(comboboxlist->show_items-1)),1.0, CL_VIEWPORTSLIDER);
     adj_set_scale(comboboxlist->slider->adj,
-        ((float)(comboboxlist->list_size)/(float)comboboxlist->show_items)/25.0);
+        ((float)(comboboxlist->list_size)/(float)comboboxlist->show_items)/(float)comboboxlist->item_height);
     adj_set_state(w->adj,st);
 }
 
@@ -345,7 +345,7 @@ void _draw_combobox_menu_slider(void *w_, void* user_data) {
     int width = metrics.width;
     int height = metrics.height;
     if (!metrics.visible) return;
-    int show_items = height/25;
+    int show_items = height/comboboxlist->item_height;
     float slidersize = 1.0;
     if (comboboxlist->list_size > show_items)
         slidersize = (float)((float)show_items/(float)comboboxlist->list_size);
@@ -417,7 +417,9 @@ void _configure_combobox_menu(Widget_t *parent, Widget_t *menu, int elem, bool a
     ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
     Widget_t *slider =  menu->childlist->childs[1];
     if (!comboboxlist->list_size) return;
-    int height = 25;
+    comboboxlist->sc = parent->scale.ascale;
+    comboboxlist->item_height = 25/comboboxlist->sc;
+    int height = comboboxlist->item_height;
     int x1, y1;
     int posy = (above) ? parent->height : 0;
     os_translate_coords(parent, parent->widget, os_get_root_window(parent->app, IS_WIDGET), 0, posy, &x1, &y1);
