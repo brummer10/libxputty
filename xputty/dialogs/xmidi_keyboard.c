@@ -637,9 +637,16 @@ static void button_pressed_keyboard(void *w_, void* button_, void* user_data) {
 static void button_released_keyboard(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
+    MidiKeyboard_mk *keys = (MidiKeyboard_mk*)w->parent_struct;
+    XButtonEvent *xbutton = (XButtonEvent*)button_;
     if (w->flags & HAS_POINTER) {
-        MidiKeyboard_mk *keys = (MidiKeyboard_mk*)w->parent_struct;
-        XButtonEvent *xbutton = (XButtonEvent*)button_;
+        if(xbutton->button == Button1) {
+            keys->send_key = keys->active_key;
+            keys->mk_send_note(p,&keys->send_key,false);
+            keys->active_key = -1;
+            expose_widget(w);
+        }
+    } else if (keys->active_key > -1) {
         if(xbutton->button == Button1) {
             keys->send_key = keys->active_key;
             keys->mk_send_note(p,&keys->send_key,false);
