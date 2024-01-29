@@ -345,6 +345,13 @@ int os_get_screen_height(Widget_t *w);
 int os_get_screen_width(Widget_t *w);
 
 /**
+ * @brief os_get_dpi               - Get the dpi of the used Display
+ * @param *main                    - Pointer to the Xputty main struct
+ */
+
+void os_get_dpi(Xputty *main);
+
+/**
  * @brief os_is directory          - check if a given path is a directory or a file
  * @param *filename                - the Path to check
  * @return bool                    - return true if path is directory, otrherwise false

@@ -24,6 +24,8 @@
 void main_init(Xputty *main) {
     main->dpy = os_open_display(0);
     assert(main->dpy);
+    main->hdpi = 1.0;
+    os_get_dpi(main);
     main->childlist = (Childlist_t*)malloc(sizeof(Childlist_t));
     assert(main->childlist);
     childlist_init(main->childlist);
@@ -38,9 +40,9 @@ void main_init(Xputty *main) {
     main->submenu = NULL;
     main->run = true;
     main->is_grab = false;
-    main->small_font = 10;
-    main->normal_font = 12;
-    main->big_font = 16;
+    main->small_font = 10 * main->hdpi;
+    main->normal_font = 12 * main->hdpi;
+    main->big_font = 16 * main->hdpi;
     main->ctext = NULL;
     main->csize = 0;
     os_init_dnd(main);

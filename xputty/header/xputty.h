@@ -48,6 +48,7 @@
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h> 
+#include <X11/Xresource.h>
 #endif //__linux__
 
 #ifdef ENABLE_NLS
@@ -256,6 +257,8 @@ struct Xputty{
     bool run;
 /** bool to indicate if button is pressed on grab window */
     bool is_grab;
+/** float to hold the current dpi setting of the Display */
+    float hdpi;
 /** padding struct to align clean **/
     char pad[2];
     Window dnd_source_window;

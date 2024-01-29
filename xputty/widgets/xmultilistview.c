@@ -92,8 +92,8 @@ Widget_t* add_multi_listview(Widget_t *parent, const char * label,
     filelist->file_scaled = NULL;
     filelist->scale_down = 0.2;
     filelist->scale_up = 1.0/0.2;
-    filelist->item_height = 375*filelist->scale_down;
-    filelist->item_width = 500*filelist->scale_down;
+    filelist->item_height = 375*filelist->scale_down * parent->app->hdpi;
+    filelist->item_width = 500*filelist->scale_down * parent->app->hdpi;
     filelist->column = max(1,width/filelist->item_width);
     filelist->icon_pos = (filelist->item_width/2) - 120/filelist->scale_up;
     filelist->slider = add_vslider(wid, "", width-10, 0, 10, height);
@@ -163,7 +163,7 @@ cairo_surface_t * scale_image(Widget_t *listview, ViewMultiList_t *filelist,
     assert(cairo_surface_status(scaled) == CAIRO_STATUS_SUCCESS); 
 
     cairo_t *cri = cairo_create (scaled);
-    cairo_scale(cri,filelist->scale_down, filelist->scale_down);
+    cairo_scale(cri,filelist->scale_down* listview->app->hdpi, filelist->scale_down* listview->app->hdpi);
     cairo_set_source_surface (cri, orig,0,0);
     cairo_rectangle(cri, 0, 0, filelist->item_width* filelist->scale_up,
                                 filelist->item_height* filelist->scale_up);
@@ -177,8 +177,8 @@ void multi_listview_set_item_size(Widget_t *listview, float set) {
     ViewMultiList_t *filelist = (ViewMultiList_t*)view_port->parent_struct;
     filelist->scale_down = set;
     filelist->scale_up = 1.0/set;
-    filelist->item_height = 375*filelist->scale_down;
-    filelist->item_width = 500*filelist->scale_down;
+    filelist->item_height = 375*filelist->scale_down * listview->app->hdpi;
+    filelist->item_width = 500*filelist->scale_down * listview->app->hdpi;
     _reconfigure_multi_listview_viewport(view_port, NULL);
     filelist->folder_scaled = scale_image(listview,filelist,filelist->folder, filelist->folder_scaled);
     filelist->folder_select_scaled = scale_image(listview,filelist,filelist->folder_select, filelist->folder_select_scaled);

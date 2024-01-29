@@ -217,12 +217,12 @@ void _draw_combobox_entrys(void *w_, void* user_data) {
         else
             use_text_color_scheme(w,NORMAL_ );
 
-        cairo_set_font_size (w->crb, (int)(12/comboboxlist->sc));
+        cairo_set_font_size (w->crb, (int)(w->app->normal_font/comboboxlist->sc));
         cairo_text_extents(w->crb,"Ay", &extents);
         double h = extents.height;
         cairo_text_extents(w->crb,comboboxlist->list_names[i] , &extents);
 
-        cairo_move_to (w->crb, 15, (comboboxlist->item_height*(a+1)) - h +2);
+        cairo_move_to (w->crb, 15, (comboboxlist->item_height*(a+1)) - h + 6 * w->app->hdpi);
         cairo_show_text(w->crb, comboboxlist->list_names[i]);
         cairo_new_path (w->crb);
         if (i == comboboxlist->prelight_item && extents.width > (float)width-20) {

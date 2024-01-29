@@ -941,7 +941,7 @@ void add_keyboard(Widget_t *wid, const char * label) {
     keys->layout = 0;
     keys->channel = 0;
     keys->velocity = 64;
-    keys->key_size = 20;
+    keys->key_size = 20 * wid->app->hdpi;
     keys->key_offset = 15;
     keys->keyboard = wid;
     memset(keys->custom_keys, 0, 128*2*sizeof keys->custom_keys[0][0]);

@@ -51,6 +51,7 @@ Widget_t* create_listview_viewport(Widget_t *parent, int elem, int width, int he
     filelist = (ViewList_t*)malloc(sizeof(ViewList_t));
     filelist->show_items = elem;
     filelist->check_dir = 0;
+    filelist->item_height = 25 * parent->app->hdpi;
     wid->flags |= HAS_MEM;
     wid->parent_struct = filelist;
     float max_value = -elem;

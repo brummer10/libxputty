@@ -783,6 +783,24 @@ int os_get_screen_width(Widget_t *w){
     return DisplayWidth(w->app->dpy, snum);
 }
 
+void os_get_dpi(Xputty *main) {
+    XrmDatabase	db;   
+    XrmValue ret;
+    char *resource_string;
+    char *type;
+
+    XrmInitialize();
+    resource_string = XResourceManagerString(main->dpy);
+    db = XrmGetStringDatabase(resource_string);
+    if (resource_string) {
+        if (XrmGetResource(db, "Xft.dpi", "String", &type, &ret) == True) {
+            if (ret.addr) {
+                main->hdpi = atof(ret.addr)/96;
+            }
+        }
+    }
+}
+
 bool os_is_directory(const char *filename) {
     struct stat sb;
     return (stat(filename, &sb) == 0 && S_ISDIR(sb.st_mode));

@@ -43,7 +43,7 @@ void _draw_list(void *w_, void* user_data) {
     use_base_color_scheme(w, NORMAL_);
     cairo_rectangle(w->crb, 0, 0, width, height);
     cairo_fill (w->crb);
-    cairo_set_font_size (w->crb, min(w->app->big_font ,w->app->normal_font/w->scale.ascale));
+    cairo_set_font_size (w->crb, w->app->normal_font);
     cairo_text_extents_t extents;
     cairo_text_extents(w->crb,"Ay", &extents);
     double h = extents.height;
@@ -61,7 +61,7 @@ void _draw_list(void *w_, void* user_data) {
             use_base_color_scheme(w, SELECTED_);
         else
             use_base_color_scheme(w,NORMAL_ );
-        cairo_rectangle(w->crb, 0, a*25, width, 25);
+        cairo_rectangle(w->crb, 0, a*filelist->item_height, width, filelist->item_height);
         cairo_fill_preserve(w->crb);
         cairo_set_line_width(w->crb, 1.0);
         use_frame_color_scheme(w, PRELIGHT_);
@@ -80,13 +80,13 @@ void _draw_list(void *w_, void* user_data) {
         if (filelist->check_dir) {
             if (os_is_directory(filelist->list_names[i])) {
                 cairo_scale(w->crb,0.08, 0.08);
-                cairo_set_source_surface (w->crb, filelist->folder,1.0*12.5,((double)a+0.1)*25.0*12.5);
+                cairo_set_source_surface (w->crb, filelist->folder,1.0*12.5,((double)a+0.1)*filelist->item_height*12.5);
                 cairo_paint (w->crb);
                 cairo_scale(w->crb,12.5, 12.5);
                 use_text_color_scheme(w, INSENSITIVE_);
             } else {
                 cairo_scale(w->crb,0.08, 0.08);
-                cairo_set_source_surface (w->crb, filelist->file,1.0*12.5,((double)a+0.1)*25.0*12.5);
+                cairo_set_source_surface (w->crb, filelist->file,1.0*12.5,((double)a+0.1)*filelist->item_height*12.5);
                 cairo_paint (w->crb);
                 cairo_scale(w->crb,12.5, 12.5);
                 use_text_color_scheme(w,NORMAL_ );
@@ -94,7 +94,7 @@ void _draw_list(void *w_, void* user_data) {
         }
         cairo_text_extents(w->crb,filelist->list_names[i] , &extents);
 
-        cairo_move_to (w->crb, 20, (25.0*((double)a+1.0))+3.0 - (h*max(0.71,w->scale.ascale)));
+        cairo_move_to (w->crb, 20, (filelist->item_height*((double)a+1.0))+3.0 - h);
         cairo_show_text(w->crb, filelist->list_names[i]);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {
@@ -118,7 +118,7 @@ void _update_list_view(void *w_) {
 
     cairo_push_group (w->crb);
     use_base_color_scheme(w, NORMAL_);
-    cairo_set_font_size (w->crb, min(w->app->big_font ,w->app->normal_font/w->scale.ascale));
+    cairo_set_font_size (w->crb, w->app->normal_font);
     cairo_text_extents_t extents;
     cairo_text_extents(w->crb,"Ay", &extents);
     double h = extents.height;
@@ -142,7 +142,7 @@ void _update_list_view(void *w_) {
             use_base_color_scheme(w, SELECTED_);
         else
             use_base_color_scheme(w,NORMAL_ );
-        cairo_rectangle(w->crb, 0, a*25, width, 25);
+        cairo_rectangle(w->crb, 0, a*filelist->item_height, width, filelist->item_height);
         cairo_fill_preserve(w->crb);
         cairo_set_line_width(w->crb, 1.0);
         use_frame_color_scheme(w, PRELIGHT_);
@@ -162,13 +162,13 @@ void _update_list_view(void *w_) {
             struct stat sb;
             if (stat(filelist->list_names[i], &sb) == 0 && S_ISDIR(sb.st_mode)) {
                 cairo_scale(w->crb,0.08, 0.08);
-                cairo_set_source_surface (w->crb, filelist->folder,1.0*12.5,((double)a+0.1)*25.0*12.5);
+                cairo_set_source_surface (w->crb, filelist->folder,1.0*12.5,((double)a+0.1)*filelist->item_height*12.5);
                 cairo_paint (w->crb);
                 cairo_scale(w->crb,12.5, 12.5);
                 use_text_color_scheme(w, INSENSITIVE_);
             } else {
                 cairo_scale(w->crb,0.08, 0.08);
-                cairo_set_source_surface (w->crb, filelist->file,1.0*12.5,((double)a+0.1)*25.0*12.5);
+                cairo_set_source_surface (w->crb, filelist->file,1.0*12.5,((double)a+0.1)*filelist->item_height*12.5);
                 cairo_paint (w->crb);
                 cairo_scale(w->crb,12.5, 12.5);
                 use_text_color_scheme(w,NORMAL_ );
@@ -176,7 +176,7 @@ void _update_list_view(void *w_) {
         }
         cairo_text_extents(w->crb,filelist->list_names[i] , &extents);
 
-        cairo_move_to (w->crb, 20, (25.0*((double)a+1.0))+3.0 - (h*max(0.71,w->scale.ascale)));
+        cairo_move_to (w->crb, 20, (filelist->item_height * ((double)a+1.0))+3.0 - h);
         cairo_show_text(w->crb, filelist->list_names[i]);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {
@@ -206,7 +206,7 @@ void _list_motion(void *w_, void* xmotion_, void* user_data) {
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
     int height = metrics.height;
-    int _items = height/(height/25);
+    int _items = height/(height/filelist->item_height);
     int prelight_item = (xmotion->y/_items)  + (int)max(0,adj_get_value(w->adj));
     if(prelight_item != filelist->prelight_item) {
         filelist->prev_prelight_item = filelist->prelight_item;
@@ -224,7 +224,7 @@ void _list_key_pressed(void *w_, void* xkey_, void* user_data) {
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
     int height = metrics.height;
-    int _items = height/(height/25);
+    int _items = height/(height/filelist->item_height);
     filelist->prelight_item = xkey->y/_items  + (int)max(0,adj_get_value(w->adj));
     int nk = key_mapping(w->app->dpy, xkey);
     if (nk) {
@@ -249,7 +249,7 @@ void _list_entry_released(void *w_, void* button_, void* user_data) {
         Metrics_t metrics;
         os_get_window_metrics(w, &metrics);
         int height = metrics.height;
-        int _items = height/(height/25);
+        int _items = height/(height/filelist->item_height);
         int prelight_item = xbutton->y/_items  + (int)max(0,adj_get_value(w->adj));
         if (prelight_item > filelist->list_size-1) return;
         if(xbutton->button == Button4) {
@@ -277,7 +277,7 @@ void _list_entry_double_clicked(void *w_, void* button_, void* user_data) {
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
     int height = metrics.height;
-    int _items = height/(height/25);
+    int _items = height/(height/filelist->item_height);
     int prelight_item = xbutton->y/_items  + (int)max(0,adj_get_value(w->adj));
     if (prelight_item > filelist->list_size-1) return;
     listview->func.double_click_callback(listview,button_,NULL);
@@ -298,7 +298,7 @@ void _reconfigure_listview_viewport(void *w_, void* user_data) {
     Metrics_t metrics;
     os_get_window_metrics(listview, &metrics);
     int height = metrics.height;
-    filelist->show_items = height/25;
+    filelist->show_items = height/filelist->item_height;
     w->adj->max_value = filelist->list_size-filelist->show_items;
     adj_set_state(w->adj,st);
 }
@@ -311,9 +311,9 @@ void _configure_listview(void *w_, void* user_data) {
     os_get_window_metrics(listview, &metrics);
     int height = metrics.height;
     int width = metrics.width;
-    filelist->show_items = height/25;
+    filelist->show_items = height/filelist->item_height;
     filelist->slider->adj->step = max(0.0,1.0/(filelist->list_size-filelist->show_items));
-    adj_set_scale(filelist->slider->adj, ((float)filelist->list_size/(float)filelist->show_items)/25.0);
+    adj_set_scale(filelist->slider->adj, ((float)filelist->list_size/(float)filelist->show_items)/filelist->item_height);
     os_resize_window (w->app->dpy, w, width, height);
 }
 
@@ -335,7 +335,7 @@ void _draw_listviewslider(void *w_, void* user_data) {
     int width = metrics.width;
     int height = metrics.height;
     if (!metrics.visible) return;
-    int show_items = height/25;
+    int show_items = height/filelist->item_height;
     float slidersize = 1.0;
     if (filelist->list_size > show_items)
         slidersize = (float)((float)show_items/(float)filelist->list_size);

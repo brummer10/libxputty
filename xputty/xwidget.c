@@ -177,6 +177,10 @@ Widget_t *create_window(Xputty *app, Window win,
 #ifdef __linux__
     w->double_click = 0;
 #endif
+    x *= app->hdpi;
+    y *= app->hdpi;
+    width *= app->hdpi;
+    height *= app->hdpi;
     w->data = 0;
     w->x = x;
     w->y = y;
@@ -279,6 +283,10 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
 #ifdef __linux__
     w->double_click = 0;
 #endif
+    x *= app->hdpi;
+    y *= app->hdpi;
+    width *= app->hdpi;
+    height *= app->hdpi;
     w->data = 0;
     w->x = x;
     w->y = y;

@@ -42,11 +42,10 @@
 #include "xmessage-dialog.h"
 
 static void combo_response(void *w_, void* user_data);
-static void set_selected_file(FileDialog *file_dialog);
+static void set_selected_file(FileDialog *file_dialog, bool reload);
 
 static void draw_window(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
-    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
     int width = metrics.width;
@@ -67,18 +66,12 @@ static void draw_window(void *w_, void* user_data) {
     cairo_move_to (w->crb, 130 * w->app->hdpi, 85 * w->app->hdpi);
     cairo_show_text(w->crb, _("Entries"));
     cairo_move_to (w->crb, 20 * w->app->hdpi, (330 * w->app->hdpi -w->scale.scale_y));
-    cairo_show_text(w->crb, _("Load: "));
-    cairo_move_to (w->crb, 45 * w->app->hdpi, (360  * w->app->hdpi-w->scale.scale_y));
+    cairo_show_text(w->crb, _("Save as: "));
+    cairo_move_to (w->crb, 45 * w->app->hdpi, (360 * w->app->hdpi -w->scale.scale_y));
     cairo_show_text(w->crb, _("Show hidden files")); 
     cairo_move_to (w->crb, 45 * w->app->hdpi, (390 * w->app->hdpi -w->scale.scale_y));
     cairo_show_text(w->crb, _("List view"));
-    if (w->label) {
-        char *file = utf8_from_locale(file_dialog->fp->selected_file);
-        cairo_move_to (w->crb, 60 * w->app->hdpi, (330 * w->app->hdpi -w->scale.scale_y));
-        cairo_show_text(w->crb, file);
-        free(file);
-    }
-    //widget_reset_scale(w);
+
     if (w->image) {
         cairo_set_source_surface (w->crb, w->image, 180 * w->app->hdpi, (332 * w->app->hdpi -w->scale.scale_y));
         cairo_paint (w->crb);
@@ -124,6 +117,14 @@ static void button_quit_callback(void *w_, void* user_data) {
     }
 }
 
+static void get_entry(Widget_t *w) {
+    Widget_t *p = (Widget_t*)w->parent;
+    FileDialog *file_dialog = (FileDialog *)p->parent_struct;
+    if (strlen( file_dialog->text_entry->input_label))
+        file_dialog->text_entry->input_label[strlen( file_dialog->text_entry->input_label)-1] = 0;
+    file_dialog->text_entry->label = file_dialog->text_entry->input_label;
+}
+
 static inline int set_files(FileDialog *file_dialog) {
     if (file_dialog->list_view) {
         listview_set_list(file_dialog->ft,file_dialog->fp->file_names , (int)file_dialog->fp->file_counter);
@@ -156,7 +157,7 @@ static void file_released_b_callback(void *w_, void *button_, void* user_data) {
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     XButtonEvent *xbutton = (XButtonEvent*)button_;
     if(xbutton->button == Button1) {
-        set_selected_file(file_dialog);
+        set_selected_file(file_dialog, true);
         if(file_dialog->fp->selected_file) {
             file_dialog->w->label = file_dialog->fp->selected_file;
             expose_widget(file_dialog->w);
@@ -235,19 +236,27 @@ static void show_svg_preview(FileDialog *file_dialog, const char* file_name) {
     expose_widget(w);
 }
 
-static void set_selected_file(FileDialog *file_dialog) {
+static void set_selected_file(FileDialog *file_dialog, bool reload) {
     if(adj_get_value(file_dialog->ft->adj)<0 ||
         adj_get_value(file_dialog->ft->adj) > file_dialog->fp->file_counter) return;
-
-    if (os_is_directory(file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)])) {
-        asprintf(&file_dialog->fp->path, "%s",file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)]);
-        reload_from_dir(file_dialog);
-        return;
-    }
-
     if ((int)adj_get_value(file_dialog->ct->adj) < 0) return;
     free(file_dialog->fp->selected_file);
     file_dialog->fp->selected_file = NULL;
+    get_entry(file_dialog->text_entry);
+    if (strlen(file_dialog->text_entry->label)) {
+        asprintf(&file_dialog->fp->selected_file, "%s%s%s", file_dialog->fp->dir_names[(int)adj_get_value(file_dialog->ct->adj)],
+            PATH_SEPARATOR,
+            file_dialog->text_entry->label);
+        return;
+    }
+    if (reload && os_is_directory(file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)])) {
+        asprintf(&file_dialog->fp->path, "%s",file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)]);
+        reload_from_dir(file_dialog);
+        return;
+    } else if (!reload && os_is_directory(file_dialog->fp->file_names[(int)adj_get_value(file_dialog->ft->adj)])) {
+        return;
+    }
+
     if (strlen(file_dialog->fp->dir_names[(int)adj_get_value(file_dialog->ct->adj)]) > 1) {
         asprintf(&file_dialog->fp->selected_file, "%s%s%s",
             file_dialog->fp->dir_names[(int)adj_get_value(file_dialog->ct->adj)],
@@ -267,6 +276,12 @@ static void set_selected_file(FileDialog *file_dialog) {
         file_dialog->w->image = NULL;
         expose_widget(file_dialog->w);
     }
+}
+
+static void forward_key_press(void *w_, void *key_, void *user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+    file_dialog->text_entry->func.key_press_callback(file_dialog->text_entry, key_, user_data);
 }
 
 static void reload_file_entrys(FileDialog *file_dialog) {
@@ -309,27 +324,66 @@ static void combo_response(void *w_, void* user_data) {
     reload_from_dir(file_dialog);
 }
 
+static void save_and_exit(void *w_) {
+    Widget_t *w = (Widget_t*)w_;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+    if(file_dialog->fp->selected_file) {
+        file_dialog->parent->func.dialog_callback(file_dialog->parent,&file_dialog->fp->selected_file);
+        file_dialog->send_clear_func = false;
+        destroy_widget(file_dialog->w,file_dialog->w->app);
+    } else {
+        Widget_t *dia = open_message_dialog(w, INFO_BOX, _("INFO"), 
+                _("Please enter a file name"),NULL);
+        os_set_transient_for_hint(file_dialog->w, dia);
+    }
+    
+}
+
+static void question_response(void *w_, void* user_data) {
+    if(user_data !=NULL) {
+        int response = *(int*)user_data;
+        if(response == 0) {
+            save_and_exit(w_);
+        }
+    }
+}
+
 static void button_ok_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     if (w->flags & HAS_POINTER && !*(int*)user_data){
-        if(file_dialog->fp->selected_file) {
-            file_dialog->parent->func.dialog_callback(file_dialog->parent,&file_dialog->fp->selected_file);
-            file_dialog->send_clear_func = false;
-        } else {
-            Widget_t *dia = open_message_dialog(w, INFO_BOX, _("INFO"), _("Please select a file"),NULL);
+        set_selected_file(file_dialog, false);
+        if( access(file_dialog->fp->selected_file, F_OK ) != -1 ) {
+            Widget_t *dia = open_message_dialog(w, QUESTION_BOX, file_dialog->fp->selected_file, 
+                _("File already exists, would you overwrite it?"),NULL);
             os_set_transient_for_hint(file_dialog->w, dia);
-            return;
+            w->func.dialog_callback = question_response;
+        } else {
+            save_and_exit(w_);
         }
-        destroy_widget(file_dialog->w,file_dialog->w->app);
    }
+}
+
+static void save_on_enter(void *w_) {
+    Widget_t *w = (Widget_t*)w_;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+    set_selected_file(file_dialog, false);
+    if( access(file_dialog->fp->selected_file, F_OK ) != -1 ) {
+        Widget_t *dia = open_message_dialog(w, QUESTION_BOX, file_dialog->fp->selected_file, 
+           _("File already exists, would you overwrite it?"),NULL);
+        os_set_transient_for_hint(file_dialog->w, dia);
+        w->func.dialog_callback = question_response;
+    } else {
+        save_and_exit(w_);
+    }
+
 }
 
 static void file_double_click_callback(void *w_, void *button, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     if(!file_dialog->fp->selected_file) {
-        set_selected_file(file_dialog);
+        set_selected_file(file_dialog, false);
     }
     if(file_dialog->fp->selected_file) {
         file_dialog->parent->func.dialog_callback(file_dialog->parent,&file_dialog->fp->selected_file);
@@ -468,6 +522,111 @@ static void set_filter_callback(void *w_, void* user_data) {
     }
 }
 
+static void draw_entry(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    if (!w) return;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width-2;
+    int height = metrics.height-2;
+    if (!metrics.visible) return;
+
+    use_base_color_scheme(w, NORMAL_);
+    cairo_rectangle(w->cr,0,0,width,height);
+    cairo_fill_preserve (w->cr);
+    use_text_color_scheme(w, NORMAL_);
+    cairo_set_line_width(w->cr, 2.0);
+    cairo_stroke(w->cr);
+
+    cairo_set_font_size (w->cr, 9.0);
+
+    cairo_move_to (w->cr, 2, 9);
+    cairo_show_text(w->cr, " ");
+}
+
+static void entry_add_text(void  *w_, void *label_) {
+    Widget_t *w = (Widget_t*)w_;
+    if (!w) return;
+    char *label = (char*)label_;
+    if (!label) {
+        label = (char*)"";
+    }
+    draw_entry(w,NULL);
+    cairo_text_extents_t extents;
+    use_text_color_scheme(w, NORMAL_);
+    cairo_set_font_size (w->cr, 11.0);
+    if (strlen( w->input_label))
+         w->input_label[strlen( w->input_label)-1] = 0;
+    if (strlen( w->input_label)<30) {
+        if (strlen(label))
+        strcat( w->input_label, label);
+    }
+    w->label = w->input_label;
+    strcat( w->input_label, "|");
+    cairo_set_font_size (w->cr, 12.0);
+    cairo_text_extents(w->cr, w->input_label , &extents);
+
+    cairo_move_to (w->cr, 2, 6.0+extents.height);
+    cairo_show_text(w->cr,  w->input_label);
+
+}
+
+static void entry_clip(Widget_t *w) {
+    draw_entry(w,NULL);
+    cairo_text_extents_t extents;
+    use_text_color_scheme(w, NORMAL_);
+    cairo_set_font_size (w->cr, 11.0);
+
+    // check for UTF 8 char
+    if (strlen( w->input_label)>=2) {
+        int i = strlen( w->input_label)-1;
+        int j = 0;
+        int u = 0;
+        for(;i>0;i--) {
+            if(IS_UTF8(w->input_label[i])) {
+                 u++;
+            }
+            j++;
+            if (u == 1) break;
+            if (j>2) break;
+        }
+        if (!u) j =2;
+
+        memset(&w->input_label[strlen( w->input_label)-(sizeof(char)*(j))],0,sizeof(char)*(j));
+        strcat( w->input_label, "|");
+    }
+    cairo_set_font_size (w->cr, 12.0);
+    cairo_text_extents(w->cr, w->input_label , &extents);
+
+    cairo_move_to (w->cr, 2, 6.0+extents.height);
+    cairo_show_text(w->cr,  w->input_label);
+
+}
+
+static void entry_get_text(void *w_, void *key_, void *user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    if (!w) return;
+    XKeyEvent *key = (XKeyEvent*)key_;
+    if (!key) return;
+    int nk = key_mapping(w->app->dpy, key);
+    if (nk == 11) {
+        entry_clip(w);
+    } else {
+        char buf[32];
+        memset(buf, 0, 32);
+        bool status = os_get_keyboard_input(w, key, buf, sizeof(buf) - 1);
+        if (key_mapping(w->app->dpy, key) == 10) {
+            FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+            save_on_enter(file_dialog->w_okay);
+            return;
+        }
+        if(status){
+            entry_add_text(w, buf);
+        }
+    }
+    os_expose_widget(w);
+}
+
 static void fd_mem_free(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
@@ -592,6 +751,7 @@ static void add_xdg_dirs(FileDialog *file_dialog) {
     file_dialog->xdg_dirs->parent_struct = file_dialog;
     file_dialog->xdg_dirs->scale.gravity = EASTNORTH;
     file_dialog->xdg_dirs->flags |= NO_PROPAGATE;
+    file_dialog->xdg_dirs->func.key_press_callback = forward_key_press;
     listview_set_list(file_dialog->xdg_dirs, file_dialog->xdg_user_dirs, (int)file_dialog->xdg_dir_counter);
     file_dialog->xdg_dirs->func.button_release_callback = xdg_dir_select_callback;
     listview_unset_active_entry(file_dialog->xdg_dirs);
@@ -702,6 +862,7 @@ static void add_win_dirs(FileDialog *file_dialog) {
     file_dialog->xdg_dirs->parent_struct = file_dialog;
     file_dialog->xdg_dirs->scale.gravity = EASTNORTH;
     file_dialog->xdg_dirs->flags |= NO_PROPAGATE;
+    file_dialog->xdg_dirs->func.key_press_callback = forward_key_press;
     listview_set_list(file_dialog->xdg_dirs, file_dialog->xdg_user_dirs, (int)file_dialog->xdg_dir_counter);
     file_dialog->xdg_dirs->func.button_release_callback = win_dir_select_callback;
     listview_unset_active_entry(file_dialog->xdg_dirs);
@@ -709,7 +870,7 @@ static void add_win_dirs(FileDialog *file_dialog) {
 
 #endif
 
-Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
+Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     FileDialog *file_dialog = (FileDialog*)malloc(sizeof(FileDialog));
 
     file_dialog->xdg_user_dirs = NULL;
@@ -747,8 +908,8 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     XSizeHints* win_size_hints;
     win_size_hints = XAllocSizeHints();
     win_size_hints->flags =  PMinSize|PBaseSize|PMaxSize|PWinGravity;
-    win_size_hints->min_width = 660; // lets keep the min width
-    win_size_hints->min_height = 415; // lets keep the min height
+    win_size_hints->min_width = 660;
+    win_size_hints->min_height = 415;
     win_size_hints->base_width = 660 * w->app->hdpi;
     win_size_hints->base_height = 415 * w->app->hdpi;
     win_size_hints->max_width = 960 * w->app->hdpi;
@@ -763,6 +924,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->w->flags |= NO_PROPAGATE;
     widget_set_title(file_dialog->w, _("File Selector"));
     file_dialog->w->func.expose_callback = draw_window;
+    file_dialog->w->func.key_press_callback = forward_key_press;
     file_dialog->w->func.mem_free_callback = fd_mem_free;
     widget_set_icon_from_png(file_dialog->w, LDVAR(directory_png));
 
@@ -770,6 +932,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->ct->parent_struct = file_dialog;
     file_dialog->ct->scale.gravity = NORTHEAST;
     file_dialog->ct->flags |= NO_PROPAGATE;
+    file_dialog->ct->func.key_press_callback = forward_key_press;
     combobox_set_menu_size(file_dialog->ct, 8);
 
     file_dialog->sel_dir = add_image_toggle_button(file_dialog->w, _("Open"), 580, 40, 60, 30);
@@ -779,6 +942,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     widget_get_png(file_dialog->sel_dir, LDVAR(arrow_png));
     add_tooltip(file_dialog->sel_dir,_("Go back one sub-directory"));
     file_dialog->sel_dir->func.value_changed_callback = open_dir_callback;
+    file_dialog->sel_dir->func.key_press_callback = forward_key_press;
 
     file_dialog->scale_size = add_hslider(file_dialog->w, "", 580, 10, 60, 15);
     set_adjustment(file_dialog->scale_size->adj, 0.2, 0.2, 0.1, 0.4, 0.01, CL_CONTINUOS);
@@ -796,6 +960,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     multi_listview_set_check_dir(file_dialog->ft, 1);
     file_dialog->ft->func.button_release_callback = file_released_b_callback;
     file_dialog->ft->func.double_click_callback = file_double_click_callback;
+    file_dialog->ft->func.key_press_callback = forward_key_press;
 
     int ds = fp_get_files(file_dialog->fp,file_dialog->fp->path, 1, 1);   
     int set_f = set_files(file_dialog); 
@@ -814,19 +979,29 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     add_win_dirs(file_dialog);
 #endif
 
+    file_dialog->text_entry = create_widget(file_dialog->w->app, file_dialog->w, 130, 320, 200, 30);
+    memset(file_dialog->text_entry->input_label, 0, 32 * (sizeof file_dialog->text_entry->input_label[0]) );
+    file_dialog->text_entry->func.expose_callback = entry_add_text;
+    file_dialog->text_entry->func.key_press_callback = entry_get_text;
+    file_dialog->text_entry->flags &= ~USE_TRANSPARENCY;
+    file_dialog->text_entry->scale.gravity = EASTWEST;
+    file_dialog->text_entry->parent_struct = file_dialog;
+
     file_dialog->w_quit = add_button(file_dialog->w, _("Cancel"), 580, 340, 60, 60);
     file_dialog->w_quit->parent_struct = file_dialog;
     file_dialog->w_quit->scale.gravity = SOUTHWEST;
     file_dialog->w_quit->flags |= NO_PROPAGATE;
     add_tooltip(file_dialog->w_quit,_("Exit file selector"));
     file_dialog->w_quit->func.value_changed_callback = button_quit_callback;
+    file_dialog->w_quit->func.key_press_callback = forward_key_press;
 
-    file_dialog->w_okay = add_button(file_dialog->w, _("Load"), 510, 340, 60, 60);
+    file_dialog->w_okay = add_button(file_dialog->w, _("Save"), 510, 340, 60, 60);
     file_dialog->w_okay->parent_struct = file_dialog;
     file_dialog->w_okay->scale.gravity = SOUTHWEST;
     file_dialog->w_okay->flags |= NO_PROPAGATE;
-    add_tooltip(file_dialog->w_okay,_("Load selected file"));
+    add_tooltip(file_dialog->w_okay,_("Save file"));
     file_dialog->w_okay->func.value_changed_callback = button_ok_callback;
+    file_dialog->w_okay->func.key_press_callback = forward_key_press;
 
     file_dialog->set_filter = add_combobox(file_dialog->w, "", 360, 345, 120, 30);
     file_dialog->set_filter->parent_struct = file_dialog;
@@ -843,6 +1018,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     if(filter !=NULL && strlen(filter))
         combobox_add_entry(file_dialog->set_filter,filter);
     combobox_set_active_entry(file_dialog->set_filter, 0);
+    file_dialog->set_filter->func.key_press_callback = forward_key_press;
     file_dialog->set_filter->func.value_changed_callback = set_filter_callback;
     if(filter !=NULL && strlen(filter))
         combobox_set_active_entry(file_dialog->set_filter, 8);
@@ -853,6 +1029,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->w_hidden->scale.gravity = EASTWEST;
     file_dialog->w_hidden->flags |= NO_PROPAGATE;
     add_tooltip(file_dialog->w_hidden,_("Show hidden files and folders"));
+    file_dialog->w_hidden->func.key_press_callback = forward_key_press;
     file_dialog->w_hidden->func.value_changed_callback = button_hidden_callback;
 
     file_dialog->view = add_check_button(file_dialog->w, "", 20, 375, 20, 20);
@@ -860,6 +1037,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->view->scale.gravity = EASTWEST;
     file_dialog->view->flags |= NO_PROPAGATE;
     add_tooltip(file_dialog->view,_("Show entries in list view"));
+    file_dialog->view->func.key_press_callback = forward_key_press;
     file_dialog->view->func.value_changed_callback = button_view_callback;
 
     widget_show_all(file_dialog->w);
@@ -892,7 +1070,7 @@ static void fbutton_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileButton *filebutton = (FileButton *)w->private_struct;
     if (w->flags & HAS_POINTER && adj_get_value(w->adj)){
-        filebutton->w = open_file_dialog(w,filebutton->path,filebutton->filter);
+        filebutton->w = save_file_dialog(w,filebutton->path,filebutton->filter);
 #ifdef __linux__
         Atom wmStateAbove = XInternAtom(w->app->dpy, "_NET_WM_STATE_ABOVE", 1 );
         Atom wmNetWmState = XInternAtom(w->app->dpy, "_NET_WM_STATE", 1 );
@@ -917,7 +1095,7 @@ static void fbutton_mem_free(void *w_, void* user_data) {
     filebutton = NULL;
 }
 
-Widget_t *add_file_button(Widget_t *parent, int x, int y, int width, int height,
+Widget_t *add_save_file_button(Widget_t *parent, int x, int y, int width, int height,
                            const char *path, const char *filter) {
     FileButton *filebutton = (FileButton*)malloc(sizeof(FileButton));
     filebutton->path = path;

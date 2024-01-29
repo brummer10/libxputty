@@ -49,6 +49,7 @@ typedef struct {
     int prev_prelight_item;
     int prev_active_item;
     int show_items;
+    int item_height;
     int list_size;
     int check_dir;
     char pad[4];

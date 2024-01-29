@@ -104,7 +104,7 @@ Widget_t* create_combobox_viewport(Widget_t *parent, int elem, int width, int he
     comboboxlist->active_item = 0;
     comboboxlist->list_names = NULL;
     comboboxlist->list_size = 0;
-    comboboxlist->item_height = 25;
+    comboboxlist->item_height = 25 * parent->app->hdpi;
     comboboxlist->sc = 1.0;
     wid->flags |= HAS_MEM;
     wid->parent_struct = comboboxlist;

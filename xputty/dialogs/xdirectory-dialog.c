@@ -59,28 +59,28 @@ static void draw_window(void *w_, void* user_data) {
 
     //widget_set_scale(w);
     use_fg_color_scheme(w, NORMAL_);
-    cairo_set_font_size (w->crb, 12.0);
-    cairo_move_to (w->crb, 20, 35);
+    cairo_set_font_size (w->crb, w->app->normal_font);
+    cairo_move_to (w->crb, 20 * w->app->hdpi, 35 * w->app->hdpi);
     cairo_show_text(w->crb, _("Base Directory"));
-    cairo_move_to (w->crb, 20, 85);
+    cairo_move_to (w->crb, 20 * w->app->hdpi, 85 * w->app->hdpi);
     cairo_show_text(w->crb, _("Places"));
-    cairo_move_to (w->crb, 130, 85);
+    cairo_move_to (w->crb, 130 * w->app->hdpi, 85 * w->app->hdpi);
     cairo_show_text(w->crb, _("Entries"));
-    cairo_move_to (w->crb, 20, 330-w->scale.scale_y);
+    cairo_move_to (w->crb, 20 * w->app->hdpi, 330 * w->app->hdpi -w->scale.scale_y);
     cairo_show_text(w->crb, _("Select: "));
-    cairo_move_to (w->crb, 45, 360-w->scale.scale_y);
+    cairo_move_to (w->crb, 45 * w->app->hdpi, 360 * w->app->hdpi -w->scale.scale_y);
     cairo_show_text(w->crb, _("Show hidden Directories")); 
-    cairo_move_to (w->crb, 45, 390-w->scale.scale_y);
+    cairo_move_to (w->crb, 45 * w->app->hdpi, 390 * w->app->hdpi -w->scale.scale_y);
     cairo_show_text(w->crb, _("List view"));
     if (w->label) {
         char *file = utf8_from_locale(file_dialog->fp->selected_file);
-        cairo_move_to (w->crb, 60, 330-w->scale.scale_y);
+        cairo_move_to (w->crb, 60 * w->app->hdpi, 330 * w->app->hdpi -w->scale.scale_y);
         cairo_show_text(w->crb, file);
         free(file);
     }
     //widget_reset_scale(w);
     if (w->image) {
-        cairo_set_source_surface (w->crb, w->image, 180, 332-w->scale.scale_y);
+        cairo_set_source_surface (w->crb, w->image, 180 * w->app->hdpi, 332 * w->app->hdpi -w->scale.scale_y);
         cairo_paint (w->crb);
     }
 }
@@ -746,10 +746,10 @@ Widget_t *open_directory_dialog(Widget_t *w, const char *path, const char *filte
     win_size_hints->flags =  PMinSize|PBaseSize|PMaxSize|PWinGravity;
     win_size_hints->min_width = 660;
     win_size_hints->min_height = 415;
-    win_size_hints->base_width = 660;
-    win_size_hints->base_height = 415;
-    win_size_hints->max_width = 960;
-    win_size_hints->max_height = 865;
+    win_size_hints->base_width = 660 * w->app->hdpi;
+    win_size_hints->base_height = 415 * w->app->hdpi;
+    win_size_hints->max_width = 960 * w->app->hdpi;
+    win_size_hints->max_height = 865 * w->app->hdpi;
     win_size_hints->win_gravity = CenterGravity;
     XSetWMNormalHints(file_dialog->w->app->dpy, file_dialog->w->widget, win_size_hints);
     XFree(win_size_hints);
