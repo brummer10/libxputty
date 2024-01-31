@@ -275,9 +275,7 @@ static void reload_file_entrys(FileDialog *file_dialog) {
     } else {
         multi_listview_remove_list(file_dialog->ft);
     }
-    fp_get_files(file_dialog->fp,file_dialog->fp->path, 0, 1);
-    if (!file_dialog->fp->file_counter)
-        fp_get_files(file_dialog->fp,file_dialog->fp->path, 1, 1);
+    fp_get_files(file_dialog->fp,file_dialog->fp->path, 1, 1);
     int set_f = set_files(file_dialog);
     if (set_f != -1) {
         if (file_dialog->list_view) {
