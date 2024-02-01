@@ -34,6 +34,15 @@
 extern "C" {
 #endif
 
+typedef void (*fb_configfunc)(Widget_t *w, int width, int height, float list_view, float show_hidden);
+
+typedef struct {
+    int width;
+    int height;
+    float list_view;
+    float show_hidden;
+} FileBrowserConfig;
+
 typedef struct {
     Widget_t *parent;
     Widget_t *w;
@@ -49,6 +58,7 @@ typedef struct {
     Widget_t *view;
     Widget_t *scale_size;
     FilePicker *fp;
+    fb_configfunc save_config;
     char **xdg_user_dirs;
     char **xdg_user_dirs_path;
     const char *home_dir;
@@ -64,6 +74,7 @@ typedef struct {
     const char *path;
     const char *filter;
     bool is_active;
+    FileBrowserConfig conf;
     char pad[7];
 } FileButton;
 
