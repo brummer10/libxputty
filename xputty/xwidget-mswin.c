@@ -185,7 +185,12 @@ void os_get_surface_size(cairo_surface_t *surface, int *width, int *height) {
 }
 
 void os_get_dpi(Xputty *main) {
+#ifdef WINUSERAPI
     main->hdpi = (float)(GetDpiForSystem()/96);
+#else
+    // fallback when GetDpiForSystem() is not declared
+    main->hdpi = 1.0;
+#endif
 }
 
 void os_set_widget_surface_size(Widget_t *w, int width, int height) {
