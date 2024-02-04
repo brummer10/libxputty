@@ -31,6 +31,7 @@
 extern "C" {
 #endif
 
+typedef UINT (WINAPI *PGDFS)();
 TCHAR szMainUIClassName[]   = TEXT("xputtyMainUI____0123456789ABCDEF");
 TCHAR szWidgetUIClassName[] = TEXT("xputtyWidgetUI__0123456789ABCDEF");
 
@@ -185,7 +186,10 @@ void os_get_surface_size(cairo_surface_t *surface, int *width, int *height) {
 }
 
 void os_get_dpi(Xputty *main) {
-    main->hdpi = (float)(GetDpiForSystem()/96);
+    PGDFS pGDFS;
+    pGDFS = (PGDFS) GetProcAddress(GetModuleHandle(TEXT("User32.dll")), "GetDpiForSystem");
+    if(NULL != pGDFS) main->hdpi = (float)(pGDFS()/96);
+    else main->hdpi = 1.0;    
 }
 
 void os_set_widget_surface_size(Widget_t *w, int width, int height) {
