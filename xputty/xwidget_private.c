@@ -199,7 +199,9 @@ void _propagate_child_expose(Widget_t *wid) {
         int i = 0;
         for(;i<wid->childlist->elem;i++) {
             Widget_t *w = wid->childlist->childs[i];
+#ifdef __linux__ // Redraw on Linux is not needed
             if ( w->flags & NO_PROPAGATE) continue;
+#endif
             if (w->flags & USE_TRANSPARENCY) {
                 if(w->flags & FAST_REDRAW)
 #ifdef __linux__ //ForceRedraw
