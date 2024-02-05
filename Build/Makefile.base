@@ -97,6 +97,11 @@ endif
 		export TARGET = Windows
 	else
 		# Not found
+		ifeq ($(UNAME_S), BSD) #FreeBSD
+			export TARGET = Linux
+			export CFLAGS += -D__linux__
+			export CXXFLAGS += -D__linux__
+		endif
 		ifeq ($(UNAME_S), Linux) #LINUX
 			export TARGET = Linux
 		endif
@@ -142,7 +147,11 @@ endif
 endif
 
 ifndef EXTRAQUIET
+ifeq ($(UNAME_S), BSD)
+$(info for         $(yellow)FreeBSD$(reset))
+else
 $(info for         $(yellow)$(TARGET)$(reset))
+endif
 $(info with        $(yellow)$(CC)$(reset))
 $(info using       $(yellow)$(LD)$(reset))
 endif
