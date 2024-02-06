@@ -52,6 +52,7 @@ typedef struct {
     unsigned int list_size;
     char **list_names;
     float sc;
+    int pop_pos;
 } ComboBox_t;
 
 
@@ -123,6 +124,14 @@ void combobox_delete_entrys(Widget_t *combobox);
  */
 
 void combobox_set_menu_size(Widget_t *combobox, int v);
+
+/**
+ * @brief combobox_set_pop_position  - set the position to shown in the pop menu
+ * @param *combobox                  - pointer to the Widget_t combobox
+ * @param v                          - the position 0 = right 1 = left
+ */
+
+void combobox_set_pop_position(Widget_t *combobox, int v);
 
 #ifdef __cplusplus
 }

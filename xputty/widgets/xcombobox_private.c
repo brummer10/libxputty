@@ -444,11 +444,12 @@ void _configure_combobox_menu(Widget_t *parent, Widget_t *menu, int elem, bool a
         if(item_width<parent->width)item_width = parent->width;
     }
 
+    int posx = (comboboxlist->pop_pos) ? item_width - 20 : 0;
     int screen_height = os_get_screen_height(parent);
     if (y1+(height*elem) > screen_height) y1 = y1-((height*elem)+parent->height);
     os_resize_window (menu->app->dpy, menu, item_width, height*elem);
     os_resize_window (view_port->app->dpy, view_port, item_width, height*elem);
     os_move_window(menu->app->dpy,slider,item_width-15, 0);
     os_resize_window(menu->app->dpy,slider,15,height*elem);
-    os_move_window(menu->app->dpy,menu,x1, y1);   
+    os_move_window(menu->app->dpy,menu,x1 - posx, y1);   
 }

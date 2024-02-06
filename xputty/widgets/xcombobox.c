@@ -64,6 +64,13 @@ void combobox_set_menu_size(Widget_t *combobox, int v) {
     _configure_combobox_menu(combobox, menu, comboboxlist->show_items, true);
 }
 
+void combobox_set_pop_position(Widget_t *combobox, int v) {
+    Widget_t * menu = combobox->childlist->childs[1];
+    Widget_t* view_port =  menu->childlist->childs[0];
+    ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
+    comboboxlist->pop_pos = v;
+}
+
 void combobox_delete_entrys(Widget_t *combobox) {
     Widget_t * menu = combobox->childlist->childs[1];
     Widget_t* view_port =  menu->childlist->childs[0];
@@ -106,6 +113,7 @@ Widget_t* create_combobox_viewport(Widget_t *parent, int elem, int width, int he
     comboboxlist->list_size = 0;
     comboboxlist->item_height = 25 * parent->app->hdpi;
     comboboxlist->sc = 1.0;
+    comboboxlist->pop_pos = 0;
     wid->flags |= HAS_MEM;
     wid->parent_struct = comboboxlist;
     float max_value = -elem;
