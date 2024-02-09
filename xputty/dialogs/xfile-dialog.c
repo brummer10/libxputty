@@ -113,6 +113,18 @@ static void draw_fd_hslider(void *w_, void* user_data) {
     cairo_new_path (w->crb);
 }
 
+static void exit_call(FileDialog *file_dialog) {
+    if (file_dialog->w->flags & HIDE_ON_DELETE) widget_hide(file_dialog->w);
+    else destroy_widget(file_dialog->w,file_dialog->w->app);
+}
+
+static void hide_call(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+    file_dialog->parent->func.dialog_callback(file_dialog->parent,NULL);
+
+}
+
 static void button_quit_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
@@ -120,7 +132,7 @@ static void button_quit_callback(void *w_, void* user_data) {
     if (w->flags & HAS_POINTER && !adj_get_value(w->adj)){
         file_dialog->parent->func.dialog_callback(file_dialog->parent,NULL);
         file_dialog->send_clear_func = false;
-        destroy_widget(file_dialog->w,file_dialog->w->app);
+        exit_call(file_dialog);
     }
 }
 
@@ -321,7 +333,7 @@ static void button_ok_callback(void *w_, void* user_data) {
             os_set_transient_for_hint(file_dialog->w, dia);
             return;
         }
-        destroy_widget(file_dialog->w,file_dialog->w->app);
+        exit_call(file_dialog);
    }
 }
 
@@ -341,7 +353,7 @@ static void file_double_click_callback(void *w_, void *button, void* user_data) 
         os_set_transient_for_hint(file_dialog->w, dia);
         return;
     }
-    destroy_widget(file_dialog->w,file_dialog->w->app);
+    exit_call(file_dialog);
 }
 
 static void reload_all(FileDialog *file_dialog) {
@@ -768,6 +780,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     widget_set_title(file_dialog->w, _("File Selector"));
     file_dialog->w->func.expose_callback = draw_window;
     file_dialog->w->func.mem_free_callback = fd_mem_free;
+    file_dialog->w->func.unmap_notify_callback = hide_call;
     widget_set_icon_from_png(file_dialog->w, LDVAR(directory_png));
 
     file_dialog->ct = add_combobox(file_dialog->w, "", 20, 40, 550, 30);
