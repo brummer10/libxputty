@@ -44,6 +44,24 @@
 static void combo_response(void *w_, void* user_data);
 static void set_selected_file(FileDialog *file_dialog);
 
+char* utf8clip(char* dst, char* src, size_t sizeDest ) {
+    if( sizeDest ){
+        size_t sizeSrc = strlen(src);
+        size_t sizerc = strlen(src);
+        while( sizeSrc >= sizeDest ){
+            const char* lastByte = src + sizeSrc;
+            while( lastByte-- > src )
+                if((*lastByte & 0xC0) != 0x80)
+                    break;
+            sizeSrc = lastByte - src;
+        }
+        memcpy(dst, "...", 3);
+        memcpy(&dst[3], &src[sizeSrc], sizerc - sizeSrc);
+        dst[sizerc - sizeSrc + 3] = '\0';
+    }
+    return dst;
+}
+
 static void draw_window(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
@@ -73,7 +91,12 @@ static void draw_window(void *w_, void* user_data) {
     cairo_move_to (w->crb, 45 * w->app->hdpi, (390 * w->app->hdpi -w->scale.scale_y));
     cairo_show_text(w->crb, _("List view"));
     if (w->label) {
+        cairo_text_extents_t extents;
         char *file = utf8_from_locale(file_dialog->fp->selected_file);
+        cairo_text_extents(w->crb, file, &extents);
+        size_t sr = strlen(file);
+        size_t dr = (size_t)((width - 100)/(extents.width/sr));
+        if ((sr-4) > dr) utf8clip(file, file,min(sr,sr - dr));
         cairo_move_to (w->crb, 60 * w->app->hdpi, (330 * w->app->hdpi -w->scale.scale_y));
         cairo_show_text(w->crb, file);
         free(file);
