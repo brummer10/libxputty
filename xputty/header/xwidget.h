@@ -91,6 +91,7 @@ typedef struct {
     xevfunc user_callback;
     xevfunc mem_free_callback;
     xevfunc configure_notify_callback;
+    xevfunc resize_notify_callback;
     xevfunc map_notify_callback;
     xevfunc unmap_notify_callback;
     xevfunc dialog_callback;
@@ -118,6 +119,7 @@ typedef struct {
  * @param USER              - (*xevfunc) user_callback(void * widget, void* user_data)
  * @param MEM_FREE_CB       - (*xevfunc) mem_free_callback(void * widget, void* user_data)
  * @param CONFIGURE_NOTIFY  - (*xevfunc) configure_notify_callback(void * widget, void* user_data)
+ * @param RESIZE_NOTIFY     - (*xevfunc) resize_notify_callback(void * widget, void* user_data)
  * @param MAP_NOTIFY        - (*xevfunc) map_notify_callback(void * widget, void* user_data)
  * @param UNMAP_NOTIFY      - (*xevfunc) unmap_notify_callback(void * widget, void* user_data)
  * @param DIALOG_RESPONS    - (*xevfunc) dialog_callback(void * widget, void* user_data)
@@ -138,6 +140,7 @@ typedef enum {
     USER,
     MEM_FREE_CB,
     CONFIGURE_NOTIFY,
+    RESIZE_NOTIFY,
     MAP_NOTIFY,
     UNMAP_NOTIFY,
     DIALOG_RESPONSE,

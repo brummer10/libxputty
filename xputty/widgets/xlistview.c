@@ -52,6 +52,7 @@ Widget_t* create_listview_viewport(Widget_t *parent, int elem, int width, int he
     filelist->show_items = elem;
     filelist->check_dir = 0;
     filelist->item_height = 25 * parent->app->hdpi;
+    filelist->scale = 1.0;
     wid->flags |= HAS_MEM;
     wid->parent_struct = filelist;
     float max_value = -elem;
@@ -137,3 +138,13 @@ void listview_set_check_dir(Widget_t *listview, int set) {
     ViewList_t *filelist = (ViewList_t*)view_port->parent_struct;
     filelist->check_dir = set;
 }
+
+void listview_set_scale_factor(Widget_t *listview, float set) {
+    Widget_t* view_port =  listview->childlist->childs[0];
+    ViewList_t *filelist = (ViewList_t*)view_port->parent_struct;
+    filelist->scale = set/0.2;
+    filelist->item_height = 25 * filelist->scale * view_port->app->hdpi;
+    _reconfigure_listview_viewport(view_port, NULL);
+    expose_widget(view_port);
+}
+

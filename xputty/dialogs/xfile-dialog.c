@@ -325,8 +325,6 @@ static void button_ok_callback(void *w_, void* user_data) {
     if (w->flags & HAS_POINTER && !*(int*)user_data){
         if(file_dialog->fp->selected_file) {
             file_dialog->parent->func.dialog_callback(file_dialog->parent,&file_dialog->fp->selected_file);
-            file_dialog->save_config(file_dialog->parent, file_dialog->w->width, file_dialog->w->height,
-                adj_get_value(file_dialog->view->adj), adj_get_value(file_dialog->w_hidden->adj));
             file_dialog->send_clear_func = false;
         } else {
             Widget_t *dia = open_message_dialog(w, INFO_BOX, _("INFO"), _("Please select a file"),NULL);
@@ -345,8 +343,6 @@ static void file_double_click_callback(void *w_, void *button, void* user_data) 
     }
     if(file_dialog->fp->selected_file) {
         file_dialog->parent->func.dialog_callback(file_dialog->parent,&file_dialog->fp->selected_file);
-        file_dialog->save_config(file_dialog->parent, file_dialog->w->width, file_dialog->w->height,
-            adj_get_value(file_dialog->view->adj), adj_get_value(file_dialog->w_hidden->adj));
         file_dialog->send_clear_func = false;
     } else {
         Widget_t *dia = open_message_dialog(w, INFO_BOX, _("INFO"), _("Please select a file"),NULL);
@@ -395,8 +391,11 @@ static void set_scale_factor_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     float v = adj_get_value(w->adj);
+    file_dialog->config_changed = true;
     if (!file_dialog->list_view) {
         multi_listview_set_item_size(file_dialog->ft, v);
+    } else {
+        listview_set_scale_factor(file_dialog->ft, v);
     }
 }
 
@@ -413,6 +412,7 @@ static void open_dir_callback(void *w_, void* user_data) {
 static void button_hidden_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+    file_dialog->config_changed = true;
     if (w->flags & HAS_POINTER) {
         file_dialog->fp->show_hidden = adj_get_value(w->adj) ? true : false;
         reload_all(file_dialog);
@@ -423,6 +423,7 @@ static void button_view_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     file_dialog->list_view = adj_get_value(w->adj) ? true : false;
+    file_dialog->config_changed = true;
     if (file_dialog->list_view) {
         destroy_widget(file_dialog->ft, w->app);
         file_dialog->ft = add_listview(file_dialog->w, "", 130, 90, 510, 225);
@@ -438,6 +439,7 @@ static void button_view_callback(void *w_, void* user_data) {
         } else {
             listview_unset_active_entry(file_dialog->ft);
         }
+        listview_set_scale_factor(file_dialog->ft,adj_get_value(file_dialog->scale_size->adj));
         resize_childs(file_dialog->w);
         widget_show_all(file_dialog->ft);
     } else {
@@ -480,20 +482,53 @@ static void set_filter_callback(void *w_, void* user_data) {
     }
 }
 
+static void resize_callback(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    FileDialog *file_dialog = (FileDialog *)w->parent_struct;
+    if (!file_dialog->conf.scip_first_rezise) {
+        file_dialog->config_changed = true;
+    } else {
+        file_dialog->conf.scip_first_rezise = false;
+    }
+}
+
+void save_config(FileDialog *file_dialog) {
+    char* config_file = NULL;
+#if defined _WIN32
+    asprintf(&config_file, "%s\\XFileBrowser\\XFileBrowser.conf", getenv("APPDATA"));
+#else
+    asprintf(&config_file, "%s/.config/XFileBrowser.conf", getenv("HOME"));
+#endif
+    FILE *fpm;
+    if((fpm=freopen(config_file, "w" ,stdout))==NULL) {
+        printf("Error opening config file\n");
+        return;
+    }
+    printf("[width]=%i\n", file_dialog->w->width);
+    printf("[height]=%i\n", file_dialog->w->height);
+    printf("[list_view]=%f\n", file_dialog->list_view ? 1.0 : 0.0);
+    printf("[show_hidden]=%f\n", file_dialog->fp->show_hidden ? 1.0 : 0.0);
+    printf("[scale_size]=%f\n", adj_get_value(file_dialog->scale_size->adj));
+    fclose(fpm);
+    free(config_file);
+}
+
 static void fd_mem_free(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     if(file_dialog->send_clear_func)
         file_dialog->parent->func.dialog_callback(file_dialog->parent,NULL);
+    if (file_dialog->config_changed)
+        save_config(file_dialog);
     fp_free(file_dialog->fp);
     free(file_dialog->fp);
-    for (int i = 0; i<sizeof(file_dialog->xdg_user_dirs);i++) {
+    for (int i = 0; i<file_dialog->xdg_dir_counter;i++) {
         free(file_dialog->xdg_user_dirs[i]);
     }
-    free(file_dialog->xdg_user_dirs);
-    for (int i = 0; i<sizeof(file_dialog->xdg_user_dirs_path);i++) {
+    for (int i = 0; i<file_dialog->xdg_dir_counter;i++) {
         free(file_dialog->xdg_user_dirs_path[i]);
     }
+    free(file_dialog->xdg_user_dirs);
     free(file_dialog->xdg_user_dirs_path);
     free(file_dialog);
 }
@@ -721,7 +756,56 @@ static void add_win_dirs(FileDialog *file_dialog) {
 
 #endif
 
-void dummy_config(Widget_t *w, int width, int height, float list_view, float show_hidden) {
+void read_config(FileDialog *file_dialog) {
+    char* config_file = NULL;
+#if defined _WIN32
+    asprintf(&config_file, "%s\\XFileBrowser\\XFileBrowser.conf", getenv("APPDATA"));
+#else
+    asprintf(&config_file, "%s/.config/XFileBrowser.conf", getenv("HOME"));
+#endif
+    FILE *fpm;
+    char buf[128];
+    if((fpm = fopen(config_file, "r")) == NULL) {
+        file_dialog->conf.width = 660 * file_dialog->parent->app->hdpi;
+        file_dialog->conf.height = 415 * file_dialog->parent->app->hdpi;
+        file_dialog->conf.list_view = 0.0;
+        file_dialog->conf.show_hidden = 0.0;
+        file_dialog->conf.sc_size = 0.2;
+        free(config_file);
+        return;
+    }
+    while (fgets(buf, 128, fpm) != NULL) {
+        char *ptr = strtok(buf, "=");
+        while(ptr != NULL) {
+            if (strstr(ptr, "[width]") != NULL) {
+                ptr = strtok(NULL, "\n");
+                file_dialog->conf.width = (int)strtod(ptr, NULL);
+            } else if (strstr(ptr, "[height]") != NULL) {
+                ptr = strtok(NULL, "\n");
+                file_dialog->conf.height = (int)strtod(ptr, NULL);
+            } else if (strstr(ptr, "[list_view]") != NULL) {
+                ptr = strtok(NULL, "\n");
+                float v = strtod(ptr, NULL);
+                if((int)v) file_dialog->list_view = true;
+                file_dialog->conf.list_view = v;
+            } else if (strstr(ptr, "[show_hidden]") != NULL) {
+                ptr = strtok(NULL, "\n");
+                float v = strtod(ptr, NULL);
+                if((int)v) file_dialog->fp->show_hidden = true;
+                file_dialog->conf.show_hidden = v;
+            } else if (strstr(ptr, "[scale_size]") != NULL) {
+                ptr = strtok(NULL, "\n");
+                file_dialog->conf.sc_size = strtod(ptr, NULL);
+            }
+            ptr = strtok(NULL, "=");
+        }
+    }
+    fclose(fpm);
+    free(config_file);
+    if ((file_dialog->conf.width != file_dialog->w->width) ||
+        (file_dialog->conf.height != file_dialog->w->height)) {
+        file_dialog->conf.scip_first_rezise = true;
+    } else file_dialog->conf.scip_first_rezise = false;
 }
 
 Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
@@ -756,15 +840,15 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->parent = w;
     file_dialog->send_clear_func = true;
     file_dialog->list_view = false;
-    file_dialog->save_config = dummy_config;
+    file_dialog->config_changed = false;
 
     file_dialog->w = create_window(w->app, os_get_root_window(w->app, IS_WINDOW), 0, 0, 660, 415);
 #ifdef __linux__
     XSizeHints* win_size_hints;
     win_size_hints = XAllocSizeHints();
     win_size_hints->flags =  PMinSize|PBaseSize|PMaxSize|PWinGravity;
-    win_size_hints->min_width = 660; // lets keep the min width
-    win_size_hints->min_height = 415; // lets keep the min height
+    win_size_hints->min_width = 554; // lets keep the min width
+    win_size_hints->min_height = 332; // lets keep the min height
     win_size_hints->base_width = 660 * w->app->hdpi;
     win_size_hints->base_height = 415 * w->app->hdpi;
     win_size_hints->max_width = 960 * w->app->hdpi;
@@ -781,12 +865,15 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->w->func.expose_callback = draw_window;
     file_dialog->w->func.mem_free_callback = fd_mem_free;
     file_dialog->w->func.unmap_notify_callback = hide_call;
+    file_dialog->w->func.resize_notify_callback = resize_callback;
     widget_set_icon_from_png(file_dialog->w, LDVAR(directory_png));
+
+    read_config(file_dialog);
 
     file_dialog->ct = add_combobox(file_dialog->w, "", 20, 40, 550, 30);
     file_dialog->ct->parent_struct = file_dialog;
     file_dialog->ct->scale.gravity = NORTHEAST;
-    file_dialog->ct->flags |= NO_PROPAGATE;
+   // file_dialog->ct->flags |= NO_PROPAGATE;
     combobox_set_menu_size(file_dialog->ct, 8);
 
     file_dialog->sel_dir = add_image_toggle_button(file_dialog->w, _("Open"), 580, 40, 60, 30);
@@ -799,6 +886,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
 
     file_dialog->scale_size = add_hslider(file_dialog->w, "", 580, 10, 60, 15);
     set_adjustment(file_dialog->scale_size->adj, 0.2, 0.2, 0.1, 0.4, 0.01, CL_CONTINUOS);
+    adj_set_value(file_dialog->scale_size->adj, file_dialog->conf.sc_size);
     file_dialog->scale_size->parent_struct = file_dialog;
     file_dialog->scale_size->scale.gravity = WESTNORTH;
     file_dialog->scale_size->flags |= NO_PROPAGATE;
@@ -806,11 +894,18 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     add_tooltip(file_dialog->scale_size,_("Set Icon scale factor"));
     file_dialog->scale_size->func.value_changed_callback = set_scale_factor_callback;
 
-    file_dialog->ft = add_multi_listview(file_dialog->w, "", 130, 90, 510, 225);
+    if (file_dialog->list_view) {
+        file_dialog->ft = add_listview(file_dialog->w, "", 130, 90, 510, 225);
+        listview_set_check_dir(file_dialog->ft, 1);
+        listview_set_scale_factor(file_dialog->ft,adj_get_value(file_dialog->scale_size->adj));
+    } else {
+        file_dialog->ft = add_multi_listview(file_dialog->w, "", 130, 90, 510, 225);
+        multi_listview_set_check_dir(file_dialog->ft, 1);
+        multi_listview_set_item_size(file_dialog->ft,adj_get_value(file_dialog->scale_size->adj));
+    }
     file_dialog->ft->parent_struct = file_dialog;
     file_dialog->ft->scale.gravity = NORTHWEST;
     file_dialog->ft->flags |= NO_PROPAGATE;
-    multi_listview_set_check_dir(file_dialog->ft, 1);
     file_dialog->ft->func.button_release_callback = file_released_b_callback;
     file_dialog->ft->func.double_click_callback = file_double_click_callback;
 
@@ -819,9 +914,17 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     set_dirs(file_dialog);
     combobox_set_active_entry(file_dialog->ct, ds);
     if (set_f != -1) {
-        multi_listview_set_active_entry(file_dialog->ft, set_f);
+        if (file_dialog->list_view) {
+            listview_set_active_entry(file_dialog->ft, set_f);
+        } else {
+            multi_listview_set_active_entry(file_dialog->ft, set_f);
+        }
     } else {
-        multi_listview_unset_active_entry(file_dialog->ft);
+        if (file_dialog->list_view) {
+            listview_unset_active_entry(file_dialog->ft);
+        } else {
+            multi_listview_unset_active_entry(file_dialog->ft);
+        }
     }
     file_dialog->ct->func.value_changed_callback = combo_response;
 
@@ -870,6 +973,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->w_hidden->scale.gravity = EASTWEST;
     file_dialog->w_hidden->flags |= NO_PROPAGATE;
     add_tooltip(file_dialog->w_hidden,_("Show hidden files and folders"));
+    adj_set_value(file_dialog->w_hidden->adj, file_dialog->conf.show_hidden);
     file_dialog->w_hidden->func.value_changed_callback = button_hidden_callback;
 
     file_dialog->view = add_check_button(file_dialog->w, "", 20, 375, 20, 20);
@@ -877,8 +981,11 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->view->scale.gravity = EASTWEST;
     file_dialog->view->flags |= NO_PROPAGATE;
     add_tooltip(file_dialog->view,_("Show entries in list view"));
+    adj_set_value(file_dialog->view->adj, file_dialog->conf.list_view);
     file_dialog->view->func.value_changed_callback = button_view_callback;
 
+    if (file_dialog->conf.scip_first_rezise)
+        os_resize_window(w->app->dpy, file_dialog->w, file_dialog->conf.width, file_dialog->conf.height);
     widget_show_all(file_dialog->w);
     return file_dialog->w;
 }
@@ -905,15 +1012,6 @@ static void fdialog_response(void *w_, void* user_data) {
     adj_set_value(w->adj,0.0);
 }
 
-static void store_config(Widget_t *w, int width, int height, float list_view, float show_hidden) {
-    FileButton *filebutton = (FileButton *)w->private_struct;
-    filebutton->conf.width = width;
-    filebutton->conf.height = height;
-    filebutton->conf.list_view = list_view;
-    filebutton->conf.show_hidden = show_hidden;
-}
-
-
 static void fbutton_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileButton *filebutton = (FileButton *)w->private_struct;
@@ -928,11 +1026,6 @@ static void fbutton_callback(void *w_, void* user_data) {
         os_set_transient_for_hint(w, filebutton->w);
 #endif
         filebutton->is_active = true;
-        FileDialog *file_dialog = (FileDialog *)filebutton->w->parent_struct;
-        file_dialog->save_config = store_config;
-        adj_set_value(file_dialog->view->adj, filebutton->conf.list_view);
-        adj_set_value(file_dialog->w_hidden->adj, filebutton->conf.show_hidden);
-        os_resize_window(w->app->dpy, filebutton->w, filebutton->conf.width, filebutton->conf.height);
     } else if (w->flags & HAS_POINTER && !adj_get_value(w->adj)){
         if(filebutton->is_active)
             destroy_widget(filebutton->w,w->app);
@@ -956,10 +1049,6 @@ Widget_t *add_file_button(Widget_t *parent, int x, int y, int width, int height,
     filebutton->last_path = NULL;
     filebutton->w = NULL;
     filebutton->is_active = false;
-    filebutton->conf.width = 660 * parent->app->hdpi;
-    filebutton->conf.height = 415 * parent->app->hdpi;
-    filebutton->conf.list_view = 0.0;
-    filebutton->conf.show_hidden = 0.0;
     Widget_t *fbutton = add_image_toggle_button(parent, "", x, y, width, height);
     fbutton->private_struct = filebutton;
     fbutton->flags |= HAS_MEM;

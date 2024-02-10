@@ -43,7 +43,7 @@ void _draw_list(void *w_, void* user_data) {
     use_base_color_scheme(w, NORMAL_);
     cairo_rectangle(w->crb, 0, 0, width, height);
     cairo_fill (w->crb);
-    cairo_set_font_size (w->crb, w->app->normal_font);
+    cairo_set_font_size (w->crb, w->app->normal_font * filelist->scale);
     cairo_text_extents_t extents;
     cairo_text_extents(w->crb,"Ay", &extents);
     double h = extents.height;
@@ -118,7 +118,7 @@ void _update_list_view(void *w_) {
 
     cairo_push_group (w->crb);
     use_base_color_scheme(w, NORMAL_);
-    cairo_set_font_size (w->crb, w->app->normal_font);
+    cairo_set_font_size (w->crb, w->app->normal_font* filelist->scale);
     cairo_text_extents_t extents;
     cairo_text_extents(w->crb,"Ay", &extents);
     double h = extents.height;

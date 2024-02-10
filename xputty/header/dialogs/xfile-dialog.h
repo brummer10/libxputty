@@ -41,6 +41,8 @@ typedef struct {
     int height;
     float list_view;
     float show_hidden;
+    float sc_size;
+    bool scip_first_rezise;
 } FileBrowserConfig;
 
 typedef struct {
@@ -58,6 +60,7 @@ typedef struct {
     Widget_t *view;
     Widget_t *scale_size;
     FilePicker *fp;
+    FileBrowserConfig conf;
     fb_configfunc save_config;
     char **xdg_user_dirs;
     char **xdg_user_dirs_path;
@@ -65,6 +68,7 @@ typedef struct {
     unsigned int xdg_dir_counter;
     bool list_view;
     bool send_clear_func;
+    bool config_changed;
     char pad[2];
 } FileDialog;
 
@@ -74,7 +78,6 @@ typedef struct {
     const char *path;
     const char *filter;
     bool is_active;
-    FileBrowserConfig conf;
     char pad[7];
 } FileButton;
 

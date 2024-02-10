@@ -120,6 +120,8 @@ void configure_event(void *w_, void* user_data) {
     Metrics_t metrics;
     os_get_window_metrics(wid, &metrics);
     if (wid->width != metrics.width || wid->height != metrics.height) {
+        if (wid->flags & IS_WINDOW) wid->func.resize_notify_callback(wid,NULL);
+
         wid->scale.scale_x    = (float)wid->scale.init_width - metrics.width;
         wid->scale.scale_y    = (float)wid->scale.init_height - metrics.height;
         wid->scale.cscale_x   = (float)((float)wid->scale.init_width/(float)metrics.width);
@@ -222,6 +224,7 @@ Widget_t *create_window(Xputty *app, Window win,
     w->func.user_callback = _dummy_callback;
     w->func.mem_free_callback = _dummy_callback;
     w->func.configure_notify_callback = _dummy_callback;
+    w->func.resize_notify_callback = _dummy_callback;
     w->func.map_notify_callback = _dummy_callback;
     w->func.unmap_notify_callback = _dummy_callback;
     w->func.visibiliy_change_callback = _dummy_callback;
@@ -329,6 +332,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     w->func.user_callback = _dummy_callback;
     w->func.mem_free_callback = _dummy_callback;
     w->func.configure_notify_callback = os_transparent_draw;
+    w->func.resize_notify_callback = _dummy_callback;
     w->func.map_notify_callback = _dummy_callback;
     w->func.unmap_notify_callback = _dummy_callback;
     w->func.visibiliy_change_callback = _dummy_callback;

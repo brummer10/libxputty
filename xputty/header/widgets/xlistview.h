@@ -52,6 +52,7 @@ typedef struct {
     int item_height;
     int list_size;
     int check_dir;
+    float scale;
     char pad[4];
 } ViewList_t;
 
@@ -123,6 +124,14 @@ void listview_set_list(Widget_t *listview, char **list, int list_size);
  */
 
 void listview_set_check_dir(Widget_t *listview, int set);
+
+/**
+ * @brief listview_set_scale_factor - set optional scale factor for list item
+ * @param *listview                 - pointer to the Widget_t listview which should show the list
+ * @param set                       - 0.2 = no scale (default); 0.1 = scale down 0.4 = scale up
+ */
+
+void listview_set_scale_factor(Widget_t *listview, float set);
 
 #ifdef __cplusplus
 }

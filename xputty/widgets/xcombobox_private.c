@@ -152,7 +152,7 @@ void _draw_combobox(void *w_, void* user_data) {
     cairo_text_extents_t extents;
 
     use_text_color_scheme(w, get_color_state(w));
-    float font_size = w->app->normal_font/w->scale.ascale;
+    float font_size = w->app->normal_font/comboboxlist->sc;
     cairo_set_font_size (w->crb, font_size);
     cairo_text_extents(w->crb,"Ay", &extents);
     double h = extents.height;
@@ -417,7 +417,7 @@ void _configure_combobox_menu(Widget_t *parent, Widget_t *menu, int elem, bool a
     ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
     Widget_t *slider =  menu->childlist->childs[1];
     if (!comboboxlist->list_size) return;
-    comboboxlist->sc = parent->scale.ascale;
+    comboboxlist->sc = min(1.0,parent->scale.ascale);
     comboboxlist->item_height = 25/comboboxlist->sc;
     int height = comboboxlist->item_height;
     int x1, y1;
