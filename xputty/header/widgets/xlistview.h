@@ -41,6 +41,7 @@ extern "C" {
 
 typedef struct {
     char **list_names;
+    char *tooltip_text;
     Widget_t *slider;
     cairo_surface_t *folder;
     cairo_surface_t *file;

@@ -102,7 +102,10 @@ void _draw_list(void *w_, void* user_data) {
         cairo_show_text(w->crb, label);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {
-            tooltip_set_text(w,label);
+            free(filelist->tooltip_text);
+            filelist->tooltip_text = NULL;
+            filelist->tooltip_text = utf8_from_locale(filelist->list_names[i]);
+            tooltip_set_text(w, filelist->tooltip_text);
             w->flags |= HAS_TOOLTIP;
             show_tooltip(w);
         } else if (i == filelist->prelight_item && extents.width < (float)width-20){

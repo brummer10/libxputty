@@ -538,6 +538,7 @@ void save_config(FileDialog *file_dialog) {
     printf("[list_view]=%.2f\n", file_dialog->list_view ? 1.0 : 0.0);
     printf("[show_hidden]=%.2f\n", file_dialog->fp->show_hidden ? 1.0 : 0.0);
     printf("[scale_size]=%.2f\n", file_dialog->conf.sc_size);
+    printf("[FIN]=1\n");
     fclose(fpm);
     free(config_file);
 }

@@ -49,6 +49,7 @@ Widget_t* create_listview_viewport(Widget_t *parent, int elem, int width, int he
     wid->scale.gravity = NORTHWEST;
     ViewList_t *filelist;
     filelist = (ViewList_t*)malloc(sizeof(ViewList_t));
+    filelist->tooltip_text = NULL;
     filelist->show_items = elem;
     filelist->check_dir = 0;
     filelist->item_height = 25 * parent->app->hdpi;
@@ -105,6 +106,7 @@ void listview_mem_free(void *w_, void* user_data) {
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
     cairo_surface_destroy(filelist->folder);
     cairo_surface_destroy(filelist->file);
+    free(filelist->tooltip_text);
     free(filelist);
 }
 
