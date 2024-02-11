@@ -414,6 +414,7 @@ static void set_scale_factor_callback(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     FileDialog *file_dialog = (FileDialog *)w->parent_struct;
     float v = adj_get_value(w->adj);
+    file_dialog->conf.sc_size = v;
     file_dialog->config_changed = true;
     if (!file_dialog->list_view) {
         multi_listview_set_item_size(file_dialog->ft, v);
@@ -518,7 +519,12 @@ static void resize_callback(void *w_, void* user_data) {
 void save_config(FileDialog *file_dialog) {
     char* config_file = NULL;
 #if defined _WIN32
-    asprintf(&config_file, "%s\\XFileBrowser\\XFileBrowser.conf", getenv("APPDATA"));
+    char* pPath = NULL;
+    asprintf(&pPath, "%s\\XFileBrowser", getenv("APPDATA"));
+    if (!os_is_directory(pPath)) 
+        mkdir(pPath);
+    asprintf(&config_file, "%s\\XFileBrowser.conf", pPath);
+    free(pPath);
 #else
     asprintf(&config_file, "%s/.config/XFileBrowser.conf", getenv("HOME"));
 #endif
@@ -529,9 +535,9 @@ void save_config(FileDialog *file_dialog) {
     }
     printf("[width]=%i\n", file_dialog->w->width);
     printf("[height]=%i\n", file_dialog->w->height);
-    printf("[list_view]=%f\n", file_dialog->list_view ? 1.0 : 0.0);
-    printf("[show_hidden]=%f\n", file_dialog->fp->show_hidden ? 1.0 : 0.0);
-    printf("[scale_size]=%f\n", adj_get_value(file_dialog->scale_size->adj));
+    printf("[list_view]=%.2f\n", file_dialog->list_view ? 1.0 : 0.0);
+    printf("[show_hidden]=%.2f\n", file_dialog->fp->show_hidden ? 1.0 : 0.0);
+    printf("[scale_size]=%.2f\n", file_dialog->conf.sc_size);
     fclose(fpm);
     free(config_file);
 }
