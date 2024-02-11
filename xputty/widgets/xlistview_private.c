@@ -92,25 +92,31 @@ void _draw_list(void *w_, void* user_data) {
                 use_text_color_scheme(w,NORMAL_ );
             }
         }
-        cairo_text_extents(w->crb,filelist->list_names[i] , &extents);
+        char label[124];
+        memset(label, '\0', sizeof(char)*124);
+        const char *ulabel = utf8_from_locale(filelist->list_names[i]);
+        strcpy(label, ulabel);
+        cairo_text_extents(w->crb, label, &extents);
 
         cairo_move_to (w->crb, 20, (filelist->item_height*((double)a+1.0))+3.0 - h);
-        cairo_show_text(w->crb, filelist->list_names[i]);
+        cairo_show_text(w->crb, label);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {
-            tooltip_set_text(w,filelist->list_names[i]);
+            tooltip_set_text(w,label);
             w->flags |= HAS_TOOLTIP;
             show_tooltip(w);
         } else if (i == filelist->prelight_item && extents.width < (float)width-20){
             w->flags &= ~HAS_TOOLTIP;
             hide_tooltip(w);
         }
+        free((void*)ulabel);
         a++;
     }
 }
 
 void _update_list_view(void *w_) {
     Widget_t *w = (Widget_t*)w_;
+#ifdef __linux__
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
     int width = metrics.width;
@@ -197,6 +203,9 @@ void _update_list_view(void *w_) {
 
     cairo_pop_group_to_source (w->cr);
     cairo_paint (w->cr);
+#else
+    os_expose_widget(w);
+#endif
 }
 
 void _list_motion(void *w_, void* xmotion_, void* user_data) {

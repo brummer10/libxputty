@@ -25,6 +25,12 @@
 
 
 static inline int fp_compare_fun (const void *p1, const void *p2) {
+#ifdef _WIN32
+    if(strstr(*(const char**)p1, PATH_SEPARATOR) && strstr(*(const char**)p2, PATH_SEPARATOR))
+        return strcasecmp(*(const char**) p1, *(const char**) p2);
+    if(strstr(*(const char**)p1, PATH_SEPARATOR)) return -1;
+    if(strstr(*(const char**)p2, PATH_SEPARATOR)) return 1;
+#endif
     return strcasecmp(*(const char**) p1, *(const char**) p2);
 }
 
@@ -264,7 +270,7 @@ int fp_get_files(FilePicker *filepicker, char *path, int get_dirs, int get_files
             asprintf(&filepicker->file_names[filepicker->file_counter++], is_root_directory(path) ?
               "%s%s" : "%s" PATH_SEPARATOR "%s"  , path,dp->d_name);
             //asprintf(&filepicker->file_names[filepicker->file_counter++],"%s%s" , path,dp->d_name);
-            assert(&filepicker->dir_names[filepicker->file_counter-1] != NULL);
+            assert(&filepicker->file_names[filepicker->file_counter-1] != NULL);
         }
     }
     closedir(dirp);
