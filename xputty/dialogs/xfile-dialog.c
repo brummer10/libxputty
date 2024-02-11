@@ -795,11 +795,6 @@ void read_config(FileDialog *file_dialog) {
     FILE *fpm;
     char buf[128];
     if((fpm = fopen(config_file, "r")) == NULL) {
-        file_dialog->conf.width = 660 * file_dialog->parent->app->hdpi;
-        file_dialog->conf.height = 415 * file_dialog->parent->app->hdpi;
-        file_dialog->conf.list_view = 0.0;
-        file_dialog->conf.show_hidden = 0.0;
-        file_dialog->conf.sc_size = 0.2;
         free(config_file);
         return;
     }
@@ -870,6 +865,11 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->send_clear_func = true;
     file_dialog->list_view = false;
     file_dialog->config_changed = false;
+    file_dialog->conf.width = 660 * file_dialog->parent->app->hdpi;
+    file_dialog->conf.height = 415 * file_dialog->parent->app->hdpi;
+    file_dialog->conf.list_view = 0.0;
+    file_dialog->conf.show_hidden = 0.0;
+    file_dialog->conf.sc_size = 0.2;
 
     file_dialog->w = create_window(w->app, os_get_root_window(w->app, IS_WINDOW), 0, 0, 660, 415);
 #ifdef __linux__
