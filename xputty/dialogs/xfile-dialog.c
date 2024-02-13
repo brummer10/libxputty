@@ -535,9 +535,9 @@ void save_config(FileDialog *file_dialog) {
     }
     printf("[width]=%i\n", file_dialog->w->width);
     printf("[height]=%i\n", file_dialog->w->height);
-    printf("[list_view]=%.2f\n", file_dialog->list_view ? 1.0 : 0.0);
-    printf("[show_hidden]=%.2f\n", file_dialog->fp->show_hidden ? 1.0 : 0.0);
-    printf("[scale_size]=%.2f\n", file_dialog->conf.sc_size);
+    printf("[list_view]=%i\n", file_dialog->list_view ? 1 : 0);
+    printf("[show_hidden]=%i\n", file_dialog->fp->show_hidden ? 1 : 0);
+    printf("[scale_size]=%i\n", (int)(100 * file_dialog->conf.sc_size));
     printf("[FIN]=1\n");
     fclose(fpm);
     free(config_file);
@@ -820,7 +820,7 @@ void read_config(FileDialog *file_dialog) {
                 file_dialog->conf.show_hidden = v;
             } else if (strstr(ptr, "[scale_size]") != NULL) {
                 ptr = strtok(NULL, "\n");
-                file_dialog->conf.sc_size = strtod(ptr, NULL);
+                file_dialog->conf.sc_size = (strtod(ptr, NULL) * 0.01);
             }
             ptr = strtok(NULL, "=");
         }

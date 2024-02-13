@@ -146,6 +146,8 @@ ifeq ($(TARGET), Windows)
 endif
 endif
 
+ifneq ($(MAKECMDGOALS),install)
+
 ifndef EXTRAQUIET
 ifeq ($(UNAME_S), BSD)
 $(info for         $(yellow)FreeBSD$(reset))
@@ -179,6 +181,8 @@ endif
 RESOURCES_C = $(RESOURCES_OBJ)
 else
 $($(red)error Neither xxd, nor xxdi.pl, nor suitable ld found$(reset))
+endif
+
 endif
 
 export MKBASE=1
