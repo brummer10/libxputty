@@ -30,6 +30,12 @@
 #ifndef XPUTTY1_H_
 #define XPUTTY1_H_
 
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#ifndef __linux__
+#define __linux__ 1
+#endif
+#endif
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -21,11 +21,11 @@
 	# include path for library headers
 	INCLUDES := -I. -I$(HEADER_DIR) -I$(WIDGET_HEADER_DIR) -I$(RESOURCES_DIR) -I$(DIALOG_HEADER_DIR) -I$(XDG_DIR)
 	# link flags to dynamic link cairo and X11 (default)
-	LDFLAGS += -fPIC `$(PKGCONFIG) $(PKGCONFIG_FLAGS) --cflags --libs cairo $(XELF)` -lm 
+	LDFLAGS += -fPIC `$(PKGCONFIG) $(PKGCONFIG_FLAGS) --cflags cairo $(XELF)` 
 	# set link flags to static link cairo and X11
 	# (you could ignore ld warnings, but the resulting binary is huge
 	# (6.4Mb for x11 and cairo) NOT RECOMMENDED!!
-	STATIC_LDFLAGS += -fPIC -static `pkg-config --static --cflags --libs cairo ` \
+	STATIC_LDFLAGS += -fPIC -static `pkg-config --static --cflags cairo ` \
 	 -lX11 -ldl -lxcb -lpthread -lXau -lXdmcp
 	# debug flags, use this to indicate a problem with libxputty
 	DEBUG_LDFLAGS += -g -DDEBUG 
