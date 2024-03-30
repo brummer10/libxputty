@@ -130,7 +130,7 @@ void listview_set_list(Widget_t *listview, char **list, int list_size) {
     filelist->list_names = list;
     filelist->list_size = list_size;
     set_adjustment(listview->adj,0.0, 0.0, 0.0, (float)(list_size-1.0),1.0, CL_NONE);
-    float max_value = view_port->adj->max_value+ (float)list_size;
+    float max_value = view_port->adj->max_value+ (float)list_size +1.0;
     set_adjustment(view_port->adj,0.0, 0.0, 0.0, max_value,1.0, CL_VIEWPORT);
     _configure_listview(view_port, NULL);
 }
