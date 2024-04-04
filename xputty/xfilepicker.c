@@ -56,8 +56,19 @@ static inline bool fp_show_filter_files(FilePicker *filepicker, char* file) {
     if (!filepicker->use_filter) {
         return true;
     } else {
-        if(strstr(filepicker->filter,"."))
-            return strstr(file, filepicker->filter);
+        if(strstr(filepicker->filter,".")) {
+            char *ms =strdup(filepicker->filter);
+            char * p = strtok (ms, "|");
+            while (p) {
+               if (strstr(file, p)) {
+                    free(ms);
+                    return true;
+                }
+                p = strtok (NULL, "|");
+            }
+            free(ms);
+            return false;
+        }
 #ifdef __XDG_MIME_H__
         return strstr(xdg_mime_get_mime_type_from_file_name(file), filepicker->filter);
 #else
