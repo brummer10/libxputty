@@ -97,7 +97,12 @@ endif
 		export TARGET = Windows
 	else
 		# Not found
-		ifeq ($(UNAME_S), BSD) #FreeBSD
+		ifeq ($(UNAME_S), BSD)
+			export TARGET = Linux
+			export CFLAGS += -D__linux__=1
+			export CXXFLAGS += -D__linux__=1
+		endif
+		ifeq ($(UNAME_S), FreeBSD)
 			export TARGET = Linux
 			export CFLAGS += -D__linux__=1
 			export CXXFLAGS += -D__linux__=1
@@ -150,6 +155,8 @@ ifneq ($(MAKECMDGOALS),install)
 
 ifndef EXTRAQUIET
 ifeq ($(UNAME_S), BSD)
+$(info for         $(yellow)BSD$(reset))
+else ifeq ($(UNAME_S), FreeBSD)
 $(info for         $(yellow)FreeBSD$(reset))
 else
 $(info for         $(yellow)$(TARGET)$(reset))
