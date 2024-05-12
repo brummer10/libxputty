@@ -106,6 +106,22 @@ static void draw_window(void *w_, void* user_data) {
         cairo_set_source_surface (w->crb, w->image, 180 * w->app->hdpi, (332 * w->app->hdpi -w->scale.scale_y));
         cairo_paint (w->crb);
     }
+    if (file_dialog->metadata) {
+        int i = w->app->normal_font+1;
+        cairo_rectangle(w->crb,160 * w->app->hdpi, (330 * w->app->hdpi -w->scale.scale_y) + 2 , (180 * w->app->hdpi -w->scale.scale_x), 6*i);
+        use_base_color_scheme(w, NORMAL_);
+        cairo_fill (w->crb);
+        use_fg_color_scheme(w, NORMAL_);
+        char *meta = strdup(file_dialog->metadata);
+        char * p = strtok (meta, "|");
+        while (p) {
+            cairo_move_to (w->crb, 160 * w->app->hdpi, (330 * w->app->hdpi -w->scale.scale_y) + i);
+            cairo_show_text(w->crb, p);
+            p = strtok (NULL, "|");
+            i += w->app->normal_font+1;
+        }
+        free(meta);
+    }
 }
 
 static void draw_fd_hslider(void *w_, void* user_data) {
@@ -239,6 +255,143 @@ static void reload_from_dir(FileDialog *file_dialog) {
     expose_widget(file_dialog->xdg_dirs);
 }
 
+void strrem(char *str, const char *sub) {
+    char *p, *q, *r;
+    if ((q = r = strstr(str, sub)) != NULL) {
+        size_t len = strlen(sub);
+        while ((r = strstr(p = r + len, sub)) != NULL) {
+            while (p < r)
+                *q++ = *p++;
+        }
+        while ((*q++ = *p++) != '\0')
+            continue;
+    }
+}
+
+void get_aidax_meta_data(FileDialog *file_dialog, const char* file_name) {
+    free(file_dialog->metadata);
+    file_dialog->metadata = NULL;
+    FILE *fpm;
+    char buf[2400];
+    char meta[1024];
+    strcpy (meta," ");
+    if((fpm = fopen(file_name, "r")) == NULL) {
+        return;
+    }
+    while (fgets(buf, 2400, fpm) != NULL) {
+        char *ptr = strtok(buf, ":");
+        while(ptr != NULL) {
+            if (strstr(ptr, "name") != NULL) {
+                ptr = strtok(NULL, ",");
+                strrem(ptr, "\"");
+                if (strlen(ptr) && !strstr(ptr, "null")) {
+                    strcat(meta, ptr);
+                    strcat(meta, " |");
+                }
+            } else if (strstr(ptr, "author") != NULL) {
+                ptr = strtok(NULL, ",");
+                strrem(ptr, "\"");
+                if (strlen(ptr) && !strstr(ptr, "null")) {
+                    strcat(meta, " by: ");
+                    strcat(meta, ptr);
+                    strcat(meta, " |");
+                }
+            } else if (strstr(ptr, "based") != NULL) {
+                ptr = strtok(NULL, ",");
+                strrem(ptr, "\"");
+                if (strlen(ptr) && !strstr(ptr, "null")) {
+                    strcat(meta, " gear: ");
+                    strcat(meta, ptr);
+                    strcat(meta, " |");
+                }
+            } else if (strstr(ptr, "style") != NULL) {
+                ptr = strtok(NULL, ",");
+                strrem(ptr, "\"");
+                if (strlen(ptr) && !strstr(ptr, "null")) {
+                    strcat(meta, " type: ");
+                    strcat(meta, ptr);
+                    strcat(meta, " |");
+                }
+            } else if (strstr(ptr, "samplerate") != NULL) {
+                ptr = strtok(NULL, ",");
+                strrem(ptr, "\"");
+                if (strlen(ptr) && !strstr(ptr, "null")) {
+                    strcat(meta, " Sample Rate: ");
+                    strcat(meta, ptr);
+                    strcat(meta, " Hz |");
+                }
+            }
+            ptr = strtok(NULL, ":");
+        }
+        asprintf(&file_dialog->metadata, "%s ", meta);
+    }
+    fclose(fpm);
+}
+
+void get_meta_data(FileDialog *file_dialog, const char* file_name) {
+    free(file_dialog->metadata);
+    file_dialog->metadata = NULL;
+    FILE *fpm;
+    char buf[2400];
+    char meta[1024];
+    strcpy (meta," ");
+    if((fpm = fopen(file_name, "r")) == NULL) {
+        return;
+    }
+    while (fgets(buf, 2400, fpm) != NULL) {
+        char *ptr = strtok(buf, ":");
+        while(ptr != NULL) {
+            if (strstr(ptr, "name") != NULL) {
+                ptr = strtok(NULL, ",");
+                strrem(ptr, "\"");
+                if (strlen(ptr) && !strstr(ptr, "null")) {
+                    strcat(meta, ptr);
+                    strcat(meta, " |");
+                }
+            } else if (strstr(ptr, "modeled_by") != NULL) {
+                ptr = strtok(NULL, ",");
+                strrem(ptr, "\"");
+                if (strlen(ptr) && !strstr(ptr, "null")) {
+                    strcat(meta, " by: ");
+                    strcat(meta, ptr);
+                    strcat(meta, " |");
+                }
+            } else if (strstr(ptr, "gear_type") != NULL) {
+                ptr = strtok(NULL, ",");
+                if (strlen(ptr) && !strstr(ptr, "null")) {
+                    strcat(meta, " gear: ");
+                    strcat(meta, ptr);
+                    strcat(meta, " |");
+                }
+            } else if (strstr(ptr, "gear_model") != NULL) {
+                ptr = strtok(NULL, ",");
+                if (strlen(ptr) && !strstr(ptr, "null")) {
+                    strcat(meta, " model: ");
+                    strcat(meta, ptr);
+                    strcat(meta, " |");
+                }
+            } else if (strstr(ptr, "tone_type") != NULL) {
+                ptr = strtok(NULL, "}");
+                if (strlen(ptr) && !strstr(ptr, "null")) {
+                    strcat(meta, " type: ");
+                    strcat(meta, ptr);
+                    strcat(meta, " |");
+                }
+            } else if (strstr(ptr, "sample_rate") != NULL) {
+                ptr = strtok(NULL, "}");
+                if (strlen(ptr) && !strstr(ptr, "null")) {
+                    strcat(meta, " Sample Rate: ");
+                    strcat(meta, ptr);
+                    strcat(meta, " Hz |");
+                }
+            }
+            ptr = strtok(NULL, ":");
+        }
+        asprintf(&file_dialog->metadata, "%s ", meta);
+    }
+    fclose(fpm);
+}
+
 static void show_preview(FileDialog *file_dialog, const char* file_name) {
     Widget_t* w = file_dialog->w;
     cairo_surface_t *getpng = cairo_image_surface_create_from_png (file_name);
@@ -301,6 +454,16 @@ static void set_selected_file(FileDialog *file_dialog) {
         cairo_surface_destroy(file_dialog->w->image);
         file_dialog->w->image = NULL;
         expose_widget(file_dialog->w);
+    }
+    if (strstr(file_dialog->fp->selected_file, ".nam")) {
+        get_meta_data(file_dialog, file_dialog->fp->selected_file);
+    } else if (strstr(file_dialog->fp->selected_file, ".aidax")) {
+        get_aidax_meta_data(file_dialog, file_dialog->fp->selected_file);
+    } else if (strstr(file_dialog->fp->selected_file, ".json")) {
+        get_aidax_meta_data(file_dialog, file_dialog->fp->selected_file);
+    } else {
+        free(file_dialog->metadata);
+        file_dialog->metadata = NULL;
     }
 }
 
@@ -560,6 +723,7 @@ static void fd_mem_free(void *w_, void* user_data) {
     }
     free(file_dialog->xdg_user_dirs);
     free(file_dialog->xdg_user_dirs_path);
+    free(file_dialog->metadata);
     free(file_dialog);
 }
 
@@ -838,6 +1002,7 @@ Widget_t *open_file_dialog(Widget_t *w, const char *path, const char *filter) {
 
     file_dialog->xdg_user_dirs = NULL;
     file_dialog->xdg_user_dirs_path = NULL;
+    file_dialog->metadata = NULL;
     file_dialog->xdg_dir_counter = 0;
     file_dialog->fp = (FilePicker*)malloc(sizeof(FilePicker));
 

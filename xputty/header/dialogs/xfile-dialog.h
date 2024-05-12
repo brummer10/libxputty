@@ -65,6 +65,7 @@ typedef struct {
     char **xdg_user_dirs;
     char **xdg_user_dirs_path;
     const char *home_dir;
+    char *metadata;
     unsigned int xdg_dir_counter;
     bool list_view;
     bool send_clear_func;
