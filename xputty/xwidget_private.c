@@ -296,6 +296,7 @@ void _set_adj_value(void *w_, bool x, int direction) {
         switch(adj->type) {
             case (CL_VIEWPORT):
             case (CL_VIEWPORTSLIDER):
+            case (CL_ENUM):
                 value = min(adj->max_value,max(adj->min_value,
                     adj->value + (adj->step * -direction)));
             break;
