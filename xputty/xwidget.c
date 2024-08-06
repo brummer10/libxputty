@@ -176,7 +176,7 @@ Widget_t *create_window(Xputty *app, Window win,
     w->label = NULL;
     memset(w->input_label, 0, 32 * (sizeof w->input_label[0]));
     w->state = 0;
-#ifdef __linux__
+#ifdef _OS_UNIX_
     w->double_click = 0;
 #endif
     x *= app->hdpi;
@@ -237,7 +237,7 @@ Widget_t *create_window(Xputty *app, Window win,
 
     os_create_main_window_and_surface(w, app, win, x, y, width, height);
     create_cairo_context_and_buffer(w);
-#ifdef __linux__ // childlist already set up
+#ifdef _OS_UNIX_ // childlist already set up
     childlist_add_child(app->childlist,w);
 #endif
     return w;
@@ -283,7 +283,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
     w->label = NULL;
     memset(w->input_label, 0, 32 * (sizeof w->input_label[0]));
     w->state = 0;
-#ifdef __linux__
+#ifdef _OS_UNIX_
     w->double_click = 0;
 #endif
     x *= app->hdpi;
@@ -345,7 +345,7 @@ Widget_t *create_widget(Xputty *app, Widget_t *parent,
 
     os_create_widget_window_and_surface(w, app, parent, x, y, width, height);
     create_cairo_context_and_buffer(w);
-#ifdef __linux__ // childlist already set up
+#ifdef _OS_UNIX_ // childlist already set up
     childlist_add_child(app->childlist,w);
 #endif
     return w;

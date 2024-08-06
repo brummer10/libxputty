@@ -24,7 +24,7 @@
 #define XFILE_DIALOG_H_
 
 #include "xwidgets.h"
-#ifdef __linux__
+#ifdef _OS_UNIX_
 #include "xdgmime.h"
 #endif
 #include "xasprintf.h"

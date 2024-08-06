@@ -369,7 +369,7 @@ struct Widget_t {
     XIC xic;
 /** Context to Locale and UTF 8 support */
     XIM xim;
-#ifdef __linux__
+#ifdef _OS_UNIX_
 /** int to hold the widget state default = 0 */
     Time double_click;
 #endif

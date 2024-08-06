@@ -30,9 +30,9 @@
 #ifndef XPUTTY1_H_
 #define XPUTTY1_H_
 
-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
-#ifndef __linux__
-#define __linux__ 1
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#ifndef _OS_UNIX_
+#define _OS_UNIX_ 1
 #endif
 #endif
 
@@ -48,14 +48,14 @@
 #include <cairo.h>
 #include "xputty-mswin.h" // no ifdef needed
 
-#ifdef __linux__
+#ifdef _OS_UNIX_
 #include <cairo-xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h> 
 #include <X11/Xresource.h>
-#endif //__linux__
+#endif //_OS_UNIX_
 
 #ifdef ENABLE_NLS
 #include <libintl.h>
@@ -70,12 +70,12 @@
 extern "C" {
 #endif
 
-#ifdef __linux__
+#ifdef _OS_UNIX_
 #define DND_STATUS_ACCEPT(e) ((e)->xclient.data.l[1] & 0x1L)
 #define DND_VERSION(e) ((e)->xclient.data.l[1] >> 24)
 #define DND_SOURCE_WIN(e) ((e)->xclient.data.l[0])
 #define DND_DROP_TIME(e) ((e)->xclient.data.l[2])
-#endif //__linux__
+#endif //_OS_UNIX_
 
 
 /*---------------------------------------------------------------------

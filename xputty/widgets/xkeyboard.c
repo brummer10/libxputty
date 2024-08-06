@@ -696,7 +696,7 @@ static void key_press(void *w_, void *key_, void *user_data) {
     MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
     XKeyEvent *key = (XKeyEvent*)key_;
     if (!key) return;
-#ifdef __linux__
+#ifdef _OS_UNIX_
     if (adj_get_value(keys->grab_keyboard->adj)) {
         char xkeys[32];
         XQueryKeymap(w->app->dpy, xkeys);
@@ -739,7 +739,7 @@ static void key_release(void *w_, void *key_, void *user_data) {
     MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
     XKeyEvent *key = (XKeyEvent*)key_;
     if (!key) return;
-#ifdef __linux__
+#ifdef _OS_UNIX_
     if (adj_get_value(keys->grab_keyboard->adj)) {
         char xkeys[32];
         XQueryKeymap(w->app->dpy, xkeys);
@@ -868,7 +868,7 @@ static void velocity_changed(void *w_, void* user_data) {
 }
 
 static void grab_callback(void *w_, void* user_data) {
-#ifdef __linux__
+#ifdef _OS_UNIX_
     Widget_t *w = (Widget_t*)w_;
     MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
     if (adj_get_value(w->adj)) {

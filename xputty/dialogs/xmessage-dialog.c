@@ -59,7 +59,7 @@ Widget_t *create_hyperlink(Widget_t *w, char*label, int x, int y,
     Widget_t *wid = create_widget(w->app, w, x, y, width, height);
     wid->label = label;
     wid->scale.gravity = ASPECT;
-#ifdef __linux__
+#ifdef _OS_UNIX_
     Cursor c = XCreateFontCursor(wid->app->dpy, XC_hand2);
     XDefineCursor (wid->app->dpy, wid->widget, c);
     XFreeCursor(wid->app->dpy, c);

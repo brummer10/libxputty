@@ -32,14 +32,14 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifdef __linux__
-#include <pwd.h>
-#endif
-
 #include <libgen.h>
 
 #include "xfile-dialog.h"
 #include "xmessage-dialog.h"
+
+#ifdef _OS_UNIX_
+#include <pwd.h>
+#endif
 
 static void combo_response(void *w_, void* user_data);
 static void set_selected_file(FileDialog *file_dialog);
@@ -215,7 +215,7 @@ static void entry_response(void *w_, void* user_data) {
         free(file_dialog->fp->selected_file);
         file_dialog->fp->selected_file = NULL;
         asprintf(&file_dialog->fp->selected_file, "%s%s%s",file_dialog->fp->path, PATH_SEPARATOR, enter_name);
-#ifdef __linux__
+#ifdef _OS_UNIX_
         int result = mkdir(file_dialog->fp->selected_file, 0755);
 #elif defined _WIN32
         int result = mkdir(file_dialog->fp->selected_file);
@@ -474,7 +474,7 @@ static void fd_mem_free(void *w_, void* user_data) {
     free(file_dialog);
 }
 
-#ifdef __linux__
+#ifdef _OS_UNIX_
 static int starts_with(const char *restrict string, const char *restrict prefix) {
     while(*prefix)
     {
@@ -713,7 +713,7 @@ Widget_t *open_directory_dialog(Widget_t *w, const char *path, const char *filte
     file_dialog->xdg_dir_counter = 0;
     file_dialog->fp = (FilePicker*)malloc(sizeof(FilePicker));
 
-#ifdef __linux__
+#ifdef _OS_UNIX_
     parse_xdg_dirs(file_dialog);
 
     struct stat sb;
@@ -740,7 +740,7 @@ Widget_t *open_directory_dialog(Widget_t *w, const char *path, const char *filte
     file_dialog->list_view = false;
 
     file_dialog->w = create_window(w->app, os_get_root_window(w->app, IS_WINDOW), 0, 0, 660, 415);
-#ifdef __linux__
+#ifdef _OS_UNIX_
     XSizeHints* win_size_hints;
     win_size_hints = XAllocSizeHints();
     win_size_hints->flags =  PMinSize|PBaseSize|PMaxSize|PWinGravity;
@@ -806,7 +806,7 @@ Widget_t *open_directory_dialog(Widget_t *w, const char *path, const char *filte
     }
     file_dialog->ct->func.value_changed_callback = combo_response;
 
-#ifdef __linux__
+#ifdef _OS_UNIX_
     add_xdg_dirs(file_dialog);
 #elif defined _WIN32
     add_win_dirs(file_dialog);
@@ -891,7 +891,7 @@ static void fbutton_callback(void *w_, void* user_data) {
     FileButton *filebutton = (FileButton *)w->private_struct;
     if (w->flags & HAS_POINTER && adj_get_value(w->adj)){
         filebutton->w = open_directory_dialog(w,filebutton->path,filebutton->filter);
-#ifdef __linux__
+#ifdef _OS_UNIX_
         Atom wmStateAbove = XInternAtom(w->app->dpy, "_NET_WM_STATE_ABOVE", 1 );
         Atom wmNetWmState = XInternAtom(w->app->dpy, "_NET_WM_STATE", 1 );
         XChangeProperty(w->app->dpy, filebutton->w->widget, wmNetWmState, XA_ATOM, 32, 

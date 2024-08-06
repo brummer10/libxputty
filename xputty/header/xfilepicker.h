@@ -44,7 +44,7 @@
 #define XFILEPICKER_H_
 
 /* comment out xdgmine.h will disable the file filter, you may implement your own.*/
-#ifdef __linux__
+#ifdef _OS_UNIX_
 #include "xdgmime.h"
 #endif
 /* comment out xasprintf and define _GNU_SOURCE on top of this file will remove this dependency.*/

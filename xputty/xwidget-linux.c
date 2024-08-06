@@ -19,7 +19,13 @@
  *
  */
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#ifndef _OS_UNIX_
+#define _OS_UNIX_ 1
+#endif
+#endif
+
+#ifdef _OS_UNIX_
 
 #include <sys/stat.h>
 
@@ -1094,4 +1100,4 @@ void os_init_dnd(Xputty *main) {
 }
 #endif
 
-#endif /* __linux__ */
+#endif /* _OS_UNIX_ */

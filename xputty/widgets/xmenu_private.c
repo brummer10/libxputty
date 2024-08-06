@@ -229,7 +229,7 @@ void _leave_submenu(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
 
     if (!w->data) {
-#ifdef __linux__ 
+#ifdef _OS_UNIX_ 
         XCrossingEvent notify;
         memset(&notify, 0, sizeof(notify));
         notify.type = LeaveNotify;

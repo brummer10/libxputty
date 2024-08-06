@@ -99,13 +99,9 @@ endif
 		# Not found
 		ifeq ($(UNAME_S), BSD)
 			export TARGET = Linux
-			export CFLAGS += -D__linux__=1
-			export CXXFLAGS += -D__linux__=1
 		endif
 		ifeq ($(UNAME_S), FreeBSD)
 			export TARGET = Linux
-			export CFLAGS += -D__linux__=1
-			export CXXFLAGS += -D__linux__=1
 		endif
 		ifeq ($(UNAME_S), Linux) #LINUX
 			export TARGET = Linux
@@ -152,6 +148,7 @@ endif
 endif
 
 ifneq ($(MAKECMDGOALS),install)
+ifneq ($(MAKECMDGOALS), clean)
 
 ifndef EXTRAQUIET
 ifeq ($(UNAME_S), BSD)
@@ -190,6 +187,7 @@ else
 $($(red)error Neither xxd, nor xxdi.pl, nor suitable ld found$(reset))
 endif
 
+endif
 endif
 
 export MKBASE=1

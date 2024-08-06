@@ -149,7 +149,7 @@ bool is_directory(DIR *dirp, struct dirent *dp) {
     return ((dirp->dd_dta.attrib & _A_SUBDIR) != 0);
 }
 
-#else // __linux__
+#else // _OS_UNIX_
 bool is_root_directory(char *path) {
    return (strcmp (path, PATH_SEPARATOR) == 0);
 }
@@ -201,7 +201,7 @@ static inline int fp_prefill_dirbuffer(FilePicker *filepicker, char *path) {
 }
 
 int fp_check_link(char *path, struct dirent *dp) {
-#ifdef __linux__ //not supported on win32
+#ifdef _OS_UNIX_ //not supported on win32
     if(dp -> d_type == DT_LNK) {
         char s[256];
         snprintf(s, 256, (strcmp(path, PATH_SEPARATOR) != 0) ?
@@ -216,7 +216,7 @@ int fp_check_link(char *path, struct dirent *dp) {
 }
 
 int fp_check_dir(char *path, struct dirent *dp) {
-#ifdef __linux__ //not supported on win32
+#ifdef _OS_UNIX_ //not supported on win32
     if (dp->d_type == DT_UNKNOWN) {
         char s[256];
         snprintf(s, 256, (strcmp(path, PATH_SEPARATOR) != 0) ?

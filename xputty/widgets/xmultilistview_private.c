@@ -138,7 +138,7 @@ void _draw_multi_list(void *w_, void* user_data) {
 
 void _update_view(void *w_) {
     Widget_t *w = (Widget_t*)w_;
-#ifdef __linux__
+#ifdef _OS_UNIX_
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
     int height = metrics.height-2;
