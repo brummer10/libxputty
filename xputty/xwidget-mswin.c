@@ -518,7 +518,7 @@ void build_xkey_event(XKeyEvent *ev, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (uScanCode) {
         case 0x001d: ev->keycode = XK_Control_L;        break;
         case 0x011d: ev->keycode = XK_Control_R;        break;
-        case 0x0038: ev->keycode = XK_ALT_L;            break;
+        case 0x0038: ev->keycode = XK_Alt_L;            break;
         case 0x0029: ev->keycode = XK_dead_circumflex;  break;
         case 0x000e: ev->keycode = XK_BackSpace;        break;
         case 0x000f: ev->keycode = XK_Tab;              break;
