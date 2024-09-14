@@ -114,6 +114,10 @@ typedef XEvent XMotionEvent;
 #define XK_x    'x'
 #define XK_y    'y'
 #define XK_z    'z'
+#define XK_Control_L    0xffe3  /* Left control */
+#define XK_Control_R    0xffe4  /* Right control */
+#define XK_Alt_L        0xffe9  /* Left alt */
+#define XK_Alt_R        0xffea  /* Right alt */
 #define XK_space        VK_SPACE // 0x20
 #define XK_quotedbl     '"' //0x22
 #define XK_parenleft    '(' //0x28
