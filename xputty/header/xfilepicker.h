@@ -43,6 +43,12 @@
 #ifndef XFILEPICKER_H_
 #define XFILEPICKER_H_
 
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#ifndef _OS_UNIX_
+#define _OS_UNIX_ 1
+#endif
+#endif
+
 /* comment out xdgmine.h will disable the file filter, you may implement your own.*/
 #ifdef _OS_UNIX_
 #include "xdgmime.h"
