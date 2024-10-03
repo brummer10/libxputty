@@ -993,11 +993,11 @@ void add_keyboard(Widget_t *wid, const char * label) {
 
     Widget_t* velocity = cmenu_add_submenu(keys->context_menu,_("Velocity"));
     velocity->private_struct = keys;
-    Widget_t* vel = menu_add_value_entry(velocity, "128");
-    vel->private_struct = keys;
-    set_adjustment(vel->adj, 0.0, 0.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
-    adj_set_value(vel->adj, keys->velocity);
-    vel->func.value_changed_callback = velocity_changed;
+    keys->vel = menu_add_value_entry(velocity, "128");
+    keys->vel->private_struct = keys;
+    set_adjustment(keys->vel->adj, 0.0, 0.0, 0.0, 127.0, 1.0, CL_CONTINUOS);
+    adj_set_value(keys->vel->adj, keys->velocity);
+    keys->vel->func.value_changed_callback = velocity_changed;
 
     keys->grab_keyboard = menu_add_check_item(keys->context_menu,_("Grab Keyboard"));
     keys->grab_keyboard->private_struct = keys;
