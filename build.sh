@@ -46,7 +46,7 @@ function linux() {
     export EXTRAQUIET=1
     # skip LTO support on Linux (produce a bunch of warnings for cairo static lib)
     export PAWPAW_SKIP_LTO=1
-    make clean && cd $PAWPAW && tput setaf 4 && source local.env Linux && \
+    make clean && cd $PAWPAW && tput setaf 4 && source local.env linux && \
     tput sgr0 && unset EXTRAQUIET && cd $CURDIR && make
 }
 

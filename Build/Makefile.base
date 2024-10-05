@@ -140,6 +140,7 @@ endif
 
 # generic link flags when build for windows with PawPaw
 ifneq (,$(findstring PawPawBuilds,$(PATH)))
+	export PAWPAW_BUILD = 1
 ifeq ($(TARGET), Windows)
 	export PAWPAW_LFLAGS = -lcairo -lpixman-1 \
 	-lfreetype -lpng16 -lz  -lcomdlg32 -ldwmapi -lgdi32 -lm -lole32 -lwinmm \
