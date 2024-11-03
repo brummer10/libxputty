@@ -24,6 +24,22 @@
 #include <sys/stat.h>
 
 
+char* _utf8_cpy(char* dst, const char* src, size_t sizeDest ) {
+    if( sizeDest ){
+        size_t sizeSrc = strlen(src);
+        while( sizeSrc >= sizeDest ){
+            const char* lastByte = src + sizeSrc;
+            while( lastByte-- > src )
+                if((*lastByte & 0xC0) != 0x80)
+                    break;
+            sizeSrc = lastByte - src;
+        }
+        memcpy(dst, src, sizeSrc);
+        dst[sizeSrc] = '\0';
+    }
+    return dst;
+}
+
 void _draw_listview(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
@@ -95,8 +111,14 @@ void _draw_list(void *w_, void* user_data) {
         char label[124];
         memset(label, '\0', sizeof(char)*124);
         const char *ulabel = utf8_from_locale(filelist->list_names[i]);
-        strcpy(label, ulabel);
-        cairo_text_extents(w->crb, label, &extents);
+        cairo_text_extents(w->crb, ulabel, &extents);
+        if (extents.width > (float)width-20) {
+            int slen = strlen(ulabel);
+            int len = ((width-10)/(extents.width/slen));
+            _utf8_cpy(label,ulabel, min(slen-4,len-3));
+        } else {
+            strncpy(label, ulabel, 123);
+        }
 
         cairo_move_to (w->crb, 20, (filelist->item_height*((double)a+1.0))+3.0 - h);
         cairo_show_text(w->crb, label);
@@ -183,10 +205,21 @@ void _update_list_view(void *w_) {
                 use_text_color_scheme(w,NORMAL_ );
             }
         }
-        cairo_text_extents(w->crb,filelist->list_names[i] , &extents);
+
+        char label[124];
+        memset(label, '\0', sizeof(char)*124);
+        const char *ulabel = utf8_from_locale(filelist->list_names[i]);
+        cairo_text_extents(w->crb, ulabel, &extents);
+        if (extents.width > (float)width-20) {
+            int slen = strlen(ulabel);
+            int len = ((width-10)/(extents.width/slen));
+            _utf8_cpy(label,ulabel, min(slen-4,len-3));
+        } else {
+            strncpy(label, ulabel, 123);
+        }
 
         cairo_move_to (w->crb, 20, (filelist->item_height * ((double)a+1.0))+3.0 - h);
-        cairo_show_text(w->crb, filelist->list_names[i]);
+        cairo_show_text(w->crb, label);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {
             tooltip_set_text(w,filelist->list_names[i]);
