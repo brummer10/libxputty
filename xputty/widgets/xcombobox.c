@@ -112,6 +112,7 @@ Widget_t* create_combobox_viewport(Widget_t *parent, int elem, int width, int he
     comboboxlist->list_names = NULL;
     comboboxlist->list_size = 0;
     comboboxlist->item_height = 25 * parent->app->hdpi;
+    comboboxlist->item_size = 0;
     comboboxlist->sc = 1.0;
     comboboxlist->pop_pos = 0;
     wid->flags |= HAS_MEM;
@@ -189,11 +190,26 @@ void combobox_add_entry(Widget_t *wid, const char  * label) {
     comboboxlist->list_size++;
     comboboxlist->list_names = (char **)realloc(comboboxlist->list_names,
       comboboxlist->list_size * sizeof(char *));
-    asprintf(&comboboxlist->list_names[comboboxlist->list_size-1],"%s",label);
+    unsigned int v = strlen(label);
+    char s[v+3];
+    if (comboboxlist->item_size && v > comboboxlist->item_size) {
+        snprintf(s, comboboxlist->item_size, "%s", label);
+        strcat(s, "...");
+    } else {
+        sprintf(s, label);
+    }
+    asprintf(&comboboxlist->list_names[comboboxlist->list_size-1],"%s", s);
     assert(comboboxlist->list_names != NULL);
     float max_value = wid->adj->max_value+1.0;
     set_adjustment(wid->adj,0.0, max_value, 0.0, max_value,1.0, CL_ENUM);
 
+}
+
+void combobox_set_entry_length(Widget_t *wid, unsigned int size) {
+    Widget_t *menu = wid->childlist->childs[1];
+    Widget_t* view_port =  menu->childlist->childs[0];
+    ComboBox_t *comboboxlist = (ComboBox_t*)view_port->parent_struct;
+    comboboxlist->item_size = size;
 }
 
 void combobox_add_numeric_entrys(Widget_t *wid, int imin, int imax) {

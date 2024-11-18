@@ -49,6 +49,7 @@ typedef struct {
     int active_item;
     int show_items;
     int item_height;
+    int item_size;
     unsigned int list_size;
     char **list_names;
     float sc;
@@ -75,6 +76,14 @@ Widget_t* add_combobox(Widget_t *parent, const char  * label, int x, int y, int 
  */
 
 void combobox_add_entry(Widget_t *wid, const char  * label);
+
+/**
+ * @brief combobox_set_entry_length    - set the max length of a combobox entry
+ * @param *wid                         - pointer to the Widget_t combobox
+ * @param size                         - max label size to show on the menu
+ */
+
+void combobox_set_entry_length(Widget_t *wid, unsigned int size);
 
 /**
  * @brief combobox_rename_entry - rename a entry in the combobox
