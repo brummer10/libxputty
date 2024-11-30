@@ -196,7 +196,7 @@ void combobox_add_entry(Widget_t *wid, const char  * label) {
         snprintf(s, comboboxlist->item_size, "%s", label);
         strcat(s, "...");
     } else {
-        sprintf(s, label);
+        sprintf(s, "%s", label);
     }
     asprintf(&comboboxlist->list_names[comboboxlist->list_size-1],"%s", s);
     assert(comboboxlist->list_names != NULL);
