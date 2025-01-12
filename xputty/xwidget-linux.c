@@ -797,12 +797,15 @@ void os_get_dpi(Xputty *main) {
 
     XrmInitialize();
     resource_string = XResourceManagerString(main->dpy);
-    db = XrmGetStringDatabase(resource_string);
     if (resource_string) {
-        if (XrmGetResource(db, "Xft.dpi", "String", &type, &ret) == True) {
-            if (ret.addr) {
-                main->hdpi = atof(ret.addr)/96;
+        db = XrmGetStringDatabase(resource_string);
+        if (db) {
+            if (XrmGetResource(db, "Xft.dpi", "String", &type, &ret) == True) {
+                if (ret.addr) {
+                    main->hdpi = atof(ret.addr)/96;
+                }
             }
+            XrmDestroyDatabase(db);
         }
     }
 }
