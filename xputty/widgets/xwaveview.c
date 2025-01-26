@@ -42,11 +42,11 @@ Widget_t* add_waveview(Widget_t *parent, const char * label,
 
 void update_waveview(Widget_t *waveview, float* wave, int size) {
     WaveView_t *wave_view = (WaveView_t*)waveview->private_struct;
-    if (size !=wave_view->size && size>1) {
+    if (size !=wave_view->size) {
         free(wave_view->wave);
         wave_view->wave = NULL;
         wave_view->size = size;
-        wave_view->wave = (float*)malloc(size*sizeof(float));
+        if (size>1) wave_view->wave = (float*)malloc(size*sizeof(float));
     }
     if (wave_view->size>1) {
         memcpy(wave_view->wave, wave, size*sizeof(float));
