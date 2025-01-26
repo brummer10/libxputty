@@ -27,7 +27,23 @@ void listbox_set_active_entry(Widget_t *w, int active) {
     float value = (float)active;
     if (value>w->adj->max_value) value = w->adj->max_value;
     else if (value<w->adj->min_value) value = w->adj->min_value;
+    Widget_t *view_port = w->childlist->childs[0];
+    int i = view_port->childlist->elem-1;
+    for(;i>-1;i--) view_port->childlist->childs[i]->state = 0;
     adj_set_value(w->adj, value);
+}
+
+void listbox_remove_entrys(Widget_t *listbox) {
+    Widget_t* view_port =  listbox->childlist->childs[0];
+    int i = view_port->childlist->elem-1;
+    for(;i>-1;i--) {
+        float max_value = view_port->adj->max_value-1.0;
+        destroy_widget(view_port->childlist->childs[i],listbox->app);
+        set_adjustment(view_port->adj,0.0, 0.0, 0.0, max_value,1.0, CL_VIEWPORT);
+        max_value = listbox->adj->max_value-1.0;
+        set_adjustment(listbox->adj,0.0, 0.0, 0.0, max_value,1.0, CL_NONE);
+    }
+    os_move_window(listbox->app->dpy,view_port,0.0, 0.0);
 }
 
 Widget_t* create_listbox_viewport(Widget_t *parent, int elem, int width, int height) {

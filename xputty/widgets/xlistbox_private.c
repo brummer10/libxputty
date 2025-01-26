@@ -123,6 +123,7 @@ void _draw_listbox_viewslider(void *w_, void* user_data) {
 void _set_listbox_viewpoint(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     int v = (int)adj_get_value(w->adj);
+    if (w->childlist->elem-1 < 1) return;
     Metrics_t metrics;
     os_get_window_metrics(w->childlist->childs[0], &metrics);
     int height = metrics.height;
