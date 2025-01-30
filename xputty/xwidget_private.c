@@ -375,6 +375,16 @@ void _resize_childs(Widget_t *wid) {
                 os_resize_window (wid->app->dpy, w, max(1,
                     w->scale.init_width - (wid->scale.scale_x)), w->height);
             break;
+            case(EASTCENTER):
+                os_resize_window (wid->app->dpy, w, max(1,
+                    w->scale.init_width - (wid->scale.scale_x*0.5)), w->scale.init_height);
+            break;
+            case(WESTCENTER):
+                os_move_window(wid->app->dpy,w,w->scale.init_x /
+                    wid->scale.cscale_x, w->scale.init_y);
+                os_resize_window (wid->app->dpy, w, max(1,
+                    w->scale.init_width - (wid->scale.scale_x*0.5)), w->scale.init_height);
+            break;
             case(WESTNORTH):
                 os_move_window(wid->app->dpy,w,w->scale.init_x-wid->scale.scale_x,
                                                                     w->scale.init_y);
