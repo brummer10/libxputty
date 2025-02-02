@@ -30,6 +30,26 @@ void _draw_listbox(void *w_, void* user_data) {
     cairo_paint (w->crb);
 }
 
+void _draw_drag_icon(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    if (!w) return;
+    Metrics_t metrics;
+    os_get_window_metrics(w, &metrics);
+    int width = metrics.width-2;
+    int height = metrics.height-2;
+    if (!metrics.visible) return;
+    use_base_color_scheme(w, PRELIGHT_);
+    cairo_paint (w->crb);
+    cairo_text_extents_t extents;
+    /** show label **/
+    use_text_color_scheme(w, get_color_state(w));
+    cairo_set_font_size (w->crb, height/2);
+    cairo_text_extents(w->crb,w->label , &extents);
+
+    cairo_move_to (w->crb, (width-extents.width)/2., height - extents.height/2. );
+    cairo_show_text(w->crb, w->label);
+}
+
 void _draw_listbox_item(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
@@ -133,11 +153,18 @@ void _set_listbox_viewpoint(void *w_, void* user_data) {
 void _listbox_entry_released(void *w_, void* button_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t* view_port = (Widget_t*)w->parent;
+    Widget_t* listbox =  (Widget_t*)view_port->parent;
+    Widget_t* drag_icon = listbox->childlist->childs[1];
+    Metrics_t metrics;
+    os_get_window_metrics(drag_icon, &metrics);
+    if (metrics.visible) {
+        widget_hide(drag_icon);
+        listbox->func.user_paste_callback(listbox, button_, (void*)&drag_icon->data);
+    }
     int direction = 0 ;
     if (w->flags & HAS_POINTER) {
         XButtonEvent *xbutton = (XButtonEvent*)button_;
         if(xbutton->button == Button1) {
-            Widget_t* listbox =  (Widget_t*)view_port->parent;
             int i = view_port->childlist->elem-1;
             int old_value = (int) listbox->adj->value;
             for(;i>-1;i--) {
@@ -167,3 +194,32 @@ void _listbox_entry_released(void *w_, void* button_, void* user_data) {
     }
 }
 
+void _listbox_entry_move(void *w_, void* xmotion_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Widget_t* view_port = (Widget_t*)w->parent;
+    if (w->flags & HAS_POINTER) {
+        XMotionEvent *xmotion = (XMotionEvent*)xmotion_;
+        if(xmotion->state == Button1Mask) {
+            Widget_t* listbox =  (Widget_t*)view_port->parent;
+            Widget_t* drag_icon = listbox->childlist->childs[1];
+            pop_widget_show_all(drag_icon);
+            int x1, y1;
+            os_translate_coords(w, w->widget, 
+                os_get_root_window(w->app, IS_WIDGET), xmotion->x, xmotion->y, &x1, &y1);
+            os_move_window(w->app->dpy, drag_icon, x1, y1);
+
+            int i = view_port->childlist->elem-1;
+            for(;i>-1;i--) {
+                Widget_t *wid = view_port->childlist->childs[i];
+                if (xmotion->window == wid->widget) {
+                    const char *l = view_port->childlist->childs[i]->label;
+                    drag_icon->label = l;
+                    drag_icon->data = i;
+                }
+               // wid->state= 0;
+            }
+            //expose_widget(view_port->childlist->childs[old_value]);
+           // expose_widget(w);
+        }
+    }
+}

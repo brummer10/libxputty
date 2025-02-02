@@ -47,6 +47,14 @@ void _draw_listbox(void *w_, void* user_data);
 void _draw_listbox_item(void *w_, void* user_data);
 
 /**
+ * @brief _draw_drag_icon   - draw item on expose call
+ * @param *w_                  - the item to draw
+ * @param *user_data           - attached user_data
+ */
+
+void _draw_drag_icon(void *w_, void* user_data);
+
+/**
  * @brief _draw_listbox_viewslider - draw a slider on the viewport
  * to indicate the view point
  * @param *w_                      - void pointer to view_port
@@ -88,6 +96,15 @@ void _set_listbox_viewpoint(void *w_, void* user_data);
  */
 
 void _listbox_entry_released(void *w_, void* button_, void* user_data);
+
+/**
+ * @brief _listbox_entry_move      - redraw the slider when buttob released 
+ * @param *w_                      - void pointer to the Widget_t entry
+ * @param *xmotion                 - void pointer to the XButtonEvent
+ * @param *user_data               - void pointer to attached user_data
+ */
+
+void _listbox_entry_move(void *w_, void* xmotion, void* user_data);
 
 #ifdef __cplusplus
 }

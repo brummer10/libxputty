@@ -104,6 +104,7 @@ typedef struct {
     evfunc motion_callback;
     evfunc key_press_callback;
     evfunc key_release_callback;
+    evfunc user_paste_callback;
 } Func_t;
 
 /**

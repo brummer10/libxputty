@@ -59,6 +59,22 @@ Widget_t* create_listbox_viewport(Widget_t *parent, int elem, int width, int hei
     return wid;
 }
 
+Widget_t* add_drag_icon(Widget_t *parent, int width, int height) {
+
+    int x1, y1;
+    os_translate_coords(parent, parent->widget, os_get_root_window(parent->app, IS_WIDGET), 0, 0, &x1, &y1);
+    Widget_t *wid = create_window(parent->app, os_get_root_window(parent->app, IS_WIDGET), x1, y1, width, height);
+    memcpy(wid->color_scheme, parent->color_scheme, sizeof (struct XColor_t));
+
+    os_set_window_attrb(wid);
+    os_set_transient_for_hint(parent, wid);
+    wid->func.expose_callback = _draw_drag_icon;
+    wid->flags |= IS_POPUP;
+    wid->scale.gravity = NONE;
+    childlist_add_child(parent->childlist, wid);
+    return wid;
+}
+
 Widget_t* add_listbox(Widget_t *parent, const char * label,
                 int x, int y, int width, int height) {
 
@@ -70,6 +86,7 @@ Widget_t* add_listbox(Widget_t *parent, const char * label,
     wid->adj_y = add_adjustment(wid,0.0, 0.0, 0.0, -1.0,1.0, CL_NONE);
     wid->adj = wid->adj_y;
     create_listbox_viewport(wid, elem, width, height);
+    add_drag_icon(wid, width, 25);
     return wid;
 }
 
@@ -89,5 +106,6 @@ Widget_t* listbox_add_entry(Widget_t *listbox, const char * label) {
     wid->func.enter_callback = os_transparent_draw;
     wid->func.leave_callback = os_transparent_draw;
     wid->func.button_release_callback = _listbox_entry_released;
+    wid->func.motion_callback = _listbox_entry_move;
     return wid;
 }
