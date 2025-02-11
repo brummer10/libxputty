@@ -581,6 +581,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     XMotionEvent xmotion;
     XKeyEvent xkey;
     void *user_data = NULL;
+    GetCursorPos(&pt);
 
     // be aware: "wid" can be NULL during window creation (esp. if there is a debugger attached)
     Widget_t *wid = (Widget_t *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
@@ -589,9 +590,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     xbutton.window = hwnd;
     xbutton.x = GET_X_LPARAM(lParam);
     xbutton.y = GET_Y_LPARAM(lParam);
+    xbutton.x_root = pt.x;
+    xbutton.y_root = pt.y;
     xmotion.window = hwnd;
     xmotion.x = GET_X_LPARAM(lParam);
     xmotion.y = GET_Y_LPARAM(lParam);
+    xmotion.x_root = pt.x;
+    xmotion.y_root = pt.y;
 
     switch (msg) {
         case WM_CREATE:
@@ -686,10 +691,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             if (!wid) return DefWindowProc(hwnd, msg, wParam, lParam);
             SetCapture(hwnd); // also receive WM_MOUSEMOVE from outside this window
             
-            if (msg == WM_LBUTTONDOWN)
+            if (msg == WM_LBUTTONDOWN) {
                 xbutton.button = Button1;
-            else
+                xbutton.state |= Button1Mask;
+            } else {
                 xbutton.button = Button3;
+                xbutton.state |= Button3Mask;
+            }
             if (wid->state == 4) break;
             if (wid->flags & HAS_TOOLTIP) hide_tooltip(wid);
             _button_press(wid, &xbutton, user_data);
@@ -709,9 +717,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
             if (GET_WHEEL_DELTA_WPARAM(wParam) <= 0) {
                 xbutton.button = Button5;
+                xbutton.state |= Button5Mask;
                 _button_press(wid, &xbutton, user_data);
             } else {
                 xbutton.button = Button4;
+                xbutton.state |= Button4Mask;
                 _button_press(wid, &xbutton, user_data);
             }
             // forward WM_MOUSEWHEEL from menuitem to viewport (with slider)
@@ -733,12 +743,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case WM_MBUTTONUP:
         case WM_RBUTTONUP:
             ReleaseCapture();
-            if (msg == WM_LBUTTONUP)
+            if (msg == WM_LBUTTONUP) {
                 xbutton.button = Button1;
-            else if (msg == WM_MBUTTONUP)
+                xbutton.state |= Button1Mask;
+            } else if (msg == WM_MBUTTONUP) {
                 xbutton.button = Button2;
-            else
+                xbutton.state |= Button2Mask;
+            } else {
                 xbutton.button = Button3;
+                xbutton.state |= Button3Mask;
+            }
             _check_grab(wid, &xbutton, wid->app);
             _check_submenu(wid, &xbutton, main);
             if (wid->state == 4) break;

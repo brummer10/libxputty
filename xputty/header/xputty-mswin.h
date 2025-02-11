@@ -59,6 +59,8 @@ typedef struct {
   Window window;
   int x;
   int y;
+  int x_root;
+  int y_root;
   int button;
   int keycode;
   unsigned int state;   /* key or button mask */
@@ -80,6 +82,10 @@ typedef XEvent XMotionEvent;
 
 #define ShiftMask       (1<<0)
 #define Button1Mask     (1<<8)
+#define Button2Mask     (1<<9)
+#define Button3Mask     (1<<10)
+#define Button4Mask     (1<<11)
+#define Button5Mask     (1<<12)
 
 // xmidi_keyboard.cpp
 #define XK_0    '0'

@@ -199,27 +199,24 @@ void _listbox_entry_move(void *w_, void* xmotion_, void* user_data) {
     Widget_t* view_port = (Widget_t*)w->parent;
     if (w->flags & HAS_POINTER) {
         XMotionEvent *xmotion = (XMotionEvent*)xmotion_;
-        if(xmotion->state == Button1Mask) {
+        if(xmotion->state & Button1Mask) {
             Widget_t* listbox =  (Widget_t*)view_port->parent;
             Widget_t* drag_icon = listbox->childlist->childs[1];
+            drag_icon->label = w->label;
             pop_widget_show_all(drag_icon);
             int x1, y1;
             os_translate_coords(w, w->widget, 
                 os_get_root_window(w->app, IS_WIDGET), xmotion->x, xmotion->y, &x1, &y1);
-            os_move_window(w->app->dpy, drag_icon, x1, y1);
+            os_move_window(w->app->dpy, drag_icon, x1+2, y1+2);
 
             int i = view_port->childlist->elem-1;
             for(;i>-1;i--) {
                 Widget_t *wid = view_port->childlist->childs[i];
                 if (xmotion->window == wid->widget) {
-                    const char *l = view_port->childlist->childs[i]->label;
-                    drag_icon->label = l;
                     drag_icon->data = i;
+                    break;
                 }
-               // wid->state= 0;
             }
-            //expose_widget(view_port->childlist->childs[old_value]);
-           // expose_widget(w);
         }
     }
 }
