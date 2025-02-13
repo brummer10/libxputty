@@ -22,6 +22,7 @@
 #include "xlistview_private.h"
 #include "xtooltip.h"
 #include <sys/stat.h>
+#include <libgen.h>
 
 
 char* _utf8_cpy(char* dst, const char* src, size_t sizeDest ) {
@@ -110,7 +111,7 @@ void _draw_list(void *w_, void* user_data) {
         }
         char label[124];
         memset(label, '\0', sizeof(char)*124);
-        const char *ulabel = utf8_from_locale(filelist->list_names[i]);
+        const char *ulabel = utf8_from_locale(basename(filelist->list_names[i]));
         cairo_text_extents(w->crb, ulabel, &extents);
         if (extents.width > (float)width-20) {
             int slen = strlen(ulabel);
@@ -120,7 +121,7 @@ void _draw_list(void *w_, void* user_data) {
             strncpy(label, ulabel, 123);
         }
 
-        cairo_move_to (w->crb, 20, (filelist->item_height*((double)a+1.0))+3.0 - h);
+        cairo_move_to (w->crb, 30, (filelist->item_height*((double)a+1.0))+3.0 - h);
         cairo_show_text(w->crb, label);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {
@@ -208,7 +209,7 @@ void _update_list_view(void *w_) {
 
         char label[124];
         memset(label, '\0', sizeof(char)*124);
-        const char *ulabel = utf8_from_locale(filelist->list_names[i]);
+        const char *ulabel = utf8_from_locale(basename(filelist->list_names[i]));
         cairo_text_extents(w->crb, ulabel, &extents);
         if (extents.width > (float)width-20) {
             int slen = strlen(ulabel);
@@ -218,7 +219,7 @@ void _update_list_view(void *w_) {
             strncpy(label, ulabel, 123);
         }
 
-        cairo_move_to (w->crb, 20, (filelist->item_height * ((double)a+1.0))+3.0 - h);
+        cairo_move_to (w->crb, 30, (filelist->item_height * ((double)a+1.0))+3.0 - h);
         cairo_show_text(w->crb, label);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {

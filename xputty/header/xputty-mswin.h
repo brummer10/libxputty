@@ -81,6 +81,7 @@ typedef XEvent XMotionEvent;
 #define Button5 5
 
 #define ShiftMask       (1<<0)
+#define ControlMask     (1<<2)
 #define Button1Mask     (1<<8)
 #define Button2Mask     (1<<9)
 #define Button3Mask     (1<<10)

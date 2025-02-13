@@ -76,7 +76,14 @@ void _draw_listbox_item(void *w_, void* user_data) {
     cairo_fill_preserve(w->crb);
     cairo_set_line_width(w->crb, 1.0);
     use_frame_color_scheme(w, PRELIGHT_);
-    cairo_stroke(w->crb); 
+    cairo_stroke(w->crb);
+    if (w->data == 1) {
+        cairo_move_to(w->crb, 0,0);
+        cairo_line_to(w->crb, width,0);
+        cairo_set_line_width(w->crb, 3.0);
+        use_fg_color_scheme(w, PRELIGHT_);
+        cairo_stroke(w->crb);
+    }
     cairo_text_extents_t extents;
     /** show label **/
     use_text_color_scheme(w, get_color_state(w));
@@ -209,12 +216,23 @@ void _listbox_entry_move(void *w_, void* xmotion_, void* user_data) {
                 os_get_root_window(w->app, IS_WIDGET), xmotion->x, xmotion->y, &x1, &y1);
             os_move_window(w->app->dpy, drag_icon, x1+2, y1+2);
 
+            int x2, y2;
+            os_translate_coords(w, os_get_root_window(w->app, IS_WIDGET),
+                view_port->widget, x1, y1, &x2, &y2);
+            int v = y2 > 0 ? y2/25 : -1;
+            if (x2 < 0 || x2 > w->width) v = -1;
             int i = view_port->childlist->elem-1;
             for(;i>-1;i--) {
                 Widget_t *wid = view_port->childlist->childs[i];
                 if (xmotion->window == wid->widget) {
                     drag_icon->data = i;
-                    break;
+                }
+                if (v == i) {
+                    view_port->childlist->childs[i]->data = 1;
+                    expose_widget(view_port->childlist->childs[i]);
+                } else if (view_port->childlist->childs[i]->data == 1) {
+                    view_port->childlist->childs[i]->data = 0;
+                    expose_widget(view_port->childlist->childs[i]);
                 }
             }
         }
