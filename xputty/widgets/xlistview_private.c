@@ -121,7 +121,8 @@ void _draw_list(void *w_, void* user_data) {
             strncpy(label, ulabel, 123);
         }
 
-        cairo_move_to (w->crb, 30, (filelist->item_height*((double)a+1.0))+3.0 - h);
+        cairo_move_to (w->crb, filelist->check_dir ? 30 : 10, 
+                (filelist->item_height*((double)a+1.0))+3.0 - h);
         cairo_show_text(w->crb, label);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {
