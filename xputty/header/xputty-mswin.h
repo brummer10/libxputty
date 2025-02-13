@@ -128,9 +128,9 @@ typedef XEvent XMotionEvent;
 #define XK_space        VK_SPACE // 0x20
 #define XK_quotedbl     '"' //0x22
 #define XK_parenleft    '(' //0x28
-#define XK_plus         '+' //0x2b
+#define XK_plus         0x002b //0x2b
 #define XK_comma        ',' //0x2c
-#define XK_minus        '-' //0x2d
+#define XK_minus        0x002d //0x2d
 #define XK_section      0x00a7
 #define XK_mu           0x00b5 
 #define XK_dollar       0x0024

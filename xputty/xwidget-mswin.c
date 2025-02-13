@@ -505,6 +505,10 @@ void build_xkey_event(XKeyEvent *ev, UINT msg, WPARAM wParam, LPARAM lParam) {
         // required size for the return buffer isn't exactly clear, maybe 255, so 1K should be a safe guess
         WCHAR lpChar[1024];
         UINT uFlags = 0x04; // 1=menu is active, 4=dont change anything
+        if (lpKeyState[VK_CONTROL] != 0) {
+            ev->state |= ControlMask;
+            lpKeyState[VK_CONTROL] = 0;
+        }
         if (msg == WM_CHAR) {
             ev->vk = uVirtKey;
             ev->vk_is_final_char = 1;
@@ -514,6 +518,7 @@ void build_xkey_event(XKeyEvent *ev, UINT msg, WPARAM wParam, LPARAM lParam) {
             ev->vk_is_final_char = 0;
         }
     }
+   // if (lpKeyState[VK_CONTROL] & 0x80) ev->state |= ControlMask;
     // handle special characters (only in KEYUP/DOWN?)
     switch (uScanCode) {
         case 0x001d: ev->keycode = XK_Control_L;        break;
