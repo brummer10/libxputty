@@ -122,6 +122,11 @@ void _configure_listbox(void *w_, void* user_data) {
     os_get_window_metrics(listbox, &metrics);
     int width = metrics.width;
     os_resize_window (w->app->dpy, w, width, 25*(si));
+    int i = w->childlist->elem-1;
+    for(;i>-1;i--) {
+        Widget_t *wid = w->childlist->childs[i];
+        os_resize_window (w->app->dpy, wid, width-5, 25);
+    }
 }
 
 void _draw_listbox_viewslider(void *w_, void* user_data) {
