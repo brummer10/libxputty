@@ -60,6 +60,8 @@
 
 ifdef USE_LDD
 	RESOURCES_O = $(RESOURCES_OBJ)
+else ifdef USE_GOLD
+	RESOURCES_O = $(RESOURCES_OBJ)
 else
 	RESOURCES_O = $(RESOURCES_C)
 endif

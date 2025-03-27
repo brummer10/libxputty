@@ -180,6 +180,7 @@ export USE_LDD = 1
 export LDEMULATION
 RESOURCES_C = $(RESOURCES_OBJ)
 else ifeq ($(HAVE_LD_GOLD),1)
+export USE_GOLD = 1
 ifndef EXTRAQUIET
 $(info Using        $(yellow)$(LD) (gold)$(reset))
 endif
