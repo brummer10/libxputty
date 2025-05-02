@@ -196,6 +196,16 @@ void _value_item_released(void *w_, void* button_, void* user_data);
 
 void _configure_menu(Widget_t *parent, Widget_t *menu, int elem, bool above);
 
+/**
+ * @brief _configure_contex_menu  - set final size and position of menu to a Widget_t
+ * @param *parent                 - pointer to the Widget_t the menu should pop over
+ * @param *menu                   - the menu to show
+ * @param elem                    - how many entries to show (max value)
+ * @param xbutton                 - button position were to show the menu
+ */
+
+void _configure_contex_menu(Widget_t *parent, Widget_t *menu, int elem, XButtonEvent *xbutton);
+
 #ifdef __cplusplus
 }
 #endif

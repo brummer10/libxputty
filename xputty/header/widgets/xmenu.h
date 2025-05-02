@@ -41,6 +41,16 @@ extern "C" {
 void pop_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above);
 
 /**
+ * @brief contex_menu_show    - pop up a menu to a Widget_t
+ * @param *parent             - pointer to the Widget_t the menu should pop over
+ * @param *menu               - the menu to show
+ * @param elem                - how many entries to show (max value)
+ * @param above               - show menu above or below the parent Widget_t
+ */
+
+void contex_menu_show(Widget_t *parent, Widget_t *menu, int elem, XButtonEvent *xbutton);
+
+/**
  * @brief pop_submenu_show    - pop up a submenu to a Widget_t
  * @param *parent             - pointer to the Widget_t the menu should pop over
  * @param *menu               - the menu to show

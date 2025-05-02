@@ -38,12 +38,28 @@ void pop_menu_show(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     if (err) debug_print("Error grap pointer\n");
 }
 
+void contex_menu_show(Widget_t *parent, Widget_t *menu, int elem, XButtonEvent *xbutton) {
+    if (!childlist_has_child(menu->childlist)) return;
+    Widget_t* view_port =  menu->childlist->childs[0];
+    if (!view_port->childlist->elem) return;
+    _configure_contex_menu(parent, menu, elem, xbutton);
+    pop_widget_show_all(menu);
+    if (view_port->childlist->elem <= elem)
+        widget_hide(menu->childlist->childs[1]);
+    int err = os_grab_pointer(menu);
+    menu->app->hold_grab = menu;
+
+    if (err) debug_print("Error grap pointer\n");
+}
+
 void pop_submenu_show(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     if (!childlist_has_child(menu->childlist)) return;
     Widget_t* view_port =  menu->childlist->childs[0];
     if (!view_port->childlist->elem) return;
     _configure_menu(parent, menu, elem, above);
     submenu_widget_show_all(menu);
+    if (view_port->childlist->elem <= elem)
+        widget_hide(menu->childlist->childs[1]);
     menu->app->submenu = menu;
 }
 

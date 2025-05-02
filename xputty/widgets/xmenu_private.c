@@ -517,3 +517,43 @@ void _configure_menu(Widget_t *parent, Widget_t *menu, int elem, bool above) {
     os_resize_window(menu->app->dpy,slider,10,height*elem);
     os_move_window(menu->app->dpy,menu,x1, y1);
 }
+
+void _configure_contex_menu(Widget_t *parent, Widget_t *menu, int elem, XButtonEvent *xbutton) {
+    Widget_t* view_port =  menu->childlist->childs[0];
+    Widget_t *slider =  menu->childlist->childs[1];
+    if (!view_port->childlist->elem) return;
+    Metrics_t metrics;
+    os_get_window_metrics(view_port->childlist->childs[0], &metrics);
+    int height = metrics.height;
+    int x1, y1;
+    int posy = xbutton->y+1;
+    int posx = xbutton->x+1 ;
+    os_translate_coords(parent, parent->widget, os_get_root_window(parent->app, IS_WIDGET), posx, posy, &x1, &y1);
+    int item_width = 1.0;
+    cairo_text_extents_t extents;
+    int i = view_port->childlist->elem-1;
+    set_adjustment(view_port->adj,0.0, view_port->adj->value, 0.0, i-(elem-1),1.0, CL_VIEWPORT);
+    bool is_not_scrolable = false;
+    if(view_port->childlist->elem <= elem) {
+        elem = view_port->childlist->elem;
+        is_not_scrolable = true;
+    }
+    for(;i>-1;i--) {
+        Widget_t *w = view_port->childlist->childs[i];
+        cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
+        cairo_text_extents(w->crb,w->label , &extents);
+        
+        item_width = max(item_width, (int)extents.width+40);
+        if(is_not_scrolable) w->scale.gravity = NORTHEAST;
+    }
+    slider->adj->step = max(0.0,1.0/(view_port->childlist->elem-elem));
+    adj_set_scale(slider->adj, ((float)view_port->childlist->elem/(float)elem)/25.0);
+
+    int screen_height = os_get_screen_height(parent);
+    if (y1+(height*elem) > screen_height) y1 = y1-((height*elem)+parent->height);
+    os_resize_window (menu->app->dpy, menu, item_width, height*elem);
+    os_resize_window (view_port->app->dpy, view_port, item_width, height*view_port->childlist->elem);
+    os_move_window(menu->app->dpy,slider,item_width-10, 0);
+    os_resize_window(menu->app->dpy,slider,10,height*elem);
+    os_move_window(menu->app->dpy,menu,x1, y1);
+}
