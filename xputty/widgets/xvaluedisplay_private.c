@@ -21,7 +21,6 @@
 
 #include "xvaluedisplay_private.h"
 
-
 void _draw_valuedisplay(void *w_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     if (!w) return;
@@ -78,7 +77,7 @@ void _draw_valuedisplay(void *w_, void* user_data) {
     } else {
         snprintf(s, 63, format[2-1], value);
     }
-
+    if(strlen(w->label)) memcpy(s + strlen(s), w->label, strlen(w->label) + 1);
     
     use_text_color_scheme(w, get_color_state(w));
     float font_size = w->app->normal_font/w->scale.ascale;
