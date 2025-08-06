@@ -249,12 +249,15 @@ void _update_list_view(void *w_) {
 
 void _list_motion(void *w_, void* xmotion_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
+    if (!w) return;
     ViewList_t *filelist = (ViewList_t*)w->parent_struct;
     XMotionEvent *xmotion = (XMotionEvent*)xmotion_;
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
     int height = metrics.height;
-    int _items = height/(height/filelist->item_height);
+    if (height <= filelist->item_height) return;
+    int delimer = height/filelist->item_height;
+    int _items = height/delimer;
     int prelight_item = (xmotion->y/_items)  + (int)max(0,adj_get_value(w->adj));
     if(prelight_item != filelist->prelight_item) {
         filelist->prev_prelight_item = filelist->prelight_item;
@@ -272,6 +275,7 @@ void _list_key_pressed(void *w_, void* xkey_, void* user_data) {
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
     int height = metrics.height;
+    if (height <= filelist->item_height) return;
     int _items = height/(height/filelist->item_height);
     filelist->prelight_item = xkey->y/_items  + (int)max(0,adj_get_value(w->adj));
     int nk = key_mapping(w->app->dpy, xkey);
@@ -297,6 +301,7 @@ void _list_entry_released(void *w_, void* button_, void* user_data) {
         Metrics_t metrics;
         os_get_window_metrics(w, &metrics);
         int height = metrics.height;
+        if (height <= filelist->item_height) return;
         int _items = height/(height/filelist->item_height);
         int prelight_item = xbutton->y/_items  + (int)max(0,adj_get_value(w->adj));
         if (prelight_item > filelist->list_size-1) return;
@@ -325,6 +330,7 @@ void _list_entry_double_clicked(void *w_, void* button_, void* user_data) {
     Metrics_t metrics;
     os_get_window_metrics(w, &metrics);
     int height = metrics.height;
+    if (height <= filelist->item_height) return;
     int _items = height/(height/filelist->item_height);
     int prelight_item = xbutton->y/_items  + (int)max(0,adj_get_value(w->adj));
     if (prelight_item > filelist->list_size-1) return;
@@ -346,6 +352,7 @@ void _reconfigure_listview_viewport(void *w_, void* user_data) {
     Metrics_t metrics;
     os_get_window_metrics(listview, &metrics);
     int height = metrics.height;
+    if (height <= filelist->item_height) return;
     filelist->show_items = height/filelist->item_height;
     w->adj->max_value = filelist->list_size-filelist->show_items;
     adj_set_state(w->adj,st);
@@ -359,6 +366,7 @@ void _configure_listview(void *w_, void* user_data) {
     os_get_window_metrics(listview, &metrics);
     int height = metrics.height;
     int width = metrics.width;
+    if (height <= filelist->item_height) return;
     filelist->show_items = height/filelist->item_height;
     filelist->slider->adj->step = max(0.0,1.0/(filelist->list_size-filelist->show_items));
     adj_set_scale(filelist->slider->adj, ((float)filelist->list_size/(float)filelist->show_items)/filelist->item_height);
