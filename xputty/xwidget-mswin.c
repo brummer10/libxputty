@@ -599,6 +599,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     xbutton.x_root = pt.x;
     xbutton.y_root = pt.y;
     xmotion.window = hwnd;
+    xmotion.state &= ~(Button1Mask|Button2Mask|Button3Mask|Button4Mask|Button5Mask);
     xmotion.x = GET_X_LPARAM(lParam);
     xmotion.y = GET_Y_LPARAM(lParam);
     xmotion.x_root = pt.x;
