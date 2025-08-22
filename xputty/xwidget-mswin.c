@@ -582,6 +582,7 @@ void HandleFiles(WPARAM wParam, Widget_t * wid)
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     POINT pt;
+    static int double_click = 0;
     XButtonEvent xbutton;
     XMotionEvent xmotion;
     XKeyEvent xkey;
@@ -742,12 +743,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case WM_LBUTTONDBLCLK:
             if (!wid) return DefWindowProc(hwnd, msg, wParam, lParam);
             xbutton.button = Button1;
+            double_click = 1;
             wid->func.double_click_callback(wid, &xbutton, user_data);
             return 0;
         case WM_LBUTTONUP:
         case WM_MBUTTONUP:
         case WM_RBUTTONUP:
             ReleaseCapture();
+            if (double_click) {
+                double_click = 0;
+                return 0;
+            }
             if (msg == WM_LBUTTONUP) {
                 xbutton.button = Button1;
                 xbutton.state |= Button1Mask;
