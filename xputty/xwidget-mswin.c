@@ -583,9 +583,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     POINT pt;
     static int double_click = 0;
+
     XButtonEvent xbutton;
+    memset(&xbutton,0,sizeof(xbutton));
     XMotionEvent xmotion;
+    memset(&xmotion,0,sizeof(xmotion));
     XKeyEvent xkey;
+    memset(&xkey,0,sizeof(xkey));
+
     void *user_data = NULL;
     GetCursorPos(&pt);
 
@@ -599,7 +604,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     xbutton.x_root = pt.x;
     xbutton.y_root = pt.y;
     xmotion.window = hwnd;
-    xmotion.state &= ~(Button1Mask|Button2Mask|Button3Mask|Button4Mask|Button5Mask);
+    //xmotion.state &= ~(Button1Mask|Button2Mask|Button3Mask|Button4Mask|Button5Mask);
     xmotion.x = GET_X_LPARAM(lParam);
     xmotion.y = GET_Y_LPARAM(lParam);
     xmotion.x_root = pt.x;
@@ -959,6 +964,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 //if(!(xev->xcrossing.state & Button1Mask)) {
                 if (!(wParam & MK_LBUTTON)) {
                     wid->state = 1;
+                    SetFocus(hwnd);
                     wid->func.enter_callback((void*)wid, user_data);
                    // if (!(wid->flags & IS_WINDOW))
                    //     RedrawWindow(hwnd, NULL, NULL, RDW_NOERASE | RDW_INVALIDATE | RDW_UPDATENOW);
