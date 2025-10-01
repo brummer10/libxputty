@@ -18,6 +18,11 @@
 	OBJ_DIR := .
 	RELEASE_DIR := ../libxputty/
 
+
+ifeq ($(PAWPAW_BUILD),1)
+	CFLAGS += -DPAWPAW=1
+endif
+
 	# include path for library headers
 	INCLUDES := -I. -I$(HEADER_DIR) -I$(WIDGET_HEADER_DIR) -I$(RESOURCES_DIR) -I$(DIALOG_HEADER_DIR) -I$(XDG_DIR)
 	# link flags to dynamic link cairo and X11 (default)

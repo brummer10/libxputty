@@ -249,15 +249,24 @@ void create_cairo_context_and_buffer(Widget_t *w) {
     int height = w->scale.init_height;
     assert(cairo_surface_status(w->surface) == CAIRO_STATUS_SUCCESS);
     w->cr = cairo_create(w->surface);
+#if defined(PAWPAW)
+    cairo_select_font_face (w->cr, "@cairo:sans-serif", CAIRO_FONT_SLANT_NORMAL,
+                               CAIRO_FONT_WEIGHT_NORMAL);
+#else
     cairo_select_font_face (w->cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
                                CAIRO_FONT_WEIGHT_NORMAL);
-
+#endif
     w->buffer = cairo_surface_create_similar (w->surface, 
                         CAIRO_CONTENT_COLOR_ALPHA, width, height);
     assert(cairo_surface_status(w->buffer) == CAIRO_STATUS_SUCCESS);
     w->crb = cairo_create (w->buffer);
+#if defined(PAWPAW)
+    cairo_select_font_face (w->crb, "@cairo:sans-serif", CAIRO_FONT_SLANT_NORMAL,
+                               CAIRO_FONT_WEIGHT_NORMAL);
+#else
     cairo_select_font_face (w->crb, "Sans", CAIRO_FONT_SLANT_NORMAL,
                                CAIRO_FONT_WEIGHT_NORMAL);
+#endif
 }
 
 Widget_t *create_widget(Xputty *app, Widget_t *parent,
