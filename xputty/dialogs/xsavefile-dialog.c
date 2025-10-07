@@ -393,7 +393,7 @@ static void file_double_click_callback(void *w_, void *button, void* user_data) 
         os_set_transient_for_hint(file_dialog->w, dia);
         return;
     }
-    destroy_widget(file_dialog->w,file_dialog->w->app);
+    //destroy_widget(file_dialog->w,file_dialog->w->app);
 }
 
 static void reload_all(FileDialog *file_dialog) {
