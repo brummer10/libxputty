@@ -100,7 +100,7 @@ void _draw_list(void *w_, void* user_data) {
                 cairo_set_source_surface (w->crb, filelist->folder,1.0*12.5,((double)a+0.1)*filelist->item_height*12.5);
                 cairo_paint (w->crb);
                 cairo_scale(w->crb,12.5, 12.5);
-                use_text_color_scheme(w, INSENSITIVE_);
+                use_text_color_scheme(w, get_color_state(w));
             } else {
                 cairo_scale(w->crb,0.08, 0.08);
                 cairo_set_source_surface (w->crb, filelist->file,1.0*12.5,((double)a+0.1)*filelist->item_height*12.5);
@@ -198,7 +198,7 @@ void _update_list_view(void *w_) {
                 cairo_set_source_surface (w->crb, filelist->folder,1.0*12.5,((double)a+0.1)*filelist->item_height*12.5);
                 cairo_paint (w->crb);
                 cairo_scale(w->crb,12.5, 12.5);
-                use_text_color_scheme(w, INSENSITIVE_);
+                use_text_color_scheme(w, get_color_state(w));
             } else {
                 cairo_scale(w->crb,0.08, 0.08);
                 cairo_set_source_surface (w->crb, filelist->file,1.0*12.5,((double)a+0.1)*filelist->item_height*12.5);
