@@ -170,6 +170,8 @@ typedef enum {
 /** Widget_t adjust nord/east */
     NORTHEAST    ,
 /** Widget_t adjust south/west */
+    NORTCENTER    ,
+/** Widget_t adjust centered */
     SOUTHWEST     ,
 /** Widget_t adjust south/east */
     SOUTHEAST     ,
