@@ -190,6 +190,8 @@ typedef enum {
 /** Widget_t adjust west/south */
     WESTSOUTH     ,
 /** Widget_t adjust west/south */
+    WESTEAST     ,
+/** Widget_t adjust west/south */
     WESTCENTER     ,
 /** Widget_t adjust centered */
     CENTER        ,
@@ -350,6 +352,8 @@ struct Widget_t {
     void *parent_struct;
 /** pointer to the Parent struct */
     void *private_struct;
+/** pointer to the user data */
+    void *user_data;
 /** the main XEvent callback */
     vfunc event_callback;
 /** struct holding the event callbacks */
