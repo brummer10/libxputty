@@ -39,7 +39,7 @@ void tooltip_set_text(Widget_t *w, const char* label) {
 }
 
 void add_tooltip(Widget_t *w, const char* label) {
-    Widget_t *wid = create_tooltip(w, 25, 25);
+    Widget_t *wid = create_tooltip(w, 25 * w->app->hdpi, 25 * w->app->hdpi);
     wid->label = label;
     _get_width(wid);
 }
@@ -48,7 +48,8 @@ Widget_t* create_tooltip(Widget_t *parent, int width, int height) {
 
     int x1, y1;
     os_translate_coords(parent, parent->widget, os_get_root_window(parent->app, IS_WIDGET), 0, 0, &x1, &y1);
-    Widget_t *wid = create_window(parent->app, os_get_root_window(parent->app, IS_WIDGET), x1+10, y1+10, width, height);
+    Widget_t *wid = create_window(parent->app, os_get_root_window(parent->app, IS_WIDGET), x1+10, y1+10,
+                                    width * parent->app->hdpi, height * parent->app->hdpi);
     os_set_window_attrb(wid);
     os_set_transient_for_hint(parent, wid);
     wid->flags &= ~USE_TRANSPARENCY;

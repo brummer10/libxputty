@@ -24,9 +24,9 @@
 
 void _get_width(Widget_t *w) {
     cairo_text_extents_t extents;
-    cairo_set_font_size (w->crb, 12);
+    cairo_set_font_size (w->crb, w->app->normal_font * w->app->hdpi);
     cairo_text_extents(w->crb,w->label , &extents);
-    os_resize_window (w->app->dpy, w, max(1, (int)extents.width+40), 25);    
+    os_resize_window (w->app->dpy, w, max(1, (int)extents.width+40), 25 * w->app->hdpi);    
 }
 
 void _draw_tooltip(void *w_, void* user_data) {
@@ -42,7 +42,7 @@ void _draw_tooltip(void *w_, void* user_data) {
     cairo_text_extents_t extents;
     /** show label **/
     use_text_color_scheme(w, get_color_state(w));
-    cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
+    cairo_set_font_size (w->crb, w->app->normal_font * w->app->hdpi);
     cairo_text_extents(w->crb,w->label , &extents);
 
     cairo_move_to (w->crb, (width-extents.width)/2., height+5 - extents.height );
