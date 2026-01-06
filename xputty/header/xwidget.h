@@ -378,8 +378,6 @@ struct Widget_t {
     Childlist_t *childlist;
 /** Locale and UTF 8 support */
     XIC xic;
-/** Context to Locale and UTF 8 support */
-    XIM xim;
 #ifdef _OS_UNIX_
 /** int to hold the widget state default = 0 */
     Time double_click;

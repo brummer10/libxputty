@@ -67,7 +67,6 @@ void os_close_display(Display *dpy) {
 
 void os_destroy_window(Widget_t *w) {
     if (w->xic) XDestroyIC(w->xic);
-    if (w->xim) XCloseIM(w->xim);
     XUnmapWindow(w->app->dpy, w->widget);
     XDestroyWindow(w->app->dpy, w->widget);
 }
@@ -133,7 +132,7 @@ void os_create_main_window_and_surface(Widget_t *w, Xputty *app, Window win,
 
     long event_mask = StructureNotifyMask|ExposureMask|KeyPressMask 
                     |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask
-                    |ButtonPressMask|Button1MotionMask;
+                    |ButtonPressMask|Button1MotionMask|FocusChangeMask;
 
 
 
@@ -142,17 +141,8 @@ void os_create_main_window_and_surface(Widget_t *w, Xputty *app, Window win,
                             CopyFromParent, &attributes);
     debug_print("XCreateWindow\n");
 
-    XSetLocaleModifiers("");
-    w->xim = XOpenIM(app->dpy, 0, 0, 0);
-    if(!w->xim){
-        XSetLocaleModifiers("@im=none");
-        w->xim = XOpenIM(app->dpy, 0, 0, 0);
-    }
-
-    w->xic = XCreateIC(w->xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
+    w->xic = XCreateIC(app->xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
                     XNClientWindow, w->widget, XNFocusWindow,  w->widget, NULL);
-
-    XSetICFocus(w->xic);
 
     XSelectInput(app->dpy, w->widget, event_mask);
 
@@ -170,7 +160,7 @@ void os_create_widget_window_and_surface(Widget_t *w, Xputty *app, Widget_t *par
 
     long event_mask = StructureNotifyMask|ExposureMask|KeyPressMask 
                     |EnterWindowMask|LeaveWindowMask|ButtonReleaseMask
-                    |ButtonPressMask|Button1MotionMask;
+                    |ButtonPressMask|Button1MotionMask|FocusChangeMask;
 
 
 
@@ -179,17 +169,8 @@ void os_create_widget_window_and_surface(Widget_t *w, Xputty *app, Widget_t *par
                             CopyFromParent|CWOverrideRedirect, &attributes);
     debug_print("XCreateWindow\n");
 
-    XSetLocaleModifiers("");
-    w->xim = XOpenIM(app->dpy, 0, 0, 0);
-    if(!w->xim){
-        XSetLocaleModifiers("@im=none");
-        w->xim = XOpenIM(app->dpy, 0, 0, 0);
-    }
-
-    w->xic = XCreateIC(w->xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
+    w->xic = XCreateIC(app->xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
                     XNClientWindow, w->widget, XNFocusWindow,  w->widget, NULL);
-
-    XSetICFocus(w->xic);
 
     XSelectInput(app->dpy, w->widget, event_mask);
 
@@ -316,6 +297,16 @@ void os_widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) 
                 debug_print("Widget_t KeyRelease %u\n", xev->xkey.keycode);
             }
         }
+        break;
+
+        case FocusIn:
+            if (wid->xic)
+                XSetICFocus(wid->xic);
+        break;
+
+        case FocusOut:
+            if (wid->xic)
+                XUnsetICFocus(wid->xic);
         break;
 
         case LeaveNotify:

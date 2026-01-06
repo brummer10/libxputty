@@ -387,6 +387,331 @@ static void draw_keyboard(void *w_, void* user_data) {
     height_t = m.height;
     if (!m.visible) return;
     MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
+
+    if (keys->key_size < 24)
+        cairo_set_font_size(w->crb, w->app->small_font);
+    else
+        cairo_set_font_size(w->crb, w->app->normal_font);
+
+    const double W = (double)keys->key_size;
+    const double white_h = (double)height_t;
+    const double scale_factor = W / 23.5;
+    const double black_cis_start = 13.0 * scale_factor; // left black key
+    const double black_gis_start = 16.0 * scale_factor; // center black key
+    const double black_dis_start = 19.0 * scale_factor; // right black key
+
+    const double black_w = W*0.59;
+    const double black_h = white_h * 0.64;
+
+    const double XOFF = (double)keys->key_offset;
+
+    int global_white_index[128];
+    for (int i = 0, wi = 0; i < 128; ++i) {
+        int pc = i % 12;
+        int is_black = (pc==1 || pc==3 || pc==6 || pc==8 || pc==10);
+        if (!is_black) {
+            global_white_index[i] = wi++;
+        } else {
+            global_white_index[i] = -1;
+        }
+    }
+
+    int start_midi = keys->octave;
+    if (start_midi < 0) start_midi = 0;
+    if (start_midi > 127) start_midi = 127;
+
+    int anchor = start_midi;
+    while (anchor <= 127 && global_white_index[anchor] == -1) anchor++;
+    if (anchor > 127) {
+        anchor = start_midi;
+        while (anchor >= 0 && global_white_index[anchor] == -1) anchor--;
+    }
+    int anchor_index = 0;
+    if (anchor >= 0 && anchor <= 127 && global_white_index[anchor] != -1)
+        anchor_index = global_white_index[anchor];
+    else
+        anchor_index = 0;
+
+    double white_x[128];
+    for (int i = 0; i < 128; ++i) white_x[i] = -1.0;
+    for (int mnum = 0; mnum < 128; ++mnum) {
+        int gw = global_white_index[mnum];
+        if (gw == -1) continue;
+        double x = XOFF + (double)(gw - anchor_index) * W;
+        white_x[mnum] = floor(x + 0.5);
+    }
+
+    for (int mnum = 0; mnum < 128; ++mnum) {
+        double x = white_x[mnum];
+        if (x < 0.0 && x + W < 0.0) continue;
+        if (x > (double)width_t) continue;
+        if (white_x[mnum] < 0.0) continue;
+
+        double rx = white_x[mnum];
+
+        int ik = is_key_in_in_matrix(keys, mnum);
+        if ( mnum == keys->active_key || is_key_in_matrix(keys->key_matrix, mnum) ) {
+            use_matrix_color(w, keys->channel);
+            cairo_set_line_width(w->crb, 1.0);
+        } else if (ik > -1) {
+            use_matrix_color(w, ik);
+            cairo_set_line_width(w->crb, 2.0);
+        } else if ( mnum == keys->prelight_key ) {
+            use_base_color_scheme(w, PRELIGHT_);
+            cairo_set_line_width(w->crb, 2.0);
+        } else {
+            use_fg_color_scheme(w, NORMAL_);
+            cairo_set_line_width(w->crb, 1.0);
+        }
+
+        cairo_rectangle(w->crb, rx, 0, floor(W + 0.5), floor(white_h + 0.5));
+        cairo_fill_preserve(w->crb);
+        use_base_color_scheme(w, NORMAL_);
+        cairo_stroke(w->crb);
+
+        if ((mnum % 12) == 0) { /* C */
+            double octave_ofset = (double)keys->key_size / 6.0;
+            cairo_move_to(w->crb, rx + octave_ofset, white_h * 0.9);
+            use_bg_color_scheme(w, NORMAL_);
+            char buf[8];
+            int octave = (mnum / 12) - 1;
+            snprintf(buf, sizeof(buf), "C%i", octave);
+            cairo_show_text(w->crb, buf);
+        }
+    }
+
+    cairo_pattern_t *black_pat = cairo_pattern_create_linear(0, 0, 0, black_h);
+    cairo_pattern_add_color_stop_rgba(black_pat, 0.0, 0.85, 0.85, 0.85, 0.40);
+    cairo_pattern_add_color_stop_rgba(black_pat, 0.2, 0.0, 0.0, 0.0, 0.0);
+    cairo_pattern_add_color_stop_rgba(black_pat, 0.8, 0.0, 0.0, 0.0, 0.0);
+    cairo_pattern_add_color_stop_rgba(black_pat, 1.0, 0.0, 0.0, 0.0, 0.4);
+
+    for (int mnum = 0; mnum < 128; ++mnum) {
+        int pc = mnum % 12;
+        int is_black = (pc==1 || pc==3 || pc==6 || pc==8 || pc==10);
+        if (!is_black) continue;
+
+        int left_midi = mnum - 1;
+        if (left_midi < 0) continue;
+        if (white_x[left_midi] < 0.0) continue;
+
+        double add_start = 0.0;
+        if (pc == 1)
+            add_start = black_cis_start+1;
+        else if (pc == 6)
+            add_start = black_cis_start;
+        else if (pc == 8)
+            add_start = black_gis_start;
+        else if (pc == 3)
+            add_start = black_dis_start-1;
+        else
+            add_start = black_dis_start;
+
+        double x_left = white_x[left_midi];
+
+        double x_black_d = x_left + add_start;
+        double x_black = floor(x_black_d + 0.5);
+
+        if (x_black + black_w < 0.0 || x_black > (double)width_t) continue;
+
+        int ik2 = is_key_in_in_matrix(keys, mnum);
+        if ( mnum == keys->active_key || is_key_in_matrix(keys->key_matrix, mnum) ) {
+            use_matrix_color(w, keys->channel);
+            cairo_set_line_width(w->crb, 1.0);
+        } else if (ik2 > -1) {
+            use_matrix_color(w, ik2);
+            cairo_set_line_width(w->crb, 2.0);
+        } else if ( mnum == keys->prelight_key ) {
+            use_base_color_scheme(w, PRELIGHT_);
+            cairo_set_line_width(w->crb, 2.0);
+        } else {
+            use_bg_color_scheme(w, NORMAL_);
+            cairo_set_line_width(w->crb, 1.0);
+        }
+
+        cairo_rectangle(w->crb, x_black, 0, floor(black_w + 0.5), floor(black_h + 0.5));
+        cairo_fill_preserve(w->crb);
+        cairo_set_source(w->crb, black_pat);
+        cairo_fill_preserve(w->crb);
+        use_base_color_scheme(w, NORMAL_);
+        cairo_stroke(w->crb);
+    }
+
+    cairo_pattern_destroy(black_pat);
+
+    cairo_pattern_t *pat = cairo_pattern_create_linear(0, 0, 0, height_t);
+    cairo_pattern_add_color_stop_rgba(pat, 1.0, 0.0, 0.0, 0.0, 0.4);
+    cairo_pattern_add_color_stop_rgba(pat, 0.8, 0.0, 0.0, 0.0, 0.0);
+    cairo_pattern_add_color_stop_rgba(pat, 0.0, 0.0, 0.0, 0.0, 0.0);
+    cairo_set_source(w->crb, pat);
+    cairo_rectangle(w->crb, 0, 0, width_t, height_t);
+    cairo_fill(w->crb);
+    cairo_pattern_destroy(pat);
+}
+
+static void keyboard_motion(void *w_, void* xmotion_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Widget_t *p = (Widget_t *)w->parent;
+    Metrics_t m;
+    os_get_window_metrics(w, &m);
+    if (!m.visible) return;
+    MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
+    XMotionEvent *ev = (XMotionEvent*)xmotion_;
+
+    double mx = (double) ev->x;
+    double my = (double) ev->y;
+    int button1_pressed = (ev->state & Button1Mask) ? 1 : 0;
+
+    const double W = (double)keys->key_size;
+    const double white_h = (double)m.height;
+    const double scale_factor = W / 23.5;
+    const double black_cis_start = 13.0 * scale_factor;
+    const double black_gis_start = 16.0 * scale_factor;
+    const double black_dis_start = 19.0 * scale_factor;
+
+    const double black_w = W * 0.65;
+    const double black_h = white_h * 0.64;
+    const double XOFF = (double)keys->key_offset;
+
+    int global_white_index[128];
+    for (int i = 0, wi = 0; i < 128; ++i) {
+        int pc = i % 12;
+        int is_black = (pc==1 || pc==3 || pc==6 || pc==8 || pc==10);
+        if (!is_black) {
+            global_white_index[i] = wi++;
+        } else {
+            global_white_index[i] = -1;
+        }
+    }
+
+    int start_midi = keys->octave;
+    if (start_midi < 0) start_midi = 0;
+    if (start_midi > 127) start_midi = 127;
+
+    int anchor = start_midi;
+    while (anchor <= 127 && global_white_index[anchor] == -1) anchor++;
+    if (anchor > 127) {
+        anchor = start_midi;
+        while (anchor >= 0 && global_white_index[anchor] == -1) anchor--;
+    }
+    int anchor_index = 0;
+    if (anchor >= 0 && anchor <= 127 && global_white_index[anchor] != -1)
+        anchor_index = global_white_index[anchor];
+    else
+        anchor_index = 0;
+
+    double white_x[128];
+    for (int i = 0; i < 128; ++i) white_x[i] = -1.0;
+    for (int mnum = 0; mnum < 128; ++mnum) {
+        int gw = global_white_index[mnum];
+        if (gw == -1) continue;
+        double x = XOFF + (double)(gw - anchor_index) * W;
+        white_x[mnum] = floor(x + 0.5);
+    }
+
+    int found = -1;
+    for (int mnum = 0; mnum < 128; ++mnum) {
+        int pc = mnum % 12;
+        int is_black = (pc==1 || pc==3 || pc==6 || pc==8 || pc==10);
+        if (!is_black) continue;
+
+        int left_midi = mnum - 1;
+        if (left_midi < 0 || left_midi > 127) continue;
+        double x_left = white_x[left_midi];
+        if (x_left < 0.0) continue;
+
+        double add_start = 0.0;
+        if (pc == 1)
+            add_start = black_cis_start+1;
+        else if (pc == 6)
+            add_start = black_cis_start;
+        else if (pc == 8)
+            add_start = black_gis_start;
+        else if (pc == 3)
+            add_start = black_dis_start-1;
+        else
+            add_start = black_dis_start;
+
+        double x_black_d = x_left + add_start;
+        double x_black = floor(x_black_d + 0.5);
+
+        if (mx >= x_black && mx < (x_black + black_w) && my >= 0.0 && my < black_h) {
+            found = mnum;
+            break;
+        }
+    }
+
+    if (found == -1) {
+        double approx = (mx - XOFF) / W;
+        long cand_global = (long) floor(approx + 0.5) + anchor_index;
+
+        for (long gw = cand_global - 1; gw <= cand_global + 1; ++gw) {
+            if (gw < 0) continue;
+            for (int mnum = 0; mnum < 128; ++mnum) {
+                if (global_white_index[mnum] != gw) continue;
+                double x = white_x[mnum];
+                if (x < 0.0) continue;
+                double x_right = x + W;
+                if (mx >= x && mx < x_right && my >= 0.0 && my < white_h) {
+                    found = mnum;
+                    break;
+                }
+            }
+            if (found != -1) break;
+        }
+
+        if (found == -1) {
+            for (int mnum = 0; mnum < 128; ++mnum) {
+                double x = white_x[mnum];
+                if (x < 0.0) continue;
+                double x_right = x + W;
+                if (mx >= x && mx < x_right && my >= 0.0 && my < white_h) {
+                    found = mnum;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (button1_pressed) {
+        if (keys->active_key != found) {
+            keys->send_key = keys->active_key;
+            if (keys->send_key >= 0 && keys->send_key < 128) {
+                if (is_key_in_matrix(keys->in_key_matrix[keys->channel], keys->send_key))
+                    set_key_in_matrix(keys->in_key_matrix[keys->channel], keys->send_key, false);
+
+                if (keys->mk_send_note)
+                    keys->mk_send_note(p, &keys->send_key, 0x80);
+            }
+
+            keys->active_key = found;
+            keys->send_key = keys->active_key;
+            keys->last_active_key = keys->active_key;
+
+            if (keys->send_key >= 0 && keys->send_key < 128) {
+                if (keys->mk_send_note)
+                    keys->mk_send_note(p, &keys->send_key, 0x90);
+            }
+            expose_widget(w);
+        }
+        keys->prelight_key = found;
+    } else {
+        if (keys->prelight_key != found) {
+            keys->prelight_key = found;
+            expose_widget(w);
+        }
+    }
+}
+/*  UNUSED NOW
+static void draw_keyboard_old(void *w_, void* user_data) {
+    Widget_t *w = (Widget_t*)w_;
+    Metrics_t m;
+    int width_t, height_t;
+    os_get_window_metrics(w, &m);
+    width_t = m.width;
+    height_t = m.height;
+    if (!m.visible) return;
+    MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
  
     int space = 2;
     int set = 0;
@@ -554,7 +879,7 @@ static void draw_keyboard(void *w_, void* user_data) {
     cairo_pattern_destroy (pat);
 }
 
-static void keyboard_motion(void *w_, void* xmotion_, void* user_data) {
+static void keyboard_motion_old(void *w_, void* xmotion_, void* user_data) {
     Widget_t *w = (Widget_t*)w_;
     Widget_t *p = (Widget_t *)w->parent;
     MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
@@ -671,6 +996,7 @@ static void keyboard_motion(void *w_, void* xmotion_, void* user_data) {
         }
     }
 }
+*/
 
 static void get_outkey(MidiKeyboard *keys, KeySym sym, float *outkey) {
     switch(keys->layout) {
@@ -942,7 +1268,7 @@ void add_keyboard(Widget_t *wid, const char * label) {
     keys->channel = 0;
     keys->velocity = 64;
     keys->key_size = 20 * wid->app->hdpi;
-    keys->key_offset = 15;
+    keys->key_offset = 0;
     keys->keyboard = wid;
     memset(keys->custom_keys, 0, 128*2*sizeof keys->custom_keys[0][0]);
     int j = 0;

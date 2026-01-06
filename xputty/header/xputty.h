@@ -265,6 +265,10 @@ struct Xputty{
     bool is_grab;
 /** float to hold the current dpi setting of the Display */
     float hdpi;
+#ifdef _OS_UNIX_
+/** Context to Locale and UTF 8 support */
+    XIM xim;
+#endif
 /** padding struct to align clean **/
     char pad[2];
     Window dnd_source_window;
