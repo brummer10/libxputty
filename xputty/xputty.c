@@ -80,7 +80,9 @@ void main_quit(Xputty *main) {
     free(main->childlist);
     free(main->color_scheme);
     free(main->systray_color);
+#ifdef _OS_UNIX_
     if (main->xim) XCloseIM(main->xim);
+#endif
     os_close_display(main->dpy);
     free(main->ctext);
     debug_print("quit\n");
