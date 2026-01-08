@@ -323,6 +323,10 @@ void os_widget_hide(Widget_t *w) {
     ShowWindow(w->widget, SW_HIDE);
 }
 
+void os_raise_widget(Widget_t *w) {
+    BringWindowToTop(w->widget);
+}
+
 void os_show_tooltip(Widget_t *wid, Widget_t *w) {
     POINT pt;
     if (GetCursorPos(&pt)) {

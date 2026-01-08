@@ -146,6 +146,14 @@ void os_set_window_min_size(Widget_t *w, int min_width, int min_height,
 
 void os_move_window(Display *dpy, Widget_t *w, int x, int y);
 
+
+/**
+ * @brief os_raise_window         - bring a widget to top level view
+ * @param *w                      - widget to raise
+ */
+
+void os_raise_widget(Widget_t *w);
+
 /**
  * @brief os_resize_window         - Resize a  Widget_t
  * @param *dpy                     - Pointer to the Display the widget belongs to

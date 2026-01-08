@@ -195,6 +195,10 @@ void os_widget_hide(Widget_t *w) {
     XUnmapWindow(w->app->dpy, w->widget);
 }
 
+void os_raise_widget(Widget_t *w) {
+    XRaiseWindow(w->app->dpy, w->widget);
+}
+
 void os_show_tooltip(Widget_t *wid, Widget_t *w) {
     unsigned int mask;
     int x, y, rx, ry;
