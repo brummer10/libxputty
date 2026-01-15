@@ -354,6 +354,10 @@ struct Widget_t {
     void *private_struct;
 /** pointer to the user data */
     void *user_data;
+/** pointer to the user cursor */
+    OS_CURSOR cursor;
+/** pointer to the alternative user cursor */
+    OS_CURSOR cursor2;
 /** the main XEvent callback */
     vfunc event_callback;
 /** struct holding the event callbacks */

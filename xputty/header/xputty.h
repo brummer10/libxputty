@@ -75,6 +75,7 @@ extern "C" {
 #define DND_VERSION(e) ((e)->xclient.data.l[1] >> 24)
 #define DND_SOURCE_WIN(e) ((e)->xclient.data.l[0])
 #define DND_DROP_TIME(e) ((e)->xclient.data.l[2])
+typedef Cursor OS_CURSOR;
 #endif //_OS_UNIX_
 
 

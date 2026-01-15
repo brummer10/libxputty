@@ -67,6 +67,8 @@ void os_close_display(Display *dpy) {
 
 void os_destroy_window(Widget_t *w) {
     if (w->xic) XDestroyIC(w->xic);
+    if (w->cursor) XFreeCursor(w->app->dpy, w->cursor);
+    if (w->cursor2) XFreeCursor(w->app->dpy, w->cursor2);
     XUnmapWindow(w->app->dpy, w->widget);
     XDestroyWindow(w->app->dpy, w->widget);
 }
@@ -206,7 +208,7 @@ void os_show_tooltip(Widget_t *wid, Widget_t *w) {
     XQueryPointer(wid->app->dpy, wid->widget, &root, &child, &rx, &ry, &x, &y, &mask);
     int x1, y1;
     os_translate_coords(wid, wid->widget, os_get_root_window(wid->app, IS_WIDGET), x, y, &x1, &y1);
-    XMoveWindow(w->app->dpy,w->widget,x1+10, y1-10);
+    XMoveWindow(w->app->dpy,w->widget,x1+10, y1+40);
     XMapWindow(w->app->dpy, w->widget);
 }
 
@@ -322,6 +324,7 @@ void os_widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) 
                 wid->state = 0;
                 wid->func.leave_callback(w_, user_data);
             }
+            if (wid->cursor) XUndefineCursor(wid->app->dpy, wid->widget);
             if (wid->flags & HAS_TOOLTIP) hide_tooltip(wid);
             debug_print("Widget_t LeaveNotify \n");
         break;
@@ -329,6 +332,7 @@ void os_widget_event_loop(void *w_, void* event, Xputty *main, void* user_data) 
         case EnterNotify:
             wid->flags |= HAS_FOCUS;
             if (wid->state == 4) break;
+            if (wid->cursor) XDefineCursor(wid->app->dpy, wid->widget, wid->cursor);
             if(!(xev->xcrossing.state & Button1Mask) &&
                !(xev->xcrossing.state & Button2Mask) &&
                !(xev->xcrossing.state & Button3Mask)) {

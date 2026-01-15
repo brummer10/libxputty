@@ -54,6 +54,7 @@ typedef XID Pixmap;
 typedef XID KeySym;
 typedef void *XIC;
 typedef void *XIM;
+typedef HCURSOR OS_CURSOR;
 
 typedef struct {
   Window window;

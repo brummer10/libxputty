@@ -988,6 +988,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             wid->func.motion_callback((void*)wid, &xmotion, user_data);
             debug_print("Widget_t MotionNotify x = %li Y = %li hwnd=%p\n",pt.x,pt.y,hwnd );
             return 0;
+        case WM_SETCURSOR:
+            if (!wid) return DefWindowProc(hwnd, msg, wParam, lParam);
+            if (LOWORD(lParam) == HTCLIENT) {
+                SetCursor(wid->cursor ? wid->cursor : LoadCursor(NULL, IDC_ARROW));
+                return TRUE;
+            }
+            break;
 
         case WM_DROPFILES:
             HandleFiles(wParam, wid);
