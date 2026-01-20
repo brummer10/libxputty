@@ -388,6 +388,9 @@ static void draw_keyboard(void *w_, void* user_data) {
     if (!m.visible) return;
     MidiKeyboard *keys = (MidiKeyboard*)w->private_struct;
 
+    use_bg_color_scheme(w, NORMAL_);
+    cairo_paint(w->crb);
+
     if (keys->key_size < 24)
         cairo_set_font_size(w->crb, w->app->small_font);
     else
