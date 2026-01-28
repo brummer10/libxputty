@@ -17,6 +17,8 @@
 	RESOURCES_DIR :=$(LIB_DIR)resources/
 	OBJ_DIR := .
 	RELEASE_DIR := ../libxputty/
+ 
+XXDI ?= xxd -i
 
 
 ifeq ($(PAWPAW_BUILD),1)
@@ -187,7 +189,7 @@ ifeq ($(TARGET), Linux)
 	$(QUIET)sed 's;PATH;$(PREFIX);' $< >$@
 endif
 
-libxputty.$(STATIC_LIB_EXT): $(SVGRESOURCES_C) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
+libxputty.$(STATIC_LIB_EXT): $(SVGRESOURCES_C) $(RESOURCES_O) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
 	@$(B_ECHO) "Build static library $@ $(reset)"
 	$(QUIET)$(AR) rcs libxputty.$(STATIC_LIB_EXT) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ)  $(SVGRESOURCES_OBJ) $(XDG_OBJ)
 	$(QUIET)mkdir -p $(RELEASE_DIR)include/
