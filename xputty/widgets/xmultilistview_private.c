@@ -97,7 +97,7 @@ void _draw_multi_list(void *w_, void* user_data) {
                 else if (i == filelist->active_item)
                     use_text_color_scheme(w, SELECTED_);
                 else
-                    use_text_color_scheme(w,INSENSITIVE_ );
+                    use_text_color_scheme(w,NORMAL_ );
 
                 char label[124];
                 memset(label, '\0', sizeof(char)*124);
@@ -199,7 +199,7 @@ void _update_view(void *w_) {
                 else if (i == filelist->active_item)
                     use_text_color_scheme(w, SELECTED_);
                 else
-                    use_text_color_scheme(w,INSENSITIVE_ );
+                    use_text_color_scheme(w,NORMAL_ );
 
                 char label[124];
                 memset(label, '\0', sizeof(char)*124);
