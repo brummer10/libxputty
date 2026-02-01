@@ -200,15 +200,22 @@ void os_widget_hide(Widget_t *w) {
 void os_raise_widget(Widget_t *w) {
     XRaiseWindow(w->app->dpy, w->widget);
 }
-
 void os_show_tooltip(Widget_t *wid, Widget_t *w) {
-    unsigned int mask;
-    int x, y, rx, ry;
-    Window child, root;
-    XQueryPointer(wid->app->dpy, wid->widget, &root, &child, &rx, &ry, &x, &y, &mask);
+    if (!wid || !w) return;
+
+    Metrics_t pm;
+    Metrics_t tm;
+    os_get_window_metrics(wid, &pm);
+    os_get_window_metrics(w, &tm);
     int x1, y1;
-    os_translate_coords(wid, wid->widget, os_get_root_window(wid->app, IS_WIDGET), x, y, &x1, &y1);
-    XMoveWindow(w->app->dpy,w->widget,x1+10, y1+40);
+    os_translate_coords(wid, wid->widget,
+        os_get_root_window(wid->app, IS_WIDGET), 0, 0, &x1, &y1);
+    int tx = x1 + (pm.width  - tm.width) / 2;
+    int spacing = (int)(10 * wid->app->hdpi);
+    int ty = y1 - tm.height - spacing;
+    if (ty < 0) ty = y1 + pm.height + spacing;
+
+    XMoveWindow(w->app->dpy, w->widget, tx, ty);
     XMapWindow(w->app->dpy, w->widget);
 }
 
