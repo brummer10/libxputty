@@ -550,7 +550,7 @@ void _configure_contex_menu(Widget_t *parent, Widget_t *menu, int elem, XButtonE
     adj_set_scale(slider->adj, ((float)view_port->childlist->elem/(float)elem)/25.0);
 
     int screen_height = os_get_screen_height(parent);
-    if (y1+(height*elem) > screen_height) y1 = y1-((height*elem)+parent->height);
+    if (y1+(height*elem) > screen_height) y1 = y1-((height*elem));
     os_resize_window (menu->app->dpy, menu, item_width, height*elem);
     os_resize_window (view_port->app->dpy, view_port, item_width, height*view_port->childlist->elem);
     os_move_window(menu->app->dpy,slider,item_width-10, 0);
