@@ -300,7 +300,7 @@ void os_create_widget_window_and_surface(Widget_t *w, Xputty *app, Widget_t *par
     DWORD dwExStyle = WS_EX_CONTROLPARENT;
     w->widget = CreateWindowEx(dwExStyle, szWidgetUIClassName,
                             TEXT("Draw Surface"), // lpWindowName
-                            WS_CHILD, // dwStyle
+                            WS_CHILD|WS_CLIPSIBLINGS, // dwStyle
                             x, y, // X, Y
                             width, height, // nWidth, nHeight
                             parent->widget, // hWndParent (no embeddeding takes place yet)
@@ -324,7 +324,8 @@ void os_widget_hide(Widget_t *w) {
 }
 
 void os_raise_widget(Widget_t *w) {
-    BringWindowToTop(w->widget);
+    SetWindowPos(w->widget, HWND_TOP, 0, 0, 0, 0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 }
 
 void os_show_tooltip(Widget_t *wid, Widget_t *w) {
