@@ -133,7 +133,7 @@ Widget_t *menubar_add_menu(Widget_t *parent, const char * label) {
     int width = (int)extents.width+20;
     Metrics_t metrics;
     os_get_window_metrics(parent, &metrics);
-    int height = metrics.height;
+    int height = metrics.height / parent->app->hdpi;
     int x = 0;
     int i = parent->childlist->elem-1;
     for(;i>-1;i--) {
