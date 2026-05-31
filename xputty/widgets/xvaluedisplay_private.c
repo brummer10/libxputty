@@ -84,7 +84,8 @@ void _draw_valuedisplay(void *w_, void* user_data) {
     cairo_set_font_size (w->crb, font_size);
     cairo_text_extents(w->crb,s , &extents);
     cairo_move_to (w->crb, (width-extents.width)*0.5, (height+extents.height)*0.55);
-    cairo_show_text(w->crb, s);
+    cairo_text_path (w->crb, s);
+    cairo_fill (w->crb);
     cairo_new_path (w->crb);
 
 }
@@ -125,7 +126,8 @@ void _draw_spinbox(void *w_, void* user_data) {
     cairo_set_font_size (w->crb, font_size);
     cairo_text_extents(w->crb,s , &extents);
     cairo_move_to (w->crb, (width-extents.width)*0.5, (height+extents.height)*0.55);
-    cairo_show_text(w->crb, s);
+    cairo_text_path (w->crb, s);
+    cairo_fill (w->crb);
     cairo_new_path (w->crb);
 }
 
@@ -148,9 +150,11 @@ void _draw_buttons(void *w_, void* user_data) {
     float font_size = w->app->big_font/w->scale.ascale;
     cairo_set_font_size (w->crb, font_size);
     cairo_move_to (w->crb, 5,18);
-    cairo_show_text(w->crb, "+");
+    cairo_text_path (w->crb, "+");
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 7,38);
-    cairo_show_text(w->crb, "-"); 
+    cairo_text_path (w->crb, "-");
+    cairo_fill (w->crb);
 }
 
 void _buttons_released(void *w_, void* button_, void* user_data) {

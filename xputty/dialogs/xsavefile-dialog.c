@@ -60,17 +60,23 @@ static void draw_window(void *w_, void* user_data) {
     use_fg_color_scheme(w, NORMAL_);
     cairo_set_font_size (w->crb, w->app->normal_font);
     cairo_move_to (w->crb, 20 * w->app->hdpi, 35 * w->app->hdpi);
-    cairo_show_text(w->crb, _("Base Directory"));
+    cairo_text_path (w->crb, _("Base Directory"));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 20 * w->app->hdpi, 85 * w->app->hdpi);
-    cairo_show_text(w->crb, _("Places"));
+    cairo_text_path (w->crb, _("Places"));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 130 * w->app->hdpi, 85 * w->app->hdpi);
-    cairo_show_text(w->crb, _("Entries"));
+    cairo_text_path (w->crb, _("Entries"));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 20 * w->app->hdpi, (330 * w->app->hdpi -w->scale.scale_y));
-    cairo_show_text(w->crb, _("Save as: "));
+    cairo_text_path (w->crb, _("Save as: "));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 45 * w->app->hdpi, (360 * w->app->hdpi -w->scale.scale_y));
-    cairo_show_text(w->crb, _("Show hidden files")); 
+    cairo_text_path (w->crb, _("Show hidden files"));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 45 * w->app->hdpi, (390 * w->app->hdpi -w->scale.scale_y));
-    cairo_show_text(w->crb, _("List view"));
+    cairo_text_path (w->crb, _("List view"));
+    cairo_fill (w->crb);
 
     if (w->image) {
         cairo_set_source_surface (w->crb, w->image, 180 * w->app->hdpi, (332 * w->app->hdpi -w->scale.scale_y));
@@ -541,7 +547,8 @@ static void draw_entry(void *w_, void* user_data) {
     cairo_set_font_size (w->cr, 9.0);
 
     cairo_move_to (w->cr, 2, 9);
-    cairo_show_text(w->cr, " ");
+    cairo_text_path (w->crb, " ");
+    cairo_fill (w->crb);
 }
 
 static void entry_add_text(void  *w_, void *label_) {
@@ -567,7 +574,8 @@ static void entry_add_text(void  *w_, void *label_) {
     cairo_text_extents(w->cr, w->input_label , &extents);
 
     cairo_move_to (w->cr, 2, 6.0+extents.height);
-    cairo_show_text(w->cr,  w->input_label);
+    cairo_text_path (w->crb, w->input_label);
+    cairo_fill (w->crb);
 
 }
 
@@ -599,7 +607,8 @@ static void entry_clip(Widget_t *w) {
     cairo_text_extents(w->cr, w->input_label , &extents);
 
     cairo_move_to (w->cr, 2, 6.0+extents.height);
-    cairo_show_text(w->cr,  w->input_label);
+    cairo_text_path (w->crb, w->input_label);
+    cairo_fill (w->crb);
 
 }
 

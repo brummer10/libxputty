@@ -62,7 +62,8 @@ void _draw_menu_label(void *w_, void* user_data) {
         cairo_text_extents(w->crb,w->input_label , &extents);
         int set_line = (extents.width/len) * pos;
         cairo_move_to (w->crb, 10, (height+lh)*0.5);
-        cairo_show_text(w->crb, w->input_label);
+        cairo_text_path (w->crb, w->input_label);
+        cairo_fill (w->crb);
         cairo_set_line_width(w->crb, 1.0);
         cairo_move_to (w->crb, 10 + set_line, (height+lh)*0.55);
         cairo_line_to(w->crb,10 + set_line + underline, (height+lh)*0.55);
@@ -70,7 +71,8 @@ void _draw_menu_label(void *w_, void* user_data) {
     } else {
         cairo_text_extents(w->crb,w->label , &extents);
         cairo_move_to (w->crb, 10, (height+lh)*0.5);
-        cairo_show_text(w->crb, w->label);
+        cairo_text_path (w->crb, w->label);
+        cairo_fill (w->crb);
     }
 
     cairo_new_path (w->crb);
@@ -193,7 +195,8 @@ void _draw_submenu(void *w_, void* user_data) {
         cairo_text_extents(w->crb,w->input_label , &extents);
         int set_line = (extents.width/len) * pos;
         cairo_move_to (w->crb, 20, (height+extents.height)*0.5);
-        cairo_show_text(w->crb, w->input_label);
+        cairo_text_path (w->crb, w->input_label);
+        cairo_fill (w->crb);
         cairo_set_line_width(w->crb, 1.0);
         cairo_move_to (w->crb, 20 + set_line, (height+extents.height)*0.55);
         cairo_line_to(w->crb,20 + set_line + underline, (height+extents.height)*0.55);
@@ -201,10 +204,12 @@ void _draw_submenu(void *w_, void* user_data) {
     } else {
         cairo_text_extents(w->crb,w->label , &extents);
         cairo_move_to (w->crb, 20, (height+extents.height)*0.5);
-        cairo_show_text(w->crb, w->label);
+        cairo_text_path (w->crb, w->label);
+        cairo_fill (w->crb);
     }
     cairo_move_to (w->crb, (width-15), (height+extents.height)*0.5);
-    cairo_show_text(w->crb, ">");
+    cairo_text_path (w->crb, ">");
+    cairo_fill (w->crb);
     cairo_new_path (w->crb);
 }
 
@@ -292,7 +297,8 @@ void _draw_item(void *w_, void* user_data) {
     cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
     cairo_text_extents(w->crb,w->label , &extents);
     cairo_move_to (w->crb, 20, (height+extents.height)*0.5);
-    cairo_show_text(w->crb, w->label);
+    cairo_text_path (w->crb, w->label);
+    cairo_fill (w->crb);
     cairo_new_path (w->crb);
 }
 
@@ -334,7 +340,8 @@ void _draw_value_item(void *w_, void* user_data) {
     cairo_set_font_size (w->crb, w->app->normal_font/w->scale.ascale);
     cairo_text_extents(w->crb, s, &extents);
     cairo_move_to (w->crb, 20, (height+extents.height)*0.5);
-    cairo_show_text(w->crb, s);
+    cairo_text_path (w->crb, s);
+    cairo_fill (w->crb);
     cairo_new_path (w->crb);
 }
 
@@ -375,7 +382,8 @@ void _draw_accel_item(void *w_, void* user_data) {
         cairo_text_extents(w->crb,w->input_label , &extents);
         int set_line = (extents.width/len) * pos;
         cairo_move_to (w->crb, 20, (height+extents.height)*0.5);
-        cairo_show_text(w->crb, w->input_label);
+        cairo_text_path (w->crb, w->input_label);
+        cairo_fill (w->crb);
         cairo_set_line_width(w->crb, 1.0);
         cairo_move_to (w->crb, 20 + set_line, (height+extents.height)*0.55);
         cairo_line_to(w->crb,20 + set_line + underline, (height+extents.height)*0.55);
@@ -383,7 +391,8 @@ void _draw_accel_item(void *w_, void* user_data) {
     } else {
         cairo_text_extents(w->crb,w->label , &extents);
         cairo_move_to (w->crb, 20, (height+extents.height)*0.5);
-        cairo_show_text(w->crb, w->label);
+        cairo_text_path (w->crb, w->label);
+        cairo_fill (w->crb);
     }
     cairo_new_path (w->crb);
 }

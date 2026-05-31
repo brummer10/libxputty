@@ -79,17 +79,23 @@ static void draw_window(void *w_, void* user_data) {
     use_fg_color_scheme(w, NORMAL_);
     cairo_set_font_size (w->crb, w->app->normal_font);
     cairo_move_to (w->crb, 20 * w->app->hdpi, 35 * w->app->hdpi);
-    cairo_show_text(w->crb, _("Base Directory"));
+    cairo_text_path (w->crb, _("Base Directory"));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 20 * w->app->hdpi, 85 * w->app->hdpi);
-    cairo_show_text(w->crb, _("Places"));
+    cairo_text_path (w->crb, _("Places"));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 130 * w->app->hdpi, 85 * w->app->hdpi);
-    cairo_show_text(w->crb, _("Entries"));
+    cairo_text_path (w->crb, _("Entries"));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 20 * w->app->hdpi, (330 * w->app->hdpi -w->scale.scale_y));
-    cairo_show_text(w->crb, _("Load: "));
+    cairo_text_path (w->crb, _("Load: "));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 45 * w->app->hdpi, (360  * w->app->hdpi-w->scale.scale_y));
-    cairo_show_text(w->crb, _("Show hidden files")); 
+    cairo_text_path (w->crb, _("Show hidden files"));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 45 * w->app->hdpi, (390 * w->app->hdpi -w->scale.scale_y));
-    cairo_show_text(w->crb, _("List view"));
+    cairo_text_path (w->crb, _("List view"));
+    cairo_fill (w->crb);
     if (w->label) {
         cairo_text_extents_t extents;
         char *file = utf8_from_locale(file_dialog->fp->selected_file);
@@ -98,7 +104,8 @@ static void draw_window(void *w_, void* user_data) {
         size_t dr = (size_t)((width - 100)/(extents.width/sr));
         if ((sr-4) > dr) utf8clip(file, file,min(sr,sr - dr));
         cairo_move_to (w->crb, 60 * w->app->hdpi, (330 * w->app->hdpi -w->scale.scale_y));
-        cairo_show_text(w->crb, file);
+        cairo_text_path (w->crb, file);
+        cairo_fill (w->crb);
         free(file);
     }
     //widget_reset_scale(w);
@@ -116,7 +123,8 @@ static void draw_window(void *w_, void* user_data) {
         char * p = strtok (meta, "|");
         while (p) {
             cairo_move_to (w->crb, 160 * w->app->hdpi, (330 * w->app->hdpi -w->scale.scale_y) + i);
-            cairo_show_text(w->crb, p);
+            cairo_text_path (w->crb, p);
+            cairo_fill (w->crb);
             p = strtok (NULL, "|");
             i += w->app->normal_font+1;
         }

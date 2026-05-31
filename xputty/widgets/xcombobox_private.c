@@ -158,7 +158,8 @@ void _draw_combobox(void *w_, void* user_data) {
     double h = extents.height;
 
     cairo_move_to (w->crb, 15, (height+h)*0.55);
-    cairo_show_text(w->crb, comboboxlist->list_names[vl]);
+    cairo_text_path (w->crb, comboboxlist->list_names[vl]);
+    cairo_fill (w->crb);
     cairo_new_path (w->crb);
     if (extents.width > (float)width-20) {
         tooltip_set_text(w,comboboxlist->list_names[vl]);
@@ -223,7 +224,8 @@ void _draw_combobox_entrys(void *w_, void* user_data) {
         cairo_text_extents(w->crb,comboboxlist->list_names[i] , &extents);
 
         cairo_move_to (w->crb, 15, (comboboxlist->item_height*(a+1)) - h + 6 * w->app->hdpi);
-        cairo_show_text(w->crb, comboboxlist->list_names[i]);
+        cairo_text_path (w->crb, comboboxlist->list_names[i]);
+        cairo_fill (w->crb);
         cairo_new_path (w->crb);
         if (i == comboboxlist->prelight_item && extents.width > (float)width-20) {
             tooltip_set_text(w,comboboxlist->list_names[i]);

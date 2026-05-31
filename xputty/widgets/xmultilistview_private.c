@@ -115,7 +115,8 @@ void _draw_multi_list(void *w_, void* user_data) {
                 cairo_text_extents(w->crb, label, &fextents);
                 int pos_x = (k*filelist->item_width) + (filelist->item_width/2) - (fextents.width*0.5);
                 cairo_move_to (w->crb, pos_x, pos_y);
-                cairo_show_text(w->crb, label);
+                cairo_text_path (w->crb, label);
+                cairo_fill (w->crb);
                 cairo_new_path (w->crb);
                 if (i == filelist->prelight_item && extents.width > (float)filelist->item_width-10) {
                     free(filelist->tooltip_text);
@@ -216,7 +217,8 @@ void _update_view(void *w_) {
                 cairo_text_extents(w->crb, label, &fextents);
                 int pos_x = (k*filelist->item_width) + (filelist->item_width/2) - (fextents.width/2.0);
                 cairo_move_to (w->crb, pos_x, pos_y);
-                cairo_show_text(w->crb, label);
+                cairo_text_path (w->crb, w->label);
+                cairo_fill (w->crb);
                 cairo_new_path (w->crb);
                 if (i == filelist->prelight_item && extents.width > (float)filelist->item_width-10) {
                     tooltip_set_text(w,filelist->list_names[i]);

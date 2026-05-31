@@ -83,7 +83,8 @@ void _draw_tabbox(void *w_, void* user_data) {
 
         cairo_text_extents(w->crb,"Äy" , &extents);
         cairo_move_to (w->crb, 5+t, 2+extents.height);
-        cairo_show_text(w->crb, wi->label);
+        cairo_text_path (w->crb, wi->label);
+        cairo_fill (w->crb);
         cairo_new_path (w->crb);
         t += tabsize;
     }

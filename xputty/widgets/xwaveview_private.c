@@ -62,7 +62,8 @@ void _draw_waveview(void *w_, void* user_data) {
 
     use_text_color_scheme(w, get_color_state(w));
     cairo_move_to (w->crb, 30, extents.height);
-    cairo_show_text(w->crb, w->label);
+    cairo_text_path (w->crb, w->label);
+    cairo_fill (w->crb);
     cairo_new_path (w->crb);
 
     if (wave_view->size<1) return;

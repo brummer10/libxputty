@@ -61,21 +61,28 @@ static void draw_window(void *w_, void* user_data) {
     use_fg_color_scheme(w, NORMAL_);
     cairo_set_font_size (w->crb, w->app->normal_font);
     cairo_move_to (w->crb, 20 * w->app->hdpi, 35 * w->app->hdpi);
-    cairo_show_text(w->crb, _("Base Directory"));
+    cairo_text_path (w->crb, _("Base Directory"));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 20 * w->app->hdpi, 85 * w->app->hdpi);
-    cairo_show_text(w->crb, _("Places"));
+    cairo_text_path (w->crb, _("Places"));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 130 * w->app->hdpi, 85 * w->app->hdpi);
-    cairo_show_text(w->crb, _("Entries"));
+    cairo_text_path (w->crb, _("Entries"));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 20 * w->app->hdpi, 330 * w->app->hdpi -w->scale.scale_y);
-    cairo_show_text(w->crb, _("Select: "));
+    cairo_text_path (w->crb, _("Select: "));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 45 * w->app->hdpi, 360 * w->app->hdpi -w->scale.scale_y);
-    cairo_show_text(w->crb, _("Show hidden Directories")); 
+    cairo_text_path (w->crb, _("Show hidden Directories"));
+    cairo_fill (w->crb);
     cairo_move_to (w->crb, 45 * w->app->hdpi, 390 * w->app->hdpi -w->scale.scale_y);
-    cairo_show_text(w->crb, _("List view"));
+    cairo_text_path (w->crb, _("List view"));
+    cairo_fill (w->crb);
     if (w->label) {
         char *file = utf8_from_locale(file_dialog->fp->selected_file);
         cairo_move_to (w->crb, 60 * w->app->hdpi, 330 * w->app->hdpi -w->scale.scale_y);
-        cairo_show_text(w->crb, file);
+        cairo_text_path (w->crb, file);
+        cairo_fill (w->crb);
         free(file);
     }
     //widget_reset_scale(w);

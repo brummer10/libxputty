@@ -123,7 +123,8 @@ void _draw_list(void *w_, void* user_data) {
 
         cairo_move_to (w->crb, filelist->check_dir ? 30 : 10, 
                 (filelist->item_height*((double)a+1.0))+3.0 - h);
-        cairo_show_text(w->crb, label);
+        cairo_text_path (w->crb, label);
+        cairo_fill (w->crb);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {
             free(filelist->tooltip_text);
@@ -222,7 +223,8 @@ void _update_list_view(void *w_) {
 
         cairo_move_to (w->crb, filelist->check_dir ? 30 : 10, 
                 (filelist->item_height*((double)a+1.0))+3.0 - h);
-        cairo_show_text(w->crb, label);
+        cairo_text_path (w->crb, label);
+        cairo_fill (w->crb);
         cairo_new_path (w->crb);
         if (i == filelist->prelight_item && extents.width > (float)width-20) {
             tooltip_set_text(w,filelist->list_names[i]);

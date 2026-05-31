@@ -49,7 +49,8 @@ void _draw_image(void *w_, void* user_data) {
         cairo_set_font_size (w->crb, w->app->big_font/w->scale.ascale);
         cairo_text_extents(w->crb,"Missing Image" , &extents);
         cairo_move_to (w->crb, (w->width -extents.width)*0.5, (w->height - extents.height)*0.5);
-        cairo_show_text(w->crb, "Missing Image");
+        cairo_text_path (w->crb, "Missing Image");
+        cairo_fill (w->crb);
         cairo_new_path (w->crb);
 
         cairo_set_line_width(w->crb,3);
