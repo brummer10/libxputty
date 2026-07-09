@@ -38,7 +38,7 @@ PAWPAW=$(dirname $PawPaw)
 function windows() {
     export EXTRAQUIET=1
     make clean && cd $PAWPAW && tput setaf 4 && source local.env win64 && \
-    tput sgr0 && unset EXTRAQUIET && cd $CURDIR && make clap
+    tput sgr0 && unset EXTRAQUIET && cd $CURDIR && make
 }
 
 # build for Linux
