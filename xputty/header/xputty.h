@@ -204,12 +204,15 @@ typedef void (*xfunc)(void * widget, void* user_data);
 ----------------------------------------------------------------------*/
 
 // library header
+#include "xresourcemacros.h"
 #include "xwidget.h"
 #include "xadjustment.h"
 #include "xchildlist.h"
 #include "xcolor.h"
 #include "xpngloader.h"
+#include "xftloader.h"
 #include "xsvgloader.h"
+#include "xresources.h"
 
 
 #ifdef __cplusplus

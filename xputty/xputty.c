@@ -48,15 +48,9 @@ void main_init(Xputty *main) {
     main->submenu = NULL;
     main->run = true;
     main->is_grab = false;
-#if defined(PAWPAW)
-    main->small_font = 11 * main->hdpi;
-    main->normal_font = 13 * main->hdpi;
-    main->big_font = 17 * main->hdpi;
-#else
-    main->small_font = 10 * main->hdpi;
-    main->normal_font = 12 * main->hdpi;
-    main->big_font = 16 * main->hdpi;
-#endif
+    main->small_font = 12 * main->hdpi;
+    main->normal_font = 14 * main->hdpi;
+    main->big_font = 18 * main->hdpi;
     main->ctext = NULL;
     main->csize = 0;
     os_init_dnd(main);
@@ -85,5 +79,6 @@ void main_quit(Xputty *main) {
 #endif
     os_close_display(main->dpy);
     free(main->ctext);
+    xftloader_cleanup();
     debug_print("quit\n");
 }

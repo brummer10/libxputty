@@ -24,67 +24,9 @@
 #define XPNGLOADER_H_
 
 #include "xputty.h"
-#include "config.h"
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-
-/**  
-        define some MACROS to read png data from binary stream 
-        png's been converted to object files with
-        ld -r -b binary name.png -o name.o
-*/
-
-#ifdef USE_LD
-
-#ifdef __APPLE__
-
-#ifdef __cplusplus
-}
-#endif
-
-#include <mach-o/getsect.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define EXTLD(NAME) \
-  extern const unsigned char _section$__DATA__ ## NAME [];
-#define LDVAR(NAME) _section$__DATA__ ## NAME
-#define LDLEN(NAME) (getsectbyname("__DATA", "__" #NAME)->size)
-
-#elif (defined __WIN32__)  /* mingw */
-
-
-#define EXTLD(NAME) \
-  extern const unsigned char _binary_ ## NAME ## _start[]; \
-  extern const unsigned char _binary_ ## NAME ## _end[];
-#define LDVAR(NAME) \
-  _binary_ ## NAME ## _start
-#define LDLEN(NAME) \
-  ((_binary_ ## NAME ## _end) - (_binary_ ## NAME ## _start))
-
-#else /* gnu/linux ld */
-
-#define EXTLD(NAME) \
-  extern const unsigned char _binary_ ## NAME ## _start[]; \
-  extern const unsigned char _binary_ ## NAME ## _end[];
-#define LDVAR(NAME) \
-  _binary_ ## NAME ## _start
-#define LDLEN(NAME) \
-  ((_binary_ ## NAME ## _end) - (_binary_ ## NAME ## _start))
-#endif
-
-#else /* xxd -i NAME */
-
-#define EXTLD(NAME) \
-    extern const unsigned char NAME;
-#define LDVAR(NAME) \
-    (const unsigned char*)&NAME
-
 #endif
 
 
@@ -106,7 +48,6 @@ typedef struct  {
     long int position;
 } binary_stream;
 
-#include "xresources.h"
 
 /**
  * @brief cairo_image_surface_create_from_stream  - read binary data 

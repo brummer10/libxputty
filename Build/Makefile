@@ -56,6 +56,11 @@ endif
 	SVGRESOURCES_C := $(notdir $(patsubst %.svg,%.c,$(SVGRESOURCES)))
 	SVGRESOURCE_EXTLD := $(notdir $(patsubst %.svg,%_svg,$(SVGRESOURCES)))
 
+	FONTS := $(wildcard $(RESOURCES_DIR)*.ttf)
+	FONTS_OBJ := $(notdir $(patsubst %.ttf,%.o,$(FONTS)))
+	FONTS_C := $(notdir $(patsubst %.ttf,%.c,$(FONTS)))
+	FONT_EXTLD := $(notdir $(patsubst %.ttf,%_ttf,$(FONTS)))
+
 	XDG_SOURCES :=  $(wildcard $(XDG_DIR)*.c)
 	XDG_OBJ := $(notdir $(patsubst %.c,%.o,$(XDG_SOURCES)))
 
@@ -65,10 +70,13 @@ endif
 
 ifdef USE_LDD
 	RESOURCES_O = $(RESOURCES_OBJ)
+	FONTS_O = $(FONTS_OBJ)
 else ifdef USE_GOLD
 	RESOURCES_O = $(RESOURCES_OBJ)
+	FONTS_O = $(FONTS_OBJ)
 else
 	RESOURCES_O = $(RESOURCES_C)
+	FONTS_O = $(FONTS_C)
 endif
 
 .PHONY: all clean debug nls updatepot po shared
@@ -95,8 +103,8 @@ ifndef EXTRAQUIET
 	$(QUIET)@$(ECHO) "Clean up $(reset)"
 endif
 	$(QUIET)rm -f libxputty.$(STATIC_LIB_EXT) libxputty.$(LIB_EXT) libxputty.$(LIB_EXT).1 \
-	libxputty.$(LIB_EXT).1.0 libxputty.lib xputty.pc $(RESOURCES_C) $(SVGRESOURCES_C) \
-	$(LIB_OBJ) $(WIDGET_OBJ) $(RESOURCES_OBJ) $(SVGRESOURCES_OBJ) $(DIALOG_OBJ) $(XDG_OBJ) $(DEP) $(RESOURCEHEADER)
+	libxputty.$(LIB_EXT).1.0 libxputty.lib xputty.pc $(RESOURCES_C) $(FONTS_C) $(SVGRESOURCES_C) \
+	$(LIB_OBJ) $(WIDGET_OBJ) $(RESOURCES_OBJ) $(FONTS_OBJ) $(SVGRESOURCES_OBJ) $(DIALOG_OBJ) $(XDG_OBJ) $(DEP) $(RESOURCEHEADER)
 	$(QUIET)rm -rf $(RELEASE_DIR)
 	$(QUIET)rm -f config.h
 
@@ -125,13 +133,16 @@ ifeq (,$(findstring undef,$(CONFIG_X)))
 endif
 endif
 
-$(RESOURCEHEADER): $(RESOURCES_O)
+$(RESOURCEHEADER): $(RESOURCES_O) $(FONTS_O)
 	$(QUIET)rm -f $(RESOURCEHEADER)
 	$(QUIET)for f in $(RESOURCE_EXTLD); do \
 		echo 'EXTLD('$${f}')' >> $(RESOURCEHEADER) ; \
 	done
 	$(QUIET)for f in $(SVGRESOURCE_EXTLD); do \
 		echo 'extern const char* '$${f}';' >> $(RESOURCEHEADER) ; \
+	done
+	$(QUIET)for f in $(FONT_EXTLD); do \
+		echo 'EXTLD_FONT('$${f}')' >> $(RESOURCEHEADER) ; \
 	done
 
 $(XDG_OBJ): $(XDG_SOURCES)
@@ -159,6 +170,27 @@ LDFLAGS += -DUSE_LD=1
 $(RESOURCES_O): $(RESOURCES)
 	@$(ECHO) "Building Resource object $@$(reset)"
 	$(QUIET)cd $(RESOURCES_DIR) && $(LD) -r -b binary -z noexecstack $(patsubst %.o,%.png,$@) -o ../../Build/$@
+endif
+
+ifdef XXDI
+$(FONTS_O): $(FONTS)
+	@$(ECHO) "Building object file for Fonts $(reset)"
+	$(QUIET)$(foreach f, $(FONTS_OBJ), \
+		cd $(RESOURCES_DIR) ; \
+		$(XXDI) $(patsubst %.o,%.ttf,$(f)) > ../../Build/$(patsubst %.o,%.c,$(f)) ; \
+		cd ../../Build/ ; \
+	)
+	$(QUIET)$(foreach f, $(FONTS_C), \
+		$(CC) -c $(f) -o $(patsubst %.c,%.o,$(f)); \
+	)
+else ifdef USE_LDD
+$(FONTS_O): $(FONTS)
+	@$(ECHO) "Building Font object $@$(reset)"
+	$(QUIET)cd $(RESOURCES_DIR) && $(LD) -r -b binary -m $(LDEMULATION) $(patsubst %.o,%.ttf,$@) -o ../../Build/$@
+else
+$(FONTS_O): $(FONTS)
+	@$(ECHO) "Building Font object $@$(reset)"
+	$(QUIET)cd $(RESOURCES_DIR) && $(LD) -r -b binary -z noexecstack $(patsubst %.o,%.ttf,$@) -o ../../Build/$@
 endif
 
 $(SVGRESOURCES_C): $(SVGRESOURCES)
@@ -189,7 +221,7 @@ endif
 
 libxputty.$(STATIC_LIB_EXT): $(SVGRESOURCES_C) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(XDG_OBJ)
 	@$(B_ECHO) "Build static library $@ $(reset)"
-	$(QUIET)$(AR) rcs libxputty.$(STATIC_LIB_EXT) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ)  $(SVGRESOURCES_OBJ) $(XDG_OBJ)
+	$(QUIET)$(AR) rcs libxputty.$(STATIC_LIB_EXT) $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ)  $(SVGRESOURCES_OBJ) $(XDG_OBJ) $(FONTS_OBJ)
 	$(QUIET)mkdir -p $(RELEASE_DIR)include/
 	$(QUIET)cp $(HEADER_DIR)*.h $(RELEASE_DIR)include/
 	$(QUIET)cp $(WIDGET_HEADER_DIR)*.h $(RELEASE_DIR)include/
@@ -204,7 +236,7 @@ endif
 
 libxputty.$(LIB_EXT): xputty.pc libxputty.$(STATIC_LIB_EXT)
 	@$(B_ECHO) "Compile shared library $@ $(reset)"
-	$(QUIET)$(CC) -shared -Wl,-soname,libxputty.$(LIB_EXT).1 -o libxputty.$(LIB_EXT).1.0 $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ) $(XDG_OBJ)
+	$(QUIET)$(CC) -shared -Wl,-soname,libxputty.$(LIB_EXT).1 -o libxputty.$(LIB_EXT).1.0 $(LIB_OBJ) $(WIDGET_OBJ) $(DIALOG_OBJ) $(RESOURCES_OBJ) $(XDG_OBJ) $(FONTS_OBJ) $(FT_LIBS)
 	$(QUIET)cp libxputty.$(LIB_EXT).1.0 $(RELEASE_DIR)
 	$(QUIET)ln -sf libxputty.$(LIB_EXT).1.0 libxputty.$(LIB_EXT).1
 	$(QUIET)ln -sf libxputty.$(LIB_EXT).1 libxputty.$(LIB_EXT)

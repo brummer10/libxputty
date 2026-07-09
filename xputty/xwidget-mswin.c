@@ -736,10 +736,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 xbutton.button = Button5;
                 xbutton.state |= Button5Mask;
                 _button_press(wid, &xbutton, user_data);
+                wid->func.button_release_callback((void*)wid, &xbutton, user_data);
             } else {
                 xbutton.button = Button4;
                 xbutton.state |= Button4Mask;
                 _button_press(wid, &xbutton, user_data);
+                wid->func.button_release_callback((void*)wid, &xbutton, user_data);
             }
             // forward WM_MOUSEWHEEL from menuitem to viewport (with slider)
             // (viewport lies below menuitem, so doesnt receive WM_MOUSEWHEEL)

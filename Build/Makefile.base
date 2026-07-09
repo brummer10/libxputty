@@ -138,6 +138,8 @@ endif
 		export EXE_EXT = .exe
 	endif
 
+export FT_LIBS := `$(PKGCONFIG) $(PKGCONFIG_FLAGS) --libs freetype2`
+
 # generic link flags when build for windows with PawPaw
 ifneq (,$(findstring PawPawBuilds,$(PATH)))
 	export PAWPAW_BUILD = 1
