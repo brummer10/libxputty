@@ -59,7 +59,7 @@ void encodeblock( unsigned char in[], char b64str[], int len ) {
                               ((in[2] & 0xc0) >> 6) ] : '=');
     out[3] = (unsigned char) (len > 2 ? b64[ in[2] & 0x3f ] : '=');
     out[4] = '\0';
-    strncat(b64str, (char*)out, sizeof(char)*5);
+    memcpy(b64str + strlen(b64str), out, 5);
 }
 
 /* encode - base64 encode a stream, adding padding if needed */
