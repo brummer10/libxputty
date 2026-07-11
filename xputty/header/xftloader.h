@@ -46,6 +46,18 @@ extern "C" {
 void widget_set_font_from_ttf(Widget_t *w, const unsigned char* data, unsigned int len);
 
 /**
+ * @brief sureface_set_font_from_ttf - load embedded font data as a
+ * cairo_font_face_t and set it as the active font on the cairo context. 
+ * The underlying FT_Library/FT_Face are owned and cached
+ * internally, so repeated calls with the same data pointer are cheap.
+ * @param *cr     - pointer to the cairo context which should use the font
+ * @param *data   - pointer to the binary font data, LDVAR_FONT(name)
+ * @param len     - length of the binary font data, LDLEN_FONT(name)
+ */
+
+void surface_set_font_from_ttf(cairo_t *cr, const unsigned char* data, unsigned int len);
+
+/**
  * @brief get_font_face_from_ttf   - load embedded font data as a
  * cairo_font_face_t without binding it to a Widget_t. Useful when you
  * want to keep a reference (e.g. in Xputty->font_face_regular) and

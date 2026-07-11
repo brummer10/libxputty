@@ -86,6 +86,13 @@ void widget_set_font_from_ttf(Widget_t *w, const unsigned char* data, unsigned i
     }
 }
 
+void surface_set_font_from_ttf(cairo_t *cr, const unsigned char* data, unsigned int len){
+    cairo_font_face_t *face = _get_or_load(data, len);
+    if (face) {
+        cairo_set_font_face(cr, face);
+    }
+}
+
 void xftloader_cleanup(void) {
     int i;
     for (i = 0; i < font_cache_count; i++) {
