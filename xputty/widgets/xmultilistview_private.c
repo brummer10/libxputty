@@ -217,7 +217,7 @@ void _update_view(void *w_) {
                 cairo_text_extents(w->crb, label, &fextents);
                 int pos_x = (k*filelist->item_width) + (filelist->item_width/2) - (fextents.width/2.0);
                 cairo_move_to (w->crb, pos_x, pos_y);
-                cairo_text_path (w->crb, w->label);
+                cairo_text_path (w->crb, label);
                 cairo_fill (w->crb);
                 cairo_new_path (w->crb);
                 if (i == filelist->prelight_item && extents.width > (float)filelist->item_width-10) {

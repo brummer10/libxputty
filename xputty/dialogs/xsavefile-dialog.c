@@ -544,11 +544,11 @@ static void draw_entry(void *w_, void* user_data) {
     cairo_set_line_width(w->cr, 2.0);
     cairo_stroke(w->cr);
 
-    cairo_set_font_size (w->cr, 9.0);
+    cairo_set_font_size (w->cr, 12.0);
 
     cairo_move_to (w->cr, 2, 9);
-    cairo_text_path (w->crb, " ");
-    cairo_fill (w->crb);
+    cairo_text_path (w->cr, " ");
+    cairo_fill (w->cr);
 }
 
 static void entry_add_text(void  *w_, void *label_) {
@@ -574,8 +574,8 @@ static void entry_add_text(void  *w_, void *label_) {
     cairo_text_extents(w->cr, w->input_label , &extents);
 
     cairo_move_to (w->cr, 2, 6.0+extents.height);
-    cairo_text_path (w->crb, w->input_label);
-    cairo_fill (w->crb);
+    cairo_text_path (w->cr, w->input_label);
+    cairo_fill (w->cr);
 
 }
 
@@ -607,8 +607,8 @@ static void entry_clip(Widget_t *w) {
     cairo_text_extents(w->cr, w->input_label , &extents);
 
     cairo_move_to (w->cr, 2, 6.0+extents.height);
-    cairo_text_path (w->crb, w->input_label);
-    cairo_fill (w->crb);
+    cairo_text_path (w->cr, w->input_label);
+    cairo_fill (w->cr);
 
 }
 
@@ -1050,6 +1050,7 @@ Widget_t *save_file_dialog(Widget_t *w, const char *path, const char *filter) {
     file_dialog->view->func.value_changed_callback = button_view_callback;
 
     widget_show_all(file_dialog->w);
+    reload_from_dir(file_dialog);
     return file_dialog->w;
 }
 
