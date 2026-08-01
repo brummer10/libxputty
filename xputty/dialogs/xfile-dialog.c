@@ -121,6 +121,8 @@ static void draw_window(void *w_, void* user_data) {
         use_fg_color_scheme(w, NORMAL_);
         char *meta = strdup(file_dialog->metadata);
         char * p = strtok (meta, "|");
+        cairo_rectangle(w->crb,160 * w->app->hdpi, (330 * w->app->hdpi -w->scale.scale_y), 220 * w->app->hdpi, 78 * w->app->hdpi);
+        cairo_clip (w->crb);
         while (p) {
             cairo_move_to (w->crb, 160 * w->app->hdpi, (330 * w->app->hdpi -w->scale.scale_y) + i);
             cairo_text_path (w->crb, p);
@@ -128,6 +130,7 @@ static void draw_window(void *w_, void* user_data) {
             p = strtok (NULL, "|");
             i += w->app->normal_font+1;
         }
+        cairo_reset_clip(w->crb);
         free(meta);
     }
 }
