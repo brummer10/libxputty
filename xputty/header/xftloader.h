@@ -24,9 +24,7 @@
 #define XFTLOADER_H_
 
 #include "xputty.h"
-#include <cairo-ft.h>
-#include <ft2build.h>
-#include FT_FREETYPE_H
+#include <cairo.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,8 +33,9 @@ extern "C" {
 
 /**
  * @brief widget_set_font_from_ttf - load embedded font data as a
- * cairo_font_face_t and set it as the active font on the Widget_t's
- * cairo context. The underlying FT_Library/FT_Face are owned and cached
+ * cairo_font_face_t (rendered via stb_truetype through a Cairo user-font)
+ * and set it as the active font on the Widget_t's cairo context.
+ * The underlying font data and cairo_font_face_t are owned and cached
  * internally, so repeated calls with the same data pointer are cheap.
  * @param *w      - pointer to the Widget_t which should use the font
  * @param *data   - pointer to the binary font data, LDVAR_FONT(name)
@@ -47,8 +46,8 @@ void widget_set_font_from_ttf(Widget_t *w, const unsigned char* data, unsigned i
 
 /**
  * @brief sureface_set_font_from_ttf - load embedded font data as a
- * cairo_font_face_t and set it as the active font on the cairo context. 
- * The underlying FT_Library/FT_Face are owned and cached
+ * cairo_font_face_t and set it as the active font on the cairo context.
+ * The underlying font data and cairo_font_face_t are owned and cached
  * internally, so repeated calls with the same data pointer are cheap.
  * @param *cr     - pointer to the cairo context which should use the font
  * @param *data   - pointer to the binary font data, LDVAR_FONT(name)
@@ -71,9 +70,8 @@ void surface_set_font_from_ttf(cairo_t *cr, const unsigned char* data, unsigned 
 cairo_font_face_t *get_font_face_from_ttf(const unsigned char* data, unsigned int len);
 
 /**
- * @brief xftloader_cleanup        - release all cached FT_Faces,
- * cairo_font_face_t's and the FT_Library. Call once on shutdown,
- * e.g. from main_quit().
+ * @brief xftloader_cleanup        - release all cached font data and
+ * cairo_font_face_t's. Call once on shutdown, e.g. from main_quit().
  */
 
 void xftloader_cleanup(void);
