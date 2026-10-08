@@ -188,7 +188,7 @@ void os_get_surface_size(cairo_surface_t *surface, int *width, int *height) {
 void os_get_dpi(Xputty *main) {
     PGDFS pGDFS;
     pGDFS = (PGDFS) GetProcAddress(GetModuleHandle(TEXT("User32.dll")), "GetDpiForSystem");
-    if(NULL != pGDFS) main->hdpi = (float)(pGDFS()/96);
+    if(NULL != pGDFS) main->hdpi = (float)(pGDFS()/96.0f);
     else main->hdpi = 1.0;    
 }
 
@@ -329,12 +329,31 @@ void os_raise_widget(Widget_t *w) {
 }
 
 void os_show_tooltip(Widget_t *wid, Widget_t *w) {
-    POINT pt;
-    if (GetCursorPos(&pt)) {
-        SetWindowPos(w->widget, NULL, //hWnd, hWndInsertAfter
-          pt.x+10, pt.y-10, 0, 0,
-          SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOZORDER|SWP_NOOWNERZORDER|SWP_SHOWWINDOW); //X, Y, width, height, uFlags
-    }
+    if (!wid || !w) return;
+
+    RECT pr, tr;
+    if (!GetWindowRect(wid->widget, &pr) || !GetWindowRect(w->widget, &tr)) return;
+
+    const int pw = pr.right  - pr.left;
+    const int tw = tr.right  - tr.left;
+    const int th = tr.bottom - tr.top;
+    const int spacing = (int)(10 * wid->app->hdpi);
+
+    RECT work = {0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)};
+    HMONITOR mon = MonitorFromWindow(wid->widget, MONITOR_DEFAULTTONEAREST);
+    MONITORINFO mi;
+    mi.cbSize = sizeof(mi);
+    if (mon && GetMonitorInfo(mon, &mi)) work = mi.rcWork;
+
+    int tx = pr.left + (pw - tw) / 2;
+    int ty = pr.top - th - spacing;
+    if (ty < work.top) ty = pr.bottom + spacing;
+
+    if (tx + tw > work.right) tx = work.right - tw;
+    if (tx < work.left)       tx = work.left;
+
+    SetWindowPos(w->widget, NULL, tx, ty, 0, 0,
+        SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOZORDER|SWP_NOOWNERZORDER|SWP_SHOWWINDOW);
 }
 
 void os_expose_widget(Widget_t *w) {
